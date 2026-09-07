@@ -1,0 +1,11 @@
+# macOS
+.DS_Store
+
+# LibreOffice / Office lock + temp files
+.~lock.*#
+~$*
+
+# scratch / temp
+*.tmp
+/tmp/
+__pycache__/
