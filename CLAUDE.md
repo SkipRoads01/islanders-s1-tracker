@@ -39,7 +39,8 @@ islanders-s1-tracker/          # data repo AND the GitHub Pages repo (one repo, 
     ├── chrome.css             # the Royals CSS ported to Islanders tokens (--isles, --orange)
     ├── extra.css              # hockey-only additions (line cards, team abbr tiles)
     ├── site.js                # sortable tables, tabs, version check
-    └── logos/crest.svg        # masthead crest; logos/wordmark.png = ghosted backdrop when present
+    └── logos/                 # crest.svg (masthead), nhl.svg + east.svg (hero marks),
+                               # wordmark.png = ghosted greyscale backdrop once it exists
 ```
 
 - Commit the workbook to git after each game. Git history is the versioning.
@@ -123,6 +124,7 @@ column A for the last numeric value.
 | `Cap` | `Season` `Salary Cap` `Main Roster` `System` `Contracts` |
 | `Front Office` | `Key` `Value` |
 | `Trades` | `Date` `Partner` `Direction` `Out` `In` `Result` |
+| `Schedule` | `G` `Date` `H/A` `Opp` `Time (ET)` |
 | `Teams` | `Team` `Abbr` `Conference` `Division` |
 | `Notes` | `Date` `Note` |
 
@@ -177,6 +179,12 @@ Carried over from the baseball project because they're habits, not sport rules:
 - **82-game season** is assumed for pace math and the schedule count until the schedule is
   on the page. Flagged, not confirmed.
 - **Own division first** in `vs. Divisions`: Metropolitan, Atlantic, Central, Pacific.
+- **Schedule** comes from the sportsbrackets.net 2026-27 calendar PDF the user supplied. It
+  lists **83 games, 42 home** (4 vs every Metropolitan club, only 2 vs TOR). Logged as given;
+  reconcile against the game's calendar when a discrepancy shows up. Preseason is not played.
+- **Every table is sortable; totals rows are locked.** A totals row goes in `<tfoot>` with
+  class `tot` and never takes part in a sort. `build_site.py`'s `table()` does this via its
+  `tfoot=` argument; never emit a totals row into `<tbody>`.
 - **Overview strip tiles** (proposed, veto any): Goals For, Goals Ag., Goal Diff, 1-Goal,
   OT/SO, Shutouts, Comebacks (+share of wins), PP, PK, Most Goals, Most Goals Allowed, BLL.
   `Pace` joins from game 10, per the Royals spec.
@@ -240,7 +248,9 @@ deploy after every game**, not just the workbook.
   because their columns are still the user's to give (§4). Do not invent them.
 - Site built and published from this repo: tabs Overview, Roster, Lines, Front Office,
   Schedule, Goalies, vs. Divisions. Game-driven sections render `.empty` placeholders.
+- Schedule loaded (83 games as supplied, see §7). Hero shows the next game, the NHL shield
+  and the Eastern Conference mark.
 - Pending from the user: goalie contracts (Sorokin, Varlamov), the wordmark image file for
-  the ghosted backdrop (`site/logos/wordmark.png`; the crest stands in until then), the
-  regular-season schedule, and the game-log columns.
+  the ghosted backdrop (`site/logos/wordmark.png`; the crest stands in until then), and the
+  G1 screenshots, which set the game-log columns.
 - Next: port `add_game.py` once the first game notes define the log columns, then log game 1.

@@ -38,3 +38,21 @@
   .starter { margin-top: 8px; }
   .starter .empty { margin-top: 10px; }
   .story-lead-txt { font-size: 13px; color: var(--ink-soft); line-height: 1.4; }
+  .hero-right { display: flex; align-items: center; gap: 14px; margin-left: auto; }
+  .leagues { display: flex; align-items: center; gap: 8px; }
+  .lm { display: block; width: auto; }
+  .lm-nhl { height: 40px; }
+  .lm-east { height: 34px; }
+  .nextgame .tabbr { width: 40px; height: 40px; font-size: 11px; border-radius: 11px; }
+  .sgame .out { margin-left: auto; text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 1px; }
+  .sgame .sdate { font-size: 12.5px; font-weight: 700; color: var(--ink-soft); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .sgame .stime { font-size: 11px; color: var(--ink-mute); font-variant-numeric: tabular-nums; }
+  .sgame.next .g { color: var(--orange); }
+  @media (max-width: 560px) {
+    .hero-right { gap: 10px; }
+    .lm-nhl { height: 30px; }
+    .lm-east { height: 26px; }
+  }
+  .hero-top { align-items: center; }
+  .sgame { grid-template-columns: 38px 1fr auto; }
+  .sgame .out { justify-self: end; }

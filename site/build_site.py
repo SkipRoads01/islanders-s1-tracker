@@ -83,6 +83,8 @@ cap = rows(wb["Cap"])
 front = {r["Key"]: r["Value"] for r in rows(wb["Front Office"])}
 trades = rows(wb["Trades"])
 teams = rows(wb["Teams"])
+schedule = rows(wb["Schedule"])
+team_name = {t["Abbr"]: t["Team"] for t in teams}
 
 # game logs do not exist yet (columns are the user's call); everything below is 0-0-0
 games = []
@@ -135,7 +137,26 @@ record_html = ('<div class="record num"><b>%d</b><span class="dash">&ndash;</spa
                '<span class="dash">&ndash;</span><b>%d</b></div>') % (W, L, OTL)
 phase_pill = ('<div class="streak-pill" style="background:var(--surface-2);color:var(--ink-soft);'
               'border-color:var(--line)"><span class="dot" style="background:var(--orange)"></span>Preseason</div>')
-hero = '<div class="hero"><div class="hero-top">%s%s</div></div>' % (record_html, phase_pill)
+nhl_uri = data_uri(SITE / "logos" / "nhl.svg", "image/svg+xml")
+east_uri = data_uri(SITE / "logos" / "east.svg", "image/svg+xml")
+league_marks = ('<div class="leagues"><img class="lm lm-nhl" src="%s" alt="NHL"><img class="lm lm-east" src="%s" alt="Eastern Conference"></div>'
+                % (nhl_uri, east_uri))
+
+def game_date(g):
+    return dt.datetime.strptime(str(g["Date"]), "%m/%d/%Y").date()
+
+next_game = schedule[GP] if GP < len(schedule) else None
+if next_game:
+    d = game_date(next_game)
+    nextgame = ('<div class="nextgame"><span class="ng-k">Next</span><span class="ng-g">G%d</span>'
+                '<span class="ng-opp"><span class="loc">%s</span> %s</span><span class="tabbr">%s</span>'
+                '<span class="ng-series"><b>%s</b><small>%s ET</small></span></div>') % (
+        int(next_game["G"]), "vs" if next_game["H/A"] == "H" else "@", esc(next_game["Opp"]), esc(next_game["Opp"]),
+        esc(d.strftime("%a %b %-d")), esc(next_game["Time (ET)"]))
+else:
+    nextgame = ""
+hero = '<div class="hero"><div class="hero-top">%s<div class="hero-right">%s%s</div></div>%s</div>' % (
+    record_html, phase_pill, league_marks, nextgame)
 
 # ---- overview
 strip = "".join([
@@ -148,7 +169,7 @@ overview = '<div class="strip">%s</div>' % strip
 overview += sec("Inside the Numbers", '<div class="story-card"><div class="story-lead"><div class="story-big num">%s</div></div>%s</div>'
                 % (record_txt.replace("-", "&ndash;"), empty("No games played")), cls="story")
 overview += sec("Recent Headlines", empty("No games played"))
-overview += sec("Game Log", empty("0 of %d played" % GAMES_IN_SEASON), meta="0 played &middot; %d season" % GAMES_IN_SEASON)
+overview += sec("Game Log", empty("0 of %d played" % (len(schedule) or GAMES_IN_SEASON)), meta="0 played &middot; %d season" % (len(schedule) or GAMES_IN_SEASON))
 overview += sec("Skating Leaders", empty("None yet"))
 overview += sec("Team Skating", empty("No games played"))
 overview += sec("Goaltending Leaders", empty("None yet"))
@@ -268,7 +289,31 @@ fo += sec("League Cap Rules", table(["Rule", "Value"],
                                                             "Min Player Salary ($M)", "Max Rookie Salary ($M)")], cls=""))
 
 # ---- schedule / goalies / divisions
-schedule_html = sec("Schedule", empty("Regular season schedule not logged yet"), meta="0 of %d played" % GAMES_IN_SEASON)
+def schedule_panel():
+    if not schedule:
+        return sec("Schedule", empty("Regular season schedule not logged yet"), meta="0 of %d played" % GAMES_IN_SEASON)
+    out = ""; month = None
+    for g in schedule:
+        d = game_date(g)
+        mlabel = d.strftime("%B %Y") if d.month == 10 or d.month == 1 else d.strftime("%B")
+        if mlabel != month:
+            if month is not None:
+                out += "</div>"
+            out += '<div class="sched-month">%s</div><div class="sched">' % esc(mlabel)
+            month = mlabel
+        home = g["H/A"] == "H"
+        gn = int(g["G"])
+        cls = "home" if home else "away"
+        is_next = next_game is not None and gn == int(next_game["G"])
+        out += ('<div class="sgame upcoming %s%s"><span class="g">G%d</span><span class="mu"><span class="loc">%s</span> %s</span>'
+                '<div class="out"><span class="sdate">%s</span><span class="stime">%s</span></div></div>') % (
+            cls, " next" if is_next else "", gn, "vs" if home else "@", esc(g["Opp"]),
+            esc(d.strftime("%a %b %-d")), esc(g["Time (ET)"]))
+    out += "</div>"
+    n_home = sum(1 for g in schedule if g["H/A"] == "H")
+    return sec("Schedule", out, meta="%d of %d played &middot; %d home &middot; %d away" % (GP, len(schedule), n_home, len(schedule) - n_home))
+
+schedule_html = schedule_panel()
 goalie_cards = "".join(
     '<div class="starter"><div class="starter-head"><div><span class="starter-name">%s</span><span class="starter-meta">%s OVR%s</span></div>'
     '<div class="starter-tot"><span>0 GP</span></div></div>%s</div>' % (
