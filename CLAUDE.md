@@ -180,12 +180,14 @@ Carried over from the baseball project because they're habits, not sport rules:
 
 - **Record format is `W-L-OTL`** because the game itself shows `0-0-0` on its matchup
   screen. Applied to the hero, footer and every `vs.` record.
-- **82-game season** is assumed for pace math and the schedule count until the schedule is
-  on the page. Flagged, not confirmed.
+- **84-game season.** The 2026-27 CBA expands the regular season from 82 to 84; both added
+  games are intra-division, so every Metropolitan rival is played 4 times and the preseason
+  is capped at 4 games. Used for pace math and the schedule count.
 - **Own division first** in `vs. Divisions`: Metropolitan, Atlantic, Central, Pacific.
-- **Schedule** comes from the sportsbrackets.net 2026-27 calendar PDF the user supplied. It
-  lists **83 games, 42 home** (4 vs every Metropolitan club, only 2 vs TOR). Logged as given;
-  reconcile against the game's calendar when a discrepancy shows up. Preseason is not played.
+- **Schedule** is the NHL.com official 2026-27 release: **84 games, 42 home, 42 away**,
+  opening **09/30/2026 at TOR**. An earlier load from a third-party calendar PDF was short
+  one game (it omitted the September opener) and was replaced. Preseason is not played.
+  **Verify any schedule source against the club's own release before loading it.**
 - **Every table is sortable; totals rows are locked.** A totals row goes in `<tfoot>` with
   class `tot` and never takes part in a sort. `build_site.py`'s `table()` does this via its
   `tfoot=` argument; never emit a totals row into `<tbody>`.
@@ -255,7 +257,7 @@ deploy after every game**, not just the workbook.
   (service worker, verified with the network cut). GitHub Pages serves `main` at the repo
   root: https://skiproads01.github.io/islanders-s1-tracker/ once the branch is merged and
   Pages is switched on.
-- Schedule loaded (83 games as supplied, see §7). Hero shows the next game, the NHL shield
+- Schedule loaded (84 games, see §7). Hero shows the next game, the NHL shield
   and the Eastern Conference mark.
 - Pending from the user: goalie contracts (Sorokin, Varlamov), the wordmark image file for
   the ghosted backdrop (`site/logos/wordmark.png`; the crest stands in until then), and the

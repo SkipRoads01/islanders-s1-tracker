@@ -26,7 +26,7 @@ VERSION = ROOT / "version.txt"
 TEAM = "New York Islanders"
 TAG = "NYI"
 SEASON = 1
-GAMES_IN_SEASON = 82   # assumption until the schedule is on the page
+GAMES_IN_SEASON = 84   # 2026-27 CBA expands the regular season from 82 to 84
 
 # ------------------------------------------------------------------ helpers
 def esc(s):
