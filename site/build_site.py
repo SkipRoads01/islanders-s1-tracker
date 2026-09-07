@@ -346,8 +346,8 @@ else:
                   'border-color:var(--line)"><span class="dot" style="background:var(--orange)"></span>Preseason</div>')
 nhl_uri = data_uri(SITE / "logos" / "nhl.svg", "image/svg+xml")
 east_uri = data_uri(SITE / "logos" / "east.svg", "image/svg+xml")
-league_marks = ('<div class="leagues"><img class="lm lm-nhl" src="%s" alt="NHL"><img class="lm lm-east" src="%s" alt="Eastern Conference"></div>'
-                % (nhl_uri, east_uri))
+league_marks = ('<div class="leagues"><img class="lm lm-east" src="%s" alt="Eastern Conference">'
+                '<img class="lm lm-nhl" src="%s" alt="NHL"></div>' % (east_uri, nhl_uri))
 
 def game_date(g):
     return dt.datetime.strptime(str(g["Date"]), "%m/%d/%Y").date()
