@@ -129,6 +129,16 @@ def table(headers, body_rows, cls="num", tfoot=None):
 def td(v, cls=None):
     return "<td%s>%s</td>" % (' class="%s"' % cls if cls else "", v if v is not None else "")
 
+# ---- club logos: .lg-XXX classes, embedded once, used by schedule / hero / divisions
+def logo_css():
+    out = []
+    for f in sorted((SITE / "logos" / "teams").glob("*.svg")):
+        out.append(".lg-%s{background-image:url(%s)}" % (f.stem, data_uri(f, "image/svg+xml")))
+    return "\n".join(out)
+
+def tlogo(abbr, extra=""):
+    return '<span class="tlogo lg-%s%s" aria-hidden="true"></span>' % (esc(abbr), (" " + extra) if extra else "")
+
 # ---- masthead + hero
 crest_uri = data_uri(SITE / "logos" / "crest.svg", "image/svg+xml")
 ghost_uri, ghost_kind = ghost_image()
@@ -149,9 +159,9 @@ next_game = schedule[GP] if GP < len(schedule) else None
 if next_game:
     d = game_date(next_game)
     nextgame = ('<div class="nextgame"><span class="ng-k">Next</span><span class="ng-g">G%d</span>'
-                '<span class="ng-opp"><span class="loc">%s</span> %s</span><span class="tabbr">%s</span>'
+                '<span class="ng-opp"><span class="loc">%s</span> %s</span>%s'
                 '<span class="ng-series"><b>%s</b><small>%s ET</small></span></div>') % (
-        int(next_game["G"]), "vs" if next_game["H/A"] == "H" else "@", esc(next_game["Opp"]), esc(next_game["Opp"]),
+        int(next_game["G"]), "vs" if next_game["H/A"] == "H" else "@", esc(next_game["Opp"]), tlogo(next_game["Opp"]),
         esc(d.strftime("%a %b %-d")), esc(next_game["Time (ET)"]))
 else:
     nextgame = ""
@@ -305,10 +315,11 @@ def schedule_panel():
         gn = int(g["G"])
         cls = "home" if home else "away"
         is_next = next_game is not None and gn == int(next_game["G"])
-        out += ('<div class="sgame upcoming %s%s"><span class="g">G%d</span><span class="mu"><span class="loc">%s</span> %s</span>'
+        out += ('<div class="sgame upcoming %s%s"><span class="g">G%d</span>%s'
+                '<div class="mu"><span class="opp"><span class="loc">%s</span> %s</span><span class="club">%s</span></div>'
                 '<div class="out"><span class="sdate">%s</span><span class="stime">%s</span></div></div>') % (
-            cls, " next" if is_next else "", gn, "vs" if home else "@", esc(g["Opp"]),
-            esc(d.strftime("%a %b %-d")), esc(g["Time (ET)"]))
+            cls, " next" if is_next else "", gn, tlogo(g["Opp"], "big"), "vs" if home else "@", esc(g["Opp"]),
+            esc(team_name.get(g["Opp"], "")), esc(d.strftime("%a %b %-d")), esc(g["Time (ET)"]))
     out += "</div>"
     n_home = sum(1 for g in schedule if g["H/A"] == "H")
     return sec("Schedule", out, meta="%d of %d played &middot; %d home &middot; %d away" % (GP, len(schedule), n_home, len(schedule) - n_home))
@@ -327,8 +338,8 @@ for t in sorted(teams, key=lambda t: (DIV_ORDER.index(t["Division"]), t["Team"])
     divs.setdefault((t["Conference"], t["Division"]), []).append(t)
 div_html = ""
 for (conf, div), ts in divs.items():
-    trs = "".join('<div class="teamrow%s"><span class="tabbr">%s</span><span class="teamname">%s</span><span class="teamrec muted">%s</span></div>' % (
-        " you" if t["Abbr"] == TAG else "", esc(t["Abbr"]), esc(t["Team"]), "n/a" if t["Abbr"] == TAG else "0&ndash;0&ndash;0")
+    trs = "".join('<div class="teamrow%s">%s<span class="teamname">%s</span><span class="teamrec muted">%s</span></div>' % (
+        " you" if t["Abbr"] == TAG else "", tlogo(t["Abbr"]), esc(t["Team"]), "n/a" if t["Abbr"] == TAG else "0&ndash;0&ndash;0")
         for t in ts)
     div_html += '<div class="div-head"><span class="div-name">%s</span><span class="div-rec">0&ndash;0&ndash;0</span></div><div class="teams">%s</div>' % (esc(div), trs)
 divisions_html = sec("vs. Divisions", div_html, meta="record vs each club")
@@ -361,6 +372,7 @@ page = """<!doctype html>
 <style>
 %(chrome)s
 %(extra)s
+%(logos)s
 </style>
 </head>
 <body>
@@ -395,7 +407,7 @@ page = """<!doctype html>
 </body>
 </html>
 """ % dict(build=build, season=SEASON, chrome=chrome_css, extra=extra_css, ghost=ghost_uri, ghost_kind=ghost_kind,
-           crest=crest_uri, as_of=esc(as_of_txt), hero=hero, tabs=tabs, panels=panels, team=TEAM, record=record_txt, js=js)
+           crest=crest_uri, as_of=esc(as_of_txt), hero=hero, logos=logo_css(), tabs=tabs, panels=panels, team=TEAM, record=record_txt, js=js)
 
 assert_ascii("index.html", page)
 OUT.write_text(page)

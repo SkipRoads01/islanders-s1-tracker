@@ -54,5 +54,21 @@
     .lm-east { height: 26px; }
   }
   .hero-top { align-items: center; }
-  .sgame { grid-template-columns: 38px 1fr auto; }
+  /* schedule rows: big club logo, opponent + full name, date/time */
+  .sgame { grid-template-columns: 34px 72px 1fr auto; gap: 12px; padding: 10px 14px 10px 12px; }
   .sgame .out { justify-self: end; }
+  .tlogo.big { width: 72px; height: 72px; border-radius: 16px; background-size: 82%; box-shadow: inset 0 0 0 1px var(--line), 0 2px 8px rgba(13,27,46,.08); }
+  .sgame .mu { display: flex; flex-direction: column; align-items: flex-start; text-align: left; gap: 2px; min-width: 0; }
+  .sgame .mu .opp { white-space: nowrap; }
+  .sgame .mu .club { display: block; font-size: 12px; font-weight: 600; color: var(--ink-mute); letter-spacing: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sgame.upcoming .mu { color: var(--ink); font-weight: 750; font-size: 16px; }
+  .sgame.next { box-shadow: 0 0 0 2px color-mix(in srgb, var(--orange) 55%, transparent), var(--shadow); }
+  .nextgame .tlogo { width: 54px; height: 54px; border-radius: 13px; background-size: 80%; }
+  @media (max-width: 560px) {
+    .sgame { grid-template-columns: 30px 58px 1fr auto; gap: 9px; padding: 9px 11px 9px 10px; }
+    .tlogo.big { width: 58px; height: 58px; border-radius: 13px; }
+    .sgame.upcoming .mu { font-size: 15px; }
+    .sgame .mu .club { font-size: 11px; }
+  }
+  .teamrow { grid-template-columns: 44px 1fr auto; }
+  .teamrow .tlogo { width: 44px; height: 44px; border-radius: 10px; background-size: 80%; }

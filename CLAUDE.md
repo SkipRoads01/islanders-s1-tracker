@@ -40,7 +40,9 @@ islanders-s1-tracker/          # data repo AND the GitHub Pages repo (one repo, 
     ├── extra.css              # hockey-only additions (line cards, team abbr tiles)
     ├── site.js                # sortable tables, tabs, version check
     └── logos/                 # crest.svg (masthead), nhl.svg + east.svg (hero marks),
-                               # wordmark.png = ghosted greyscale backdrop once it exists
+        │                      # wordmark.png = ghosted greyscale backdrop once it exists
+        └── teams/XXX.svg      # all 32 club logos, embedded as .lg-XXX classes; schedule rows
+                               # carry the opponent's at 72px, hero and divisions smaller
 ```
 
 - Commit the workbook to git after each game. Git history is the versioning.
