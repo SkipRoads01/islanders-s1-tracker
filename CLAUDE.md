@@ -1,4 +1,4 @@
-# CLAUDE.md — PS5 Hockey Franchise Tracker
+# CLAUDE.md — Islanders S1 Franchise Tracker
 
 Operating manual for maintaining the hockey franchise stat workbook in Claude Code.
 Same architecture as the baseball tracker at `~/Documents/GitHub/PS5 Baseball` — read
@@ -11,7 +11,8 @@ Read this file fully before touching the workbook.
 
 ## 1. What this project is
 
-A game-by-game statistical record of a **PS5 hockey franchise**, played manually —
+A game-by-game statistical record of a **PS5 hockey franchise** (New York Islanders,
+**Season 1**), played manually —
 every game, no sims. The user pastes handwritten play-by-play notes; you parse them and
 inject the results into a multi-sheet Excel workbook that serves as the permanent data
 source, then regenerate and publish the site.
@@ -26,7 +27,7 @@ source, then regenerate and publish the site.
 
 ```
 PS5 Hockey/
-├── <TEAM> S<N>.xlsx      # THE workbook — exact filename, set once and never renamed
+├── S1 NY Islanders.xlsx  # THE workbook — exact filename, set once and never renamed
 ├── CLAUDE.md             # this file
 ├── add_game.py           # injection engine — edit the GAME block, run it
 ├── scripts/              # reset_season.py and other helpers
@@ -46,18 +47,15 @@ PS5 Hockey/
 
 ## 3. Workbook architecture
 
-Sheets, in order: **Overview, Summary, Games, Skater Game Log, Goalie Game Log,
-Team Skating, Team Goaltending, Skating vs Opp, Goaltending vs Opp, Opp Skating,
-Opp Goaltending, Notes, Stars, Roster Ref, Schedule, Teams, Recaps, Headlines, Box.**
+**The sheet list is the user's call too — it is not settled.** The baseball workbook's
+shape is the model, not a template to copy blindly: an `Overview`/`Summary` pair driven
+by formulas, one hand-typed game log per unit, cumulative rollups that auto-sum, a
+per-opponent set, and the supporting sheets (`Schedule`, `Teams`, `Roster Ref`,
+`Recaps`, `Headlines`, `Box`, `Notes`). Build a sheet when he says what goes in it.
 
-### You type into these sheets
-| Sheet | One row per… |
-|---|---|
-| `Skater Game Log` | skater who dressed |
-| `Goalie Game Log` | goalie who played |
-| `Opp Goaltending` | opposing goalie who faced the team |
-| `Games` | the game itself (line score, special teams, flags) |
-| `Stars`, `Recaps`, `Box`, `Headlines` | three stars, play-by-play, opponent SOG/PIM, headlines |
+### Hand-typed vs. derived
+Whatever the sheets end up being, the split holds: **game logs are typed, rollups are
+formulas.** Never hand-edit a number on a sheet that recalculates.
 
 ### These recalc automatically — never hand-edit their numbers
 `Overview`, `Summary`, `Team Skating`, `Team Goaltending`, `Skating vs Opp`,
@@ -89,47 +87,25 @@ Data starts at **row 3** on every log sheet. Row 2 is blank but styled — it's 
 
 ## 4. Exact schemas
 
-**PROVISIONAL** until the first batch of real notes lands — confirm the live header row
-before writing, and adjust these to whatever the user actually tracks.
+**The user defines the columns. Do not invent them.** Every header on every input sheet
+comes from him — either stated directly or evident from what his notes actually track.
+Until he has given a sheet's columns, that sheet does not exist. Never add, rename,
+reorder, or "improve" a header on your own initiative; if a stat shows up in the notes
+that has no home, log what you can, **flag it, and ask** rather than opening a column
+for it.
 
-**Games**:
-```
-G#, Opp, H, A, GF, GA, Res, End, Pts, SOG, SOGA, PIM, PPG, PPO, PKGA, PKO,
-SHG, ENG, SO, CFBW, BLL, Streak
-```
-- `H`/`A`: exactly one is 1. Infer from which team is listed as home in the notes.
-- `Res` ∈ { W, L, OTL, SOL }. `End` ∈ { REG, OT, SO }.
-- `Pts` = 2 for W; 1 for OTL/SOL; 0 for L. **This is the key departure from baseball —
-  the record is three-column (W-L-OTL) and the standings run on points.**
-- `PPO`/`PPG` = power plays drawn / converted. `PKO`/`PKGA` = times shorthanded / goals
-  allowed on them. `PP%` and `PK%` are derived on the Team sheets, never typed.
-- `SO` = shutout thrown (0/1). `ENG` = empty-net goals scored.
-- `Streak` is a **formula — never typed** (see §6).
+Once a schema is set, record it here verbatim — column order, exact spelling, and the
+sanity checks that go with it — the way the baseball manual does. Confirm the live
+header row before every write; `max_row` lies, so find the last data row by scanning
+column A for the last numeric value.
 
-**Skater Game Log**:
-```
-G#, Opp, Player, Pos, TOI, G, A, PM, PIM, SOG, Hits, BLK, FOW, FOL, PPG, PPA, SHG, GWG
-```
-- Points (`P` = G+A) and `FO%` are derived on `Team Skating` — don't store them.
-- `PM` is plus/minus and **can be negative**; it's the one counting column that can be.
-- `TOI` in `MM:SS`, stored as text or an Excel time — pick one on the first game and
-  never mix.
-- Sanity: `PPG + SHG <= G`; `FOW + FOL` only for centers.
-
-**Goalie Game Log**:
-```
-G#, Opp, Player, Dec, TOI, SA, SV, GA, SO, EN
-```
-- `Dec` ∈ { "", W, L, OTL, SOL }. At most one decision per game.
-- Sanity: `SA = SV + GA`; `SV%` is derived; sum of goalies' `GA` == `GA` on the Games
-  row **minus** empty-net goals against, so track `EN` explicitly.
-
-**Opp Goaltending**:
-```
-G#, Opp, Goalie, Catches, Dec, TOI, SA, SV, GA
-```
-Derived from the team's shots and goals against him; requires the notes to mark
-**opponent goalie changes** (starter by name, then any change and when).
+| Sheet | Columns |
+|---|---|
+| `Games` | *awaiting the user* |
+| `Skater Game Log` | *awaiting the user* |
+| `Goalie Game Log` | *awaiting the user* |
+| `Opp Goaltending` | *awaiting the user* |
+| `Opp Skating` | *awaiting the user* |
 
 ---
 
@@ -158,8 +134,7 @@ Carried over from the baseball project because they're habits, not sport rules:
 5. **Insert the Games row ABOVE the totals row** (the first row whose column-A value is a
    formula) so the `INDIRECT` totals self-extend.
 6. **Write the Streak formula explicitly** in the new Games row, referencing the row
-   above. Hockey's version must treat OTL/SOL as streak-breaking-but-not-a-loss-streak
-   unless the user says otherwise — **ask once, then honor it forever.**
+   above — per whatever streak rule the user has set (§7).
 7. **Expansion** if needed (§3).
 8. **Update `Opp Skating`** — increment the opponent's counting cells, re-sum `ALL OPP`.
 9. **Recalc + bake** (§2). Zero error cells before shipping.
@@ -170,15 +145,12 @@ Carried over from the baseball project because they're habits, not sport rules:
 
 ## 7. Standing judgment calls
 
-- **Empty-net goals** count in `GF`/`GA` but are unearned against the goalie — keep `EN`
-  separate so `SV%` and `GAA` stay honest.
-- **Shootout goals** do not count in a skater's `G` total; the shootout winner gets the
-  team a `W` and the game's lone extra goal in `GF`. Log SO attempts in the notes only.
-- **TOI** format is fixed on game 1 and never changes.
-- When a judgment call arises, **make the call, log it, and flag it inline** for veto.
-  The user's pattern is to accept unless he corrects.
-
----
+Empty until the user makes them. Hockey has several that baseball doesn't — how an
+overtime or shootout loss affects a streak, whether empty-net and shootout goals count
+where, how TOI is formatted — and **each one is his ruling, not yours.** When a call
+arises: make the most defensible choice, apply it, and **flag it inline** for veto, then
+record the resolution here so it never gets asked twice. His pattern is to accept unless
+he corrects.
 
 ## 8. Communication style (strict)
 
@@ -193,21 +165,31 @@ Carried over from the baseball project because they're habits, not sport rules:
 
 ---
 
-## 9. The site
+## 9. The site & editorial guidelines
 
 Mirrors the baseball tracker: `site/build_site.py` regenerates `site/index.html` from the
 workbook, `site/deploy.sh` wraps it and pushes to a GitHub Pages repo. **Rebuild and
-deploy after every game.**
+deploy after every game**, not just the workbook.
 
-Non-negotiables carried over from that project:
-- **Output must be pure ASCII.** Some mobile webviews decode as Latin-1 and mojibake
-  `·`/`–`. Entity-escape emitted HTML; use `\25B2`-style escapes in CSS and `–` in
-  JS; assert the chrome files are ASCII at build time.
+### Editorial voice — same rules as baseball, hockey subjects
+- **`Inside the Numbers` is team-level season context** — records, paces, rate stats.
+  **Take the data seriously.** Keep real-world comparisons where they're earned (a pace
+  against an NHL record, a save percentage against the league's best). **Never write the
+  "it's a video game, the engine skews this" caveat into the copy** — the numbers stand
+  plainly on their own. No editorializing, no hype, no invented drama.
+- **`Recent Headlines` is player-level current form** — point streaks, a goalie's recent
+  run, a scoring drought, hot or cold stretches. Kept strictly distinct from
+  `Inside the Numbers`; never state the same fact in both. ~6 rows per game, driven by
+  the `Headlines` sheet, active/positive items first and past-tense items last (muted).
+  **The figure carries the number; the sentence must add new information rather than
+  restating it.** Derive streaks from the recaps, never by assumption — a game missed
+  does not break a streak.
 - **No instruction text anywhere** ("tap a tile for the rundown" and friends). Section
   subtitles carry data only.
+- **Output must be pure ASCII.** Some mobile webviews decode as Latin-1 and mojibake
+  `·`/`–`. Entity-escape emitted HTML; use `\25B2`-style escapes in CSS and `\u2013`
+  in JS; assert the chrome files are ASCII at build time.
 - Empty sections render an `.empty` placeholder so a 0-0-0 page looks deliberate.
-- `Headlines` sheet drives a Recent Headlines section — player-level *current form*,
-  kept distinct from the team-level `Inside the Numbers`.
 - The Pages repo keeps its **own CLAUDE.md build spec** listing customizations that must
   survive every regeneration. Read it before changing the generator.
 
@@ -215,8 +197,8 @@ Non-negotiables carried over from that project:
 
 ## 10. Current state
 
-- **Repo scaffolded; no workbook yet.** Nothing has been played or logged.
-- **Team and season not yet set** — they determine the workbook filename, the `Teams`
-  sheet, the schedule length, and the site title.
-- Next steps: name the team/season, build the empty workbook, port `add_game.py` and
-  `build_site.py` from the baseball project, then log game 1.
+- **New York Islanders, Season 1.** Repo scaffolded; no workbook yet, nothing logged.
+- **Blocked on the user for the sheet list and every column header** (§3, §4). Nothing
+  gets built until he gives them — do not invent a schema to get moving.
+- After that: build the empty workbook, port `add_game.py` and `build_site.py` from the
+  baseball project, set up the Pages repo, then log game 1.
