@@ -72,3 +72,68 @@
   }
   .teamrow { grid-template-columns: 44px 1fr auto; }
   .teamrow .tlogo { width: 44px; height: 44px; border-radius: 10px; background-size: 80%; }
+  /* ---- Game log cards ---- */
+  .game { display: grid; grid-template-columns: 34px 26px 46px 1fr auto 14px; align-items: center; gap: 11px; }
+  .gamed .gbody { padding: 2px 13px 14px; }
+  .gamed .gbody section { margin-top: 16px; }
+  .game .gscore { font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .tlogo.mid { width: 46px; height: 46px; border-radius: 11px; background-size: 82%; }
+  .game .sres { width: 22px; height: 22px; border-radius: 6px; display: grid; place-items: center; font-weight: 800; font-size: 11px; }
+  table.box td.tm, table.box th:first-child { text-align: left; font-weight: 800; }
+  table.box td.fin { font-weight: 800; color: var(--ink); }
+  table.box tr.wnr td { color: var(--ink); }
+  table.tstat td.tsk { text-align: center; font-size: 11px; font-weight: 700; letter-spacing: .04em;
+    text-transform: uppercase; color: var(--ink-mute); white-space: nowrap; }
+  table.tstat td.tsv { font-weight: 800; font-variant-numeric: tabular-nums; }
+  table.tstat td.tsv:first-child { text-align: left; }
+  table.tstat td.tsv:last-child { text-align: right; }
+  .gsum { margin: 14px 0 0; font-size: 13.5px; color: var(--ink-soft); font-style: italic; line-height: 1.45; }
+  .tabbr.sm { width: 26px; height: 26px; border-radius: 7px; font-size: 9px; }
+
+  /* ---- Player cards ---- */
+  .pname { appearance: none; -webkit-appearance: none; background: none; border: 0; padding: 0; margin: 0;
+    font: inherit; color: inherit; cursor: pointer; text-align: left; border-radius: 3px; }
+  .pname:hover { color: var(--isles-bright); text-decoration: underline; }
+  .pname:focus-visible { outline: 2px solid var(--isles-bright); outline-offset: 2px; }
+  .pname.strong { font-weight: 800; color: var(--ink); }
+  .pname.strong:hover { color: var(--isles-bright); }
+  .pmodal { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 18px; }
+  .pmodal-back { position: absolute; inset: 0; background: rgba(6,12,22,.55); }
+  .pmodal-box { position: relative; width: min(520px, 100%); max-height: 86vh; overflow-y: auto;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 18px;
+    box-shadow: 0 18px 60px rgba(6,12,22,.35); }
+  .pmodal-x { position: absolute; top: 10px; right: 12px; appearance: none; background: none; border: 0;
+    font-size: 24px; line-height: 1; color: var(--ink-mute); cursor: pointer; padding: 4px 8px; border-radius: 8px; }
+  .pmodal-x:hover { color: var(--ink); background: var(--surface-2); }
+  .pm-head { display: flex; align-items: center; gap: 14px; }
+  .pm-photo { flex: none; width: 76px; height: 76px; border-radius: 16px; overflow: hidden;
+    background: var(--surface-2); border: 1px solid var(--line); display: grid; place-items: center; }
+  .pm-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .pm-photo.sm { width: 52px; height: 52px; border-radius: 12px; }
+  .pm-photo.empty-photo .tlogo { width: 46px; height: 46px; box-shadow: none; background-color: transparent; opacity: .45; }
+  .pm-photo.sm.empty-photo .tlogo { width: 32px; height: 32px; }
+  .pm-name { font-size: 20px; font-weight: 850; letter-spacing: -.02em; }
+  .pm-meta { font-size: 12px; font-weight: 600; color: var(--ink-mute); margin-top: 2px; }
+  .pstats { display: grid; grid-template-columns: repeat(auto-fit, minmax(88px, 1fr)); gap: 7px; margin-top: 14px; }
+  .pstat { background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; }
+  .pstat .k { display: block; font-size: 9.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-mute); }
+  .pstat .v { display: block; font-size: 15px; font-weight: 800; margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .starter-head { display: flex; align-items: center; gap: 12px; }
+  .starter-head .starter-tot { margin-left: auto; display: flex; gap: 10px; font-size: 11.5px; font-weight: 700; color: var(--ink-mute); }
+  .starter-name { display: block; font-size: 16px; font-weight: 800; letter-spacing: -.01em; }
+  .starter-meta { font-size: 11.5px; font-weight: 600; color: var(--ink-mute); }
+  .starts { display: flex; flex-direction: column; gap: 7px; margin-top: 12px; }
+  .start { display: grid; grid-template-columns: 74px 1fr; gap: 10px; align-items: center;
+    background: var(--surface-2); border: 1px solid var(--line); border-radius: 11px; padding: 9px 11px; }
+  .start .g { font-size: 11px; font-weight: 700; color: var(--ink-mute); font-variant-numeric: tabular-nums; }
+  .start .pdec { color: var(--isles-bright); }
+  .start-top { display: flex; align-items: center; gap: 8px; }
+  .start .mu { font-size: 13.5px; font-weight: 700; }
+  .start .gout { font-size: 11px; font-weight: 800; }
+  .start .gout.w { color: var(--win); } .start .gout.l { color: var(--loss); }
+  .start .line { font-size: 12px; color: var(--ink-soft); font-variant-numeric: tabular-nums; margin-top: 2px; }
+  @media (max-width: 560px) {
+    .game { grid-template-columns: 28px 22px 38px 1fr auto 12px; gap: 8px; }
+    .tlogo.mid { width: 38px; height: 38px; border-radius: 9px; }
+    .pm-photo { width: 62px; height: 62px; }
+  }

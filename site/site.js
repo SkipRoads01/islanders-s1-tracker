@@ -64,6 +64,39 @@
 })();
 
 (function () {
+  /* Roster/lineup names open that player's season card. */
+  var modal = document.getElementById("pmodal");
+  if (modal) {
+    var slot = document.getElementById("pmodal-slot");
+    var last = null;
+    var open = function (key) {
+      var tpl = document.getElementById("pm-" + key);
+      if (!tpl) return;
+      slot.innerHTML = "";
+      slot.appendChild(tpl.content.cloneNode(true));
+      modal.hidden = false;
+      document.body.style.overflow = "hidden";
+      var x = modal.querySelector(".pmodal-x");
+      if (x) x.focus();
+    };
+    var close = function () {
+      modal.hidden = true;
+      slot.innerHTML = "";
+      document.body.style.overflow = "";
+      if (last) last.focus();
+    };
+    document.addEventListener("click", function (e) {
+      var btn = e.target.closest ? e.target.closest("[data-p]") : null;
+      if (btn) { last = btn; open(btn.getAttribute("data-p")); return; }
+      if (e.target.closest && e.target.closest("[data-close]")) close();
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && !modal.hidden) close();
+    });
+  }
+})();
+
+(function () {
   var tabs = Array.prototype.slice.call(document.querySelectorAll(".tab"));
   var panels = Array.prototype.slice.call(document.querySelectorAll(".panel"));
   function activate(id) {

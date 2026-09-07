@@ -116,11 +116,20 @@ column A for the last numeric value.
 
 | Sheet | Columns |
 |---|---|
-| `Games` | *awaiting the user* |
-| `Skater Game Log` | *awaiting the user* |
-| `Goalie Game Log` | *awaiting the user* |
-| `Opp Goaltending` | *awaiting the user* |
+| `Games` | `G` `Date` `Opp` `H/A` `Result` `GF` `GA` `P1 F` `P1 A` `P2 F` `P2 A` `P3 F` `P3 A` `OT F` `OT A` `SO F` `SO A` `Shots F` `Shots A` `Hits F` `Hits A` `TOA F` `TOA A` `Pass% F` `Pass% A` `FOW F` `FOW A` `PIM F` `PIM A` `PP F` `PP A` `PPM F` `PPM A` `SHG F` `SHG A` `Streak` `Record` `Summary` |
+| `Scoring` | `G` `Opp` `Period` `Team` `Scorer` `A1` `A2` `Type` `Score` |
+| `Goalie Game Log` | `G` `Opp` `Goalie` `Dec` `SA` `SV` `GA` `SV%` `TOI` `SO` `Start/Relief` |
+| `Opp Goaltending` | `G` `Opp` `Goalie` `Catches` `Dec` `SA` `SV` `GA` `SV%` `TOI` |
+| `Skater Game Log` | `G` `Opp` `Player` `Pos` `G` `A` `Pts` `+/-` `SOG` `PIM` `Hits` `Blk` `PPG` `PPA` `SHG` `GWG` `ENG` `FOW` `FOL` `TOI` |
+| `Recaps` | `G` `Opp` `Period` `Text` |
+| `Inside` | `G` `Bullet` |
+| `Headlines` | `G` `Fig` `Kicker` `Text` `Tone` |
 | `Opp Skating` | *awaiting the user* |
+
+The `Games` team-stat columns are **the game's own end-of-period screen**, in its order and
+its wording: Total Shots, Hits, Time on Attack, Passing, Faceoffs Won, Penalty Minutes,
+Powerplays, Powerplay Minutes, Shorthanded Goals. `F` is NYI, `A` is the opponent. Period
+goals/shots/hits come from the four cumulative screens differenced into per-period lines.
 | `Roster Ref` | `Player` `Pos` `Group` `Status` `#` `OVR` `POT` `POT Cert` `Age` `Ht` `Wt` `Shoots` `Type` `Ext` `Clause` `FSC` `26-27` `27-28` `28-29` `29-30` `30-31` `31-32` `32-33` `33-34` `Then` |
 | `Lines` | `Unit` `Slot` `Player` `Pos` `OVR` `Chem` |
 | `Owner Goals` | `Tier` `Goal` `Reward` `Eval Date` `Status` |
@@ -194,8 +203,22 @@ Carried over from the baseball project because they're habits, not sport rules:
 - **Overview strip tiles** (proposed, veto any): Goals For, Goals Ag., Goal Diff, 1-Goal,
   OT/SO, Shutouts, Comebacks (+share of wins), PP, PK, Most Goals, Most Goals Allowed, BLL.
   `Pace` joins from game 10, per the Royals spec.
-- Still open, ask when the first game arrives: OTL/SOL effect on streaks, shootout goals in
-  the skater log, empty-net goals against, TOI format, Three Stars vs. one Player of the Game.
+- **An OTL is not a loss.** The user's own wording. It never starts or extends a loss streak;
+  it gets its own streak token, `OT1`, `OT2`. A shootout loss takes `SO1`. The standings award
+  a point, so the record stays `W-L-OTL`.
+- **BLL counts an OTL.** A lead held and not converted to a win is a blown lead whichever
+  column the game lands in. G1 counts: NYI led 1-0 and lost in overtime.
+- **`1-Goal` includes games decided in OT or the shootout.** A 2-1 overtime result is a
+  one-goal game.
+- **`PP` reads goals/opportunities, `PK` reads killed/faced**, each with its percentage in the
+  tile's `<small>` slot.
+- **Player names are clickable wherever they appear** - roster, lines, scoring, goalie cards,
+  and inside the editorial copy. The card carries the photo, bio, contract, season line, and
+  any `Headlines` row that names the player. Photos live at `site/logos/players/<key>.png`
+  where `<key>` is the name lowercased with punctuation stripped (`bhorvat`, `isorokin`); the
+  crest stands in until a photo exists.
+- Still open, ask when they first arise: shootout goals in the skater log, empty-net goals
+  against, TOI format, Three Stars vs. one Player of the Game.
 
 Everything else is empty until the user makes the call. Hockey has several that baseball doesn't — how an
 overtime or shootout loss affects a streak, whether empty-net and shootout goals count
@@ -252,6 +275,7 @@ deploy after every game**, not just the workbook.
 - **New York Islanders, Season 1, preseason.** In-game date 09/29/2026. Record 0-0-0.
 - Workbook seeded with the front-office and roster sheets in §4; **no game-log sheets yet**
   because their columns are still the user's to give (§4). Do not invent them.
+- **G1 logged**: 09/30/2026 at TOR, 1-2 OTL. Record 0-0-1.
 - Site built from this repo: tabs Overview, Roster, Lines, Front Office, Schedule, Goalies,
   vs. Divisions. Game-driven sections render `.empty` placeholders. Works offline once loaded
   (service worker, verified with the network cut). GitHub Pages serves `main` at the repo
@@ -259,7 +283,9 @@ deploy after every game**, not just the workbook.
   Pages is switched on.
 - Schedule loaded (84 games, see §7). Hero shows the next game, the NHL shield
   and the Eastern Conference mark.
-- Pending from the user: goalie contracts (Sorokin, Varlamov), the wordmark image file for
-  the ghosted backdrop (`site/logos/wordmark.png`; the crest stands in until then), and the
-  G1 screenshots, which set the game-log columns.
-- Next: port `add_game.py` once the first game notes define the log columns, then log game 1.
+- Pending from the user: goalie contracts (Sorokin, Varlamov); the wordmark image file
+  (`site/logos/wordmark.png`; the crest stands in until then); player photos
+  (`site/logos/players/`); and **the skater box score for G1** - the play-by-play supports
+  only Horvat's goal and the three NYI minors, so `Skater Game Log` is deliberately empty and
+  Skating Leaders / Team Skating render placeholders rather than partial totals.
+- `add_game.py` is the injection engine: edit its `GAME` block, run it, then `site/deploy.sh`.
