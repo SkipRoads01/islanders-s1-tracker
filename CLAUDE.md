@@ -153,8 +153,24 @@ each row of the unit.
 
 ## 5. Notation reference (user's shorthand)
 
-**To be filled in from the first games.** The user will identify anything new as it
-happens — when he does, add it here immediately so it becomes permanent.
+### How a game gets logged (the cheap path)
+
+G1 proved the split: **the screens carry the numbers, the notes carry the story.** Every
+figure in the `Games` row came from photographs, not from anything the user had to write.
+
+| Tier | What | Fills |
+|---|---|---|
+| 1 | The team-stats screen at each intermission **and** at the final - 4 photos | every `Games` team column. Per-period lines come from differencing the cumulative screens, so no per-period screen is needed |
+| 2 | The postgame player-stats screen - 1 photo | `Skater Game Log`, and every skater's season card |
+| 3 | Whatever the user feels like writing | `Scoring`, `Recaps`, `Headlines`, the game summary |
+
+Tier 3 can be as thin as the scoring line and still produce a full page, because tiers 1 and
+2 are already complete. **A missing tier 3 never blocks a publish.** What must never happen is
+inventing tier 2 out of tier 3 - if the box score is not photographed, the skater log stays
+empty and the site says so.
+
+**The user will identify new shorthand as it happens** - when he does, add it here immediately
+so it becomes permanent.
 
 Carried over from the baseball project because they're habits, not sport rules:
 - Scores in parentheses are **leader-first**: `(3-2)` = leader has 3.
@@ -259,6 +275,14 @@ deploy after every game**, not just the workbook.
   **The figure carries the number; the sentence must add new information rather than
   restating it.** Derive streaks from the recaps, never by assumption — a game missed
   does not break a streak.
+- **Passing percentage is never a story.** The user plays every shift; the CPU side does not
+  misfire passes the way a human stick does. A gap of 15-20 points in the computer's favour is
+  the normal state of this game, not a finding about either team. Never write it as a
+  comparison, never build a bullet around it, and never call it a weakness. This is the same
+  principle as the baseball manual's rule that scarce walks are not a story. The figure still
+  gets **logged** in `Games` and **shown** in the game card's Team Stats table, where it is a
+  raw number rather than a claim. The same caution applies to any stat the engine drives
+  rather than the player: if the gap is structural, it is context, not news.
 - **No instruction text anywhere** ("tap a tile for the rundown" and friends). Section
   subtitles carry data only.
 - **Output must be pure ASCII.** Some mobile webviews decode as Latin-1 and mojibake
