@@ -143,7 +143,8 @@ goals/shots/hits come from the four cumulative screens differenced into per-peri
 
 `Transactions` covers everything the front office is offered or does, not just trades: `Type`
 is `Trade offer`, `Signing`, `Waivers` or the like, and `Result` is `Accepted` or `Declined`.
-A field the screen did not capture is a `-`, never a guess.
+On a `Waivers` row `Direction` is `Claim` and `Partner` is `-`, because a waiver claim has no
+counterparty. A field the screen did not capture is a `-`, never a guess.
 
 `Roster Ref` conventions, taken from the game's List All Contracts screen: `Group` is
 `Main Roster` or `In the System`; `Status` is `Dressed` / `Scratched` for the main roster;
