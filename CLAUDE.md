@@ -26,15 +26,25 @@ source, then regenerate and publish the site.
 ## 2. Files & layout
 
 ```
-PS5 Hockey/
-├── S1 NY Islanders.xlsx  # THE workbook — exact filename, set once and never renamed
-├── CLAUDE.md             # this file
-├── add_game.py           # injection engine — edit the GAME block, run it
-├── scripts/              # reset_season.py and other helpers
-└── site/                 # build_site.py, deploy.sh, chrome files, logos
+islanders-s1-tracker/          # data repo AND the GitHub Pages repo (one repo, site at the root)
+├── S1 NY Islanders.xlsx       # THE workbook — exact filename, set once and never renamed
+├── index.html                 # generated — never hand-edit
+├── version.txt                # generated build id; must match <meta name="build">
+├── CLAUDE.md                  # this file
+├── add_game.py                # injection engine — edit the GAME block, run it (not yet ported)
+├── scripts/seed_workbook.py   # one-time seed from the 09/29/2026 franchise screens; record only
+└── site/
+    ├── build_site.py          # workbook -> index.html + version.txt
+    ├── deploy.sh              # build, ASCII + build-id checks, commit, push
+    ├── chrome.css             # the Royals CSS ported to Islanders tokens (--isles, --orange)
+    ├── extra.css              # hockey-only additions (line cards, team abbr tiles)
+    ├── site.js                # sortable tables, tabs, version check
+    └── logos/crest.svg        # masthead crest; logos/wordmark.png = ghosted backdrop when present
 ```
 
 - Commit the workbook to git after each game. Git history is the versioning.
+- `site/deploy.sh` is the publish path. It rebuilds, refuses non-ASCII output or a build-id
+  mismatch, commits, and pushes the current branch.
 - **Recalc is mandatory every game.** The workbook stores formulas, not cached values,
   until a headless LibreOffice pass bakes them:
   ```bash
@@ -106,6 +116,23 @@ column A for the last numeric value.
 | `Goalie Game Log` | *awaiting the user* |
 | `Opp Goaltending` | *awaiting the user* |
 | `Opp Skating` | *awaiting the user* |
+| `Roster Ref` | `Player` `Pos` `Group` `Status` `#` `OVR` `POT` `POT Cert` `Age` `Ht` `Wt` `Shoots` `Type` `Ext` `Clause` `FSC` `26-27` `27-28` `28-29` `29-30` `30-31` `31-32` `32-33` `33-34` `Then` |
+| `Lines` | `Unit` `Slot` `Player` `Pos` `OVR` `Chem` |
+| `Owner Goals` | `Tier` `Goal` `Reward` `Eval Date` `Status` |
+| `Budget` | `Line` `Allocated` `Spent` `Remaining` |
+| `Cap` | `Season` `Salary Cap` `Main Roster` `System` `Contracts` |
+| `Front Office` | `Key` `Value` |
+| `Trades` | `Date` `Partner` `Direction` `Out` `In` `Result` |
+| `Teams` | `Team` `Abbr` `Conference` `Division` |
+| `Notes` | `Date` `Note` |
+
+`Roster Ref` conventions, taken from the game's List All Contracts screen: `Group` is
+`Main Roster` or `In the System`; `Status` is `Dressed` / `Scratched` for the main roster;
+year columns hold the salary in $M as a number, or the tag the game shows in that year
+(`RFA`, `UFA`, `UNSIGNED`); `Then` repeats the tag that follows the last paid year.
+`Lines` units: `F1`-`F4`, `D1`-`D3`, `PP1`-`PP2`, `PK1`-`PK3`, `G` (slot 1/2 as the lineup
+screen orders them), `SCR`. `Chem` is the unit's line-chemistry OVR impact, repeated on
+each row of the unit.
 
 ---
 
@@ -145,7 +172,18 @@ Carried over from the baseball project because they're habits, not sport rules:
 
 ## 7. Standing judgment calls
 
-Empty until the user makes them. Hockey has several that baseball doesn't — how an
+- **Record format is `W-L-OTL`** because the game itself shows `0-0-0` on its matchup
+  screen. Applied to the hero, footer and every `vs.` record.
+- **82-game season** is assumed for pace math and the schedule count until the schedule is
+  on the page. Flagged, not confirmed.
+- **Own division first** in `vs. Divisions`: Metropolitan, Atlantic, Central, Pacific.
+- **Overview strip tiles** (proposed, veto any): Goals For, Goals Ag., Goal Diff, 1-Goal,
+  OT/SO, Shutouts, Comebacks (+share of wins), PP, PK, Most Goals, Most Goals Allowed, BLL.
+  `Pace` joins from game 10, per the Royals spec.
+- Still open, ask when the first game arrives: OTL/SOL effect on streaks, shootout goals in
+  the skater log, empty-net goals against, TOI format, Three Stars vs. one Player of the Game.
+
+Everything else is empty until the user makes the call. Hockey has several that baseball doesn't — how an
 overtime or shootout loss affects a streak, whether empty-net and shootout goals count
 where, how TOI is formatted — and **each one is his ruling, not yours.** When a call
 arises: make the most defensible choice, apply it, and **flag it inline** for veto, then
@@ -197,8 +235,12 @@ deploy after every game**, not just the workbook.
 
 ## 10. Current state
 
-- **New York Islanders, Season 1.** Repo scaffolded; no workbook yet, nothing logged.
-- **Blocked on the user for the sheet list and every column header** (§3, §4). Nothing
-  gets built until he gives them — do not invent a schema to get moving.
-- After that: build the empty workbook, port `add_game.py` and `build_site.py` from the
-  baseball project, set up the Pages repo, then log game 1.
+- **New York Islanders, Season 1, preseason.** In-game date 09/29/2026. Record 0-0-0.
+- Workbook seeded with the front-office and roster sheets in §4; **no game-log sheets yet**
+  because their columns are still the user's to give (§4). Do not invent them.
+- Site built and published from this repo: tabs Overview, Roster, Lines, Front Office,
+  Schedule, Goalies, vs. Divisions. Game-driven sections render `.empty` placeholders.
+- Pending from the user: goalie contracts (Sorokin, Varlamov), the wordmark image file for
+  the ghosted backdrop (`site/logos/wordmark.png`; the crest stands in until then), the
+  regular-season schedule, and the game-log columns.
+- Next: port `add_game.py` once the first game notes define the log columns, then log game 1.

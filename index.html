@@ -1,0 +1,1029 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="build" content="20260907-015752">
+<meta name="theme-color" content="#00539b">
+<title>Islanders S1 Tracker</title>
+<style>
+
+  :root {
+    --ground: #f4f6fa;
+    --surface: #ffffff;
+    --surface-2: #eef2f8;
+    --line: #d7dfeb;
+    --ink: #0d1b2e;
+    --ink-soft: #4a5b72;
+    --ink-mute: #7c8ba0;
+    --isles: #00539b;
+    --isles-bright: #1f77cf;
+    --orange: #e0661a;
+    --orange-soft: #f47d30;
+    --win: #1f8a5b;
+    --loss: #c0453f;
+    --win-bg: #e2f2ea;
+    --loss-bg: #f8e5e4;
+    --shadow: 0 1px 2px rgba(13,27,46,.06), 0 4px 16px rgba(13,27,46,.05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ground: #080e19;
+      --surface: #101a2b;
+      --surface-2: #16233a;
+      --line: #24344e;
+      --ink: #e9f0fa;
+      --ink-soft: #a7b7cf;
+      --ink-mute: #6b7d98;
+      --isles: #3d8fdf;
+      --isles-bright: #5aa6f0;
+      --orange: #f4813a;
+      --orange-soft: #ff9a5c;
+      --win: #38c186;
+      --loss: #e46b64;
+      --win-bg: #12331f;
+      --loss-bg: #37181a;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 6px 22px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="light"] {
+    --ground: #f4f6fa; --surface: #ffffff; --surface-2: #eef2f8; --line: #d7dfeb;
+    --ink: #0d1b2e; --ink-soft: #4a5b72; --ink-mute: #7c8ba0;
+    --isles: #00539b; --isles-bright: #1f77cf; --orange: #e0661a; --orange-soft: #f47d30;
+    --win: #1f8a5b; --loss: #c0453f; --win-bg: #e2f2ea; --loss-bg: #f8e5e4;
+    --shadow: 0 1px 2px rgba(13,27,46,.06), 0 4px 16px rgba(13,27,46,.05);
+  }
+  :root[data-theme="dark"] {
+    --ground: #080e19; --surface: #101a2b; --surface-2: #16233a; --line: #24344e;
+    --ink: #e9f0fa; --ink-soft: #a7b7cf; --ink-mute: #6b7d98;
+    --isles: #3d8fdf; --isles-bright: #5aa6f0; --orange: #f4813a; --orange-soft: #ff9a5c;
+    --win: #38c186; --loss: #e46b64; --win-bg: #12331f; --loss-bg: #37181a;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 6px 22px rgba(0,0,0,.35);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.45;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 16px 64px; position: relative; z-index: 1; }
+  .num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
+  .eyebrow {
+    font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--ink-mute);
+  }
+
+  /* ---- Masthead ---- */
+  header.mast {
+    position: sticky; top: 0; z-index: 10;
+    /* Opaque, and no backdrop-filter. At 88% the content scrolling underneath
+       ghosted through the bar - readable text behind the title - and the tone
+       shifted as it passed, which reads as blanching. blur(10px) did not hide
+       it either: over a flat --ground it was worth a mean of 0.7/255. */
+    background: var(--ground);
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 20px;
+  }
+  .mast-in {
+    max-width: 720px; margin: 0 auto; padding: 14px 16px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .mast-home {
+    appearance: none; -webkit-appearance: none; background: none; border: 0;
+    padding: 0; margin: 0; font: inherit; color: inherit; text-align: left;
+    cursor: pointer; display: flex; align-items: center; gap: 16px; min-width: 0;
+    border-radius: 10px;
+  }
+  .mast-home:hover .mast-title { color: var(--isles-bright); }
+  .mast-home:focus-visible { outline: 2px solid var(--isles-bright); outline-offset: 3px; }
+  .crest { height: 108px; width: auto; flex: none; display: flex; }
+  .crest svg, .crest img { height: 108px; width: auto; display: block; }
+  .bg-crest {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 150vw; max-width: 760px;
+    z-index: 0; pointer-events: none; opacity: .05;
+  }
+  .bg-crest svg, .bg-crest img { width: 100%; height: auto; display: block; }
+  @media (prefers-color-scheme: dark) { .bg-crest { opacity: .06; } }
+  :root[data-theme="dark"] .bg-crest { opacity: .06; }
+  :root[data-theme="light"] .bg-crest { opacity: .045; }
+  .mast-title { font-weight: 850; font-size: 34px; letter-spacing: -.025em; line-height: 1.05; white-space: nowrap; }
+  .mast-title span { color: var(--orange); }
+  .mast-right { margin-left: auto; display: flex; align-items: center; gap: 16px; }
+  .updated { font-size: 11px; color: var(--ink-mute); text-align: right; white-space: nowrap; }
+  @media (max-width: 860px) {
+    .crest, .crest svg, .crest img { height: 84px; }
+    .mast-title { font-size: 27px; }
+    .mast-in, .mast-home { gap: 12px; }
+  }
+  @media (max-width: 560px) {
+    .crest, .crest svg, .crest img { height: 62px; }
+    .mast-title { font-size: 20px; }
+    .mast-in, .mast-home { gap: 10px; }
+    .mast-right { flex-direction: column; align-items: flex-end; gap: 5px; }
+    .updated { font-size: 10px; }
+  }
+
+  /* ---- Hero record ---- */
+  .hero {
+    background:
+      radial-gradient(120% 140% at 100% 0%, color-mix(in srgb, var(--isles) 22%, transparent), transparent 60%),
+      var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 22px 22px 20px;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+  .nextgame {
+    display: flex; align-items: center; gap: 11px; margin-top: 16px;
+    background: color-mix(in srgb, var(--surface-2) 70%, var(--surface));
+    border: 1px solid var(--line); border-radius: 13px; padding: 11px 13px;
+  }
+  .nextgame .ng-k {
+    font-size: 9px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--orange); border: 1px solid color-mix(in srgb, var(--orange) 45%, transparent);
+    padding: 3px 6px; border-radius: 5px; white-space: nowrap;
+  }
+  .nextgame .ng-g { font-size: 12px; font-weight: 700; color: var(--ink-mute); font-variant-numeric: tabular-nums; }
+  .nextgame .tlogo { width: 54px; height: 54px; border-radius: 13px; }
+  .nextgame .ng-opp { font-size: 15.5px; font-weight: 750; letter-spacing: -.01em; white-space: nowrap; }
+  .nextgame .ng-opp .loc { color: var(--ink-mute); font-weight: 500; }
+  .nextgame .ng-series { margin-left: auto; text-align: right; line-height: 1.2; }
+  .nextgame .ng-series b { display: block; font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .nextgame .ng-series small {
+    font-size: 8.5px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; color: var(--ink-mute);
+  }
+  .record { display: flex; align-items: baseline; gap: 4px; }
+  .record b {
+    font-size: 68px; line-height: .9; font-weight: 800; letter-spacing: -.04em;
+    color: var(--ink);
+  }
+  .record .dash { font-size: 40px; font-weight: 300; color: var(--ink-mute); padding: 0 2px; }
+  .streak-pill {
+    align-self: flex-start;
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--win-bg); color: var(--win);
+    font-weight: 800; font-size: 14px; letter-spacing: .02em;
+    padding: 7px 12px; border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--win) 30%, transparent);
+  }
+  .streak-pill .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--win); }
+  .hero-note {
+    margin-top: 12px; padding-top: 14px; border-top: 1px solid var(--line);
+    font-size: 13px; color: var(--ink-soft);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .hero-note .tag {
+    font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--orange); border: 1px solid color-mix(in srgb, var(--orange) 45%, transparent);
+    padding: 3px 7px; border-radius: 5px; flex: none;
+  }
+
+  /* ---- Stat strip ---- */
+  .strip {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+    margin-top: 12px;
+  }
+  .stat {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+    padding: 12px 10px; box-shadow: var(--shadow);
+  }
+  .stat .k { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-mute); font-weight: 700; }
+  .stat .v {
+    font-size: 22px; font-weight: 800; letter-spacing: -.02em; margin-top: 3px;
+    /* big number left, optional <small> secondary value flush right on the
+       same baseline; single-value tiles are unaffected (one flex item) */
+    display: flex; align-items: baseline; justify-content: space-between; gap: 6px;
+  }
+  .stat .v small { font-size: 12px; font-weight: 600; color: var(--ink-mute); white-space: nowrap; }
+  .stat .v.good { color: var(--win); }
+  /* a strip tile that references games is a button; a 0 tile stays inert */
+  button.stat {
+    appearance: none; -webkit-appearance: none; font: inherit; color: inherit;
+    text-align: left; width: 100%; cursor: pointer;
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+  button.stat:hover { border-color: color-mix(in srgb, var(--isles) 45%, var(--line)); }
+  button.stat:focus-visible { outline: 2px solid var(--isles-bright); outline-offset: 2px; }
+  button.stat .k::after {
+    content: "\203A"; float: right; color: var(--ink-mute);
+    font-size: 13px; line-height: .85; font-weight: 400;
+  }
+  /* compact game reference rows inside the modal */
+  .pm-sthead { margin-bottom: 13px; padding-right: 34px; }
+  .gref {
+    display: grid; grid-template-columns: auto auto auto auto; justify-content: start;
+    align-items: center; gap: 11px; padding: 9px 11px;
+    border: 1px solid var(--line); border-radius: 11px; background: var(--surface-2);
+  }
+  .gref + .gref { margin-top: 7px; }
+  .gref .g { font-size: 11px; font-weight: 700; color: var(--ink-mute); font-variant-numeric: tabular-nums; }
+  .gref .res { width: 21px; height: 21px; border-radius: 6px; display: grid; place-items: center; font-weight: 800; font-size: 11px; }
+  .gref .mu { font-size: 13.5px; font-weight: 650; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .gref .mu .loc { color: var(--ink-mute); font-weight: 500; }
+  .gref .box { justify-self: start; }
+  .gref-note { font-size: 12.5px; line-height: 1.5; color: var(--ink-soft); margin: 7px 0 0 2px; }
+  .gref-note + .gref { margin-top: 13px; }
+  /* opponent mark beside the abbreviation */
+  .matchup .mteam, .sgame .mu { display: flex; align-items: center; gap: 8px; }
+  .matchup .mteam .tlogo { width: 51px; height: 51px; border-radius: 12px; background-size: 80%; }
+  .gref .mu .tlogo { width: 51px; height: 51px; border-radius: 8px; background-size: 80%; }
+
+  /* ---- Recent Headlines (player-level current form) ---- */
+  .hl-card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
+    box-shadow: var(--shadow); overflow: hidden;
+  }
+  .hl {
+    display: flex; align-items: center; gap: 13px;
+    padding: 11px 14px; border-top: 1px solid var(--line);
+  }
+  .hl:first-child { border-top: none; }
+  .hl-fig {
+    flex: none; min-width: 32px; text-align: right;
+    font-size: 21px; font-weight: 850; letter-spacing: -.03em; line-height: 1.1;
+    color: var(--isles-bright);
+  }
+  .hl-fig.past { color: var(--ink-mute); }
+  .hl-k {
+    font-size: 9.5px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--ink-mute);
+  }
+  .hl-txt { font-size: 13.5px; color: var(--ink-soft); line-height: 1.35; }
+  .hl-txt b { color: var(--ink); font-weight: 800; }
+
+  /* ---- Story / "Around the Numbers" ---- */
+  .story-card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
+    box-shadow: var(--shadow); overflow: hidden;
+  }
+  .story-lead {
+    display: flex; align-items: center; gap: 14px; padding: 16px 16px 15px;
+    background: linear-gradient(135deg,
+      color-mix(in srgb, var(--isles) 12%, var(--surface)),
+      color-mix(in srgb, var(--orange) 9%, var(--surface)));
+    border-bottom: 1px solid var(--line);
+  }
+  .story-big {
+    font-size: 34px; font-weight: 850; letter-spacing: -.03em; line-height: 1;
+    color: var(--isles-bright); font-variant-numeric: tabular-nums; flex: none;
+  }
+  .story-list { list-style: none; margin: 0; padding: 6px 16px 14px; }
+  .story-list li {
+    position: relative; padding: 11px 0 11px 20px;
+    font-size: 13.5px; line-height: 1.45; color: var(--ink-soft);
+    border-top: 1px solid var(--line);
+  }
+  .story-list li:first-child { border-top: none; }
+  .story-list li::before {
+    content: ""; position: absolute; left: 4px; top: 18px;
+    width: 6px; height: 6px; border-radius: 50%; background: var(--orange-soft);
+  }
+  .story-list li b { color: var(--ink); font-weight: 800; }
+
+  /* ---- Section ---- */
+  section { margin-top: 30px; }
+  .sec-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin-bottom: 12px; padding-left: 2px;
+  }
+  .sec-head h2 { margin: 0; font-size: 17px; font-weight: 750; letter-spacing: -.01em; }
+  .sec-head .meta { font-size: 12px; color: var(--ink-mute); }
+
+  /* ---- Game log ---- */
+  .games { display: flex; flex-direction: column; gap: 7px; }
+  .gamed {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+    box-shadow: var(--shadow); overflow: hidden;
+  }
+  .game {
+    display: grid; grid-template-columns: 32px 26px 1fr auto 14px;
+    align-items: center; gap: 10px; padding: 10px 13px;
+    cursor: pointer; list-style: none; -webkit-tap-highlight-color: transparent;
+  }
+  .game::-webkit-details-marker { display: none; }
+  .game:focus-visible { outline: 2px solid var(--isles-bright); outline-offset: -2px; }
+  .chev { color: var(--ink-mute); font-size: 15px; line-height: 1; justify-self: end; transition: transform .18s ease; }
+  .gamed[open] .chev { transform: rotate(90deg); }
+  .recap {
+    padding: 4px 14px 14px; border-top: 1px solid var(--line);
+    font-size: 12.5px; line-height: 1.5; color: var(--ink-soft);
+  }
+  .recap p { margin: 9px 0 0; }
+  .recap p:first-child { margin-top: 6px; }
+  .recap .inn { font-weight: 800; color: var(--ink); font-size: 11px; letter-spacing: .04em; margin-right: 2px; }
+  .recap strong { font-weight: 700; color: var(--ink); }
+  .box {
+    border-collapse: collapse; font-variant-numeric: tabular-nums; justify-self: end;
+    border: 1px solid var(--line); border-radius: 7px; overflow: hidden;
+  }
+  .box th, .box td { padding: 1px 7px; text-align: right; font-size: 11px; line-height: 1.5; }
+  .box th:not(:first-child), .box td:not(:first-child) { min-width: 20px; border-left: 1px solid var(--line); }
+  .box th:first-child, .box td:first-child { text-align: left; padding-left: 8px; padding-right: 9px; }
+  .box thead th {
+    background: var(--surface-2); color: var(--ink-mute);
+    font-size: 9px; letter-spacing: .04em; text-transform: uppercase; font-weight: 700;
+    border-bottom: 1px solid var(--line);
+  }
+  .box tbody td { color: var(--ink-soft); font-weight: 700; }
+  .box tbody td:first-child { color: var(--ink-mute); font-weight: 700; }
+  .box tr.box-kc td { color: var(--ink); font-weight: 800; }
+  .box tr.box-kc td:first-child { color: var(--isles-bright); }
+  .box tr + tr td { border-top: 1px solid var(--line); }
+  .gpage { display: none; }
+  .gpage.is-active { display: block; }
+  .gpager-wrap { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 14px; }
+  .gpager {
+    appearance: none; -webkit-appearance: none; text-align: center;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 9px;
+    color: var(--ink); font: inherit; font-size: 13px; font-weight: 650;
+    padding: 8px 14px; cursor: pointer; box-shadow: var(--shadow);
+  }
+  .gpager-btn {
+    appearance: none; border: 1px solid var(--line); background: var(--surface);
+    color: var(--ink-soft); border-radius: 9px; width: 36px; height: 36px;
+    font-size: 17px; line-height: 1; cursor: pointer; box-shadow: var(--shadow); flex: none;
+  }
+  .gpager-btn:hover { color: var(--isles-bright); }
+  .gpager:focus-visible, .gpager-btn:focus-visible { outline: 2px solid var(--isles-bright); outline-offset: 2px; }
+  .game .g { font-size: 11px; font-weight: 700; color: var(--ink-mute); }
+  .res {
+    width: 26px; height: 26px; border-radius: 7px; display: grid; place-items: center;
+    font-weight: 800; font-size: 12px;
+  }
+  .res.w { background: var(--win-bg); color: var(--win); }
+  .res.l { background: var(--loss-bg); color: var(--loss); }
+  .matchup { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  .matchup .mteam { font-weight: 650; font-size: 14px; letter-spacing: -.01em; }
+  .matchup .loc { color: var(--ink-mute); font-weight: 500; }
+  .matchup .opp { color: var(--ink); }
+  .matchup .tags { flex-wrap: wrap; }
+  .score { font-weight: 750; font-size: 14px; letter-spacing: -.01em; }
+  .tags { display: flex; gap: 4px; }
+  .chip {
+    font-size: 9px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+    padding: 3px 5px; border-radius: 4px;
+    background: var(--surface-2); color: var(--ink-soft);
+    border: 1px solid var(--line);
+  }
+  .chip.gold { color: var(--orange); border-color: color-mix(in srgb, var(--orange) 40%, transparent); }
+  .chip.blue { color: var(--isles-bright); border-color: color-mix(in srgb, var(--isles) 40%, transparent); }
+
+  /* ---- Player of the Game ---- */
+  .pog-log { display: flex; flex-direction: column; gap: 7px; margin-top: 16px; }
+  .pog {
+    display: grid; grid-template-columns: 30px 40px 1fr; align-items: center; gap: 11px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+    padding: 11px 13px; box-shadow: var(--shadow);
+  }
+  .pog .g { font-size: 11px; font-weight: 700; color: var(--ink-mute); font-variant-numeric: tabular-nums; }
+  .pog .pos {
+    justify-self: start; font-size: 10px; font-weight: 800; letter-spacing: .04em;
+    color: var(--orange);
+    background: color-mix(in srgb, var(--orange) 13%, var(--surface-2));
+    border: 1px solid color-mix(in srgb, var(--orange) 42%, transparent);
+    padding: 3px 6px; border-radius: 5px; min-width: 34px; text-align: center;
+  }
+  .pog-body { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+  .pog .nm { font-weight: 700; font-size: 14px; letter-spacing: -.01em; }
+  .pog .ln { font-size: 12px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+
+  /* ---- Tabs ---- */
+  /* every tab visible at once -- the bar wraps instead of scrolling sideways */
+  .tabs {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(108px, 1fr));
+    gap: 4px; margin-top: 16px; padding: 4px;
+    background: var(--surface-2); border: 1px solid var(--line); border-radius: 12px;
+  }
+  /* 10 tabs: 5 x 2 on desktop, 2 x 5 on a phone -- no orphan on a row of its own */
+  @media (max-width: 560px) { .tabs { grid-template-columns: repeat(2, 1fr); } }
+  .tab {
+    appearance: none; -webkit-appearance: none; border: none; cursor: pointer;
+    background: transparent; color: var(--ink-soft); font: inherit;
+    font-size: 12.5px; font-weight: 700; letter-spacing: -.01em;
+    padding: 10px 6px; border-radius: 9px; white-space: nowrap;
+    text-align: center; min-width: 0;
+    transition: background .15s ease, color .15s ease;
+  }
+  .tab:hover { color: var(--ink); }
+  .tab.is-active { background: var(--surface); color: var(--isles-bright); box-shadow: var(--shadow); }
+  .tab:focus-visible { outline: 2px solid var(--isles-bright); outline-offset: 2px; }
+  .panel { display: none; }
+  .panel.is-active { display: block; }
+
+  /* ---- Starters ---- */
+  .starter {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+    box-shadow: var(--shadow); padding: 14px 15px; margin-bottom: 10px;
+  }
+  .starter-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+  .starter-name { font-size: 16px; font-weight: 750; letter-spacing: -.01em; }
+  .starter-meta { font-size: 11px; color: var(--ink-mute); font-variant-numeric: tabular-nums; margin-left: 6px; }
+  .starter-tot { display: flex; gap: 6px; flex-wrap: wrap; }
+  .starter-tot span {
+    font-size: 11px; font-weight: 700; color: var(--ink-soft);
+    background: var(--surface-2); border: 1px solid var(--line);
+    padding: 3px 7px; border-radius: 6px; font-variant-numeric: tabular-nums;
+  }
+  .starts { margin-top: 10px; }
+  .start { display: grid; grid-template-columns: 84px 1fr; gap: 10px; padding: 9px 0; border-top: 1px solid var(--line); }
+  .start:first-child { border-top: none; padding-top: 2px; }
+  .start .g { font-size: 11px; font-weight: 700; color: var(--ink-mute); font-variant-numeric: tabular-nums; display: flex; align-self: start; align-items: center; gap: 5px; min-height: 18px; }
+  /* the pitcher's own decision and record; the colour belongs to the game result */
+  .start .pdec { font-size: 11px; font-weight: 650; color: var(--ink-soft); letter-spacing: 0; }
+  /* the team's result in that game, beside the opponent */
+  .start .gout { font-size: 9px; font-weight: 800; letter-spacing: .04em; padding: 2px 5px; border-radius: 4px; }
+  .start .gout.w { background: var(--win-bg); color: var(--win); }
+  .start .gout.l { background: var(--loss-bg); color: var(--loss); }
+  .start-body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  .start-top { display: flex; align-items: center; gap: 8px; }
+  .start .mu { font-size: 13.5px; font-weight: 650; letter-spacing: -.01em; }
+  .start .mu .loc { color: var(--ink-mute); font-weight: 500; }
+  .start .dec { font-size: 9px; font-weight: 800; letter-spacing: .04em; padding: 2px 5px; border-radius: 4px; }
+  .start .dec.nd { background: var(--surface-2); color: var(--ink-mute); border: 1px solid var(--line); }
+  .start .dec.sv { background: color-mix(in srgb, var(--orange) 15%, var(--surface-2)); color: var(--orange); }
+  .start .dec.hld { background: color-mix(in srgb, var(--isles) 13%, var(--surface-2)); color: var(--isles-bright); }
+
+  /* pitcher card flip (front = game log, back = season stats) */
+  .pcard { cursor: pointer; }
+  .pcard .pc-inner { transition: height .28s cubic-bezier(.2,.7,.2,1), opacity .14s ease, transform .14s ease; }
+  .pcard .pc-inner.flipping { opacity: 0; transform: scale(.985); }
+  .pcard .pc-back { display: none; }
+  .pcard.is-flipped .pc-front { display: none; }
+  .pcard.is-flipped .pc-back { display: block; }
+  .pc-hint { margin-top: 11px; font-size: 10.5px; font-weight: 600; color: var(--ink-mute); text-align: right; letter-spacing: .01em; }
+  .pc-back-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+  .pc-back-rec { font-size: 13px; font-weight: 750; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .pstats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .pstat { background: var(--surface-2); border: 1px solid var(--line); border-radius: 9px; padding: 8px 6px; text-align: center; }
+  .pstat .k { display: block; font-size: 9px; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-mute); font-weight: 700; }
+  .pstat .v { display: block; font-size: 15px; font-weight: 800; letter-spacing: -.02em; margin-top: 2px; font-variant-numeric: tabular-nums; }
+  @media (prefers-reduced-motion: reduce) { .pcard .pc-inner { transition: none; } }
+  .start .line { font-size: 12px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+
+  /* ---- Splits tab: flip tiles (front = staff total, back = rundown) ---- */
+  .split-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; align-items: start; }
+  .split-tile {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+    box-shadow: var(--shadow); padding: 14px 15px;
+  }
+  .st-front .st-k { font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-mute); font-weight: 700; line-height: 1.25; }
+  .st-front .st-v { font-size: 30px; font-weight: 800; letter-spacing: -.02em; margin-top: 5px; font-variant-numeric: tabular-nums; }
+  .st-front .st-sub { margin-top: 3px; font-size: 11.5px; font-weight: 700; color: var(--isles-bright); font-variant-numeric: tabular-nums; }
+  /* the two handedness tiles open the Arms Faced page: by season's end the
+     list runs to a hundred names, far too many for a flip card */
+  .st-link { appearance: none; -webkit-appearance: none; font: inherit; color: inherit;
+    text-align: left; width: 100%; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .st-link .st-front > span { display: block; }
+  .st-link:hover .st-k { color: var(--isles-bright); }
+  .st-link:focus-visible { outline: 2px solid var(--isles-bright); outline-offset: 2px; }
+  /* Every totals row is locked: it lives in a tfoot, so a column sort never
+     shuffles it into the middle, and it pins to the bottom while a long list
+     scrolls past it. */
+  .tbl-wrap tfoot tr.tot td { position: sticky; bottom: 0; background: var(--surface-2);
+    border-top: 1px solid var(--line); font-weight: 800; }
+  .chd > summary { list-style: none; cursor: pointer; font-size: 11px; font-weight: 700;
+    color: var(--isles-bright); padding: 2px 0; }
+  .chd > summary::-webkit-details-marker { display: none; }
+  .chd > summary::after { content: " \25B8"; }
+  .chd[open] > summary::after { content: " \25BE"; }
+  .chd .sub { margin-top: 3px; }
+  .errd { margin-top: 10px; }
+  .errd > summary { list-style: none; cursor: pointer; padding: 7px 2px;
+    font-size: 12px; font-weight: 700; color: var(--isles-bright); }
+  .errd > summary::-webkit-details-marker { display: none; }
+  .errd > summary::after { content: " \25B8"; }
+  .errd[open] > summary::after { content: " \25BE"; }
+  .errd > summary:hover { text-decoration: underline; }
+  .backlink { appearance: none; -webkit-appearance: none; background: none; border: 0; padding: 0;
+    font: inherit; font-size: 12.5px; font-weight: 700; color: var(--isles-bright);
+    cursor: pointer; margin: 0 0 12px 2px; }
+  .backlink:hover { text-decoration: underline; }
+  .rundown { margin-top: 4px; }
+  .rundown .rd { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 6px 0; border-top: 1px solid var(--line); }
+  .rundown .rd:first-child { border-top: none; padding-top: 2px; }
+  .rundown .rd .nm { font-size: 13px; font-weight: 650; color: var(--ink-soft); letter-spacing: -.01em; }
+  .rundown .rd .ct { font-size: 14px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  table.chal .sub { color: var(--ink-mute); font-weight: 600; font-size: 11px; margin-left: 4px; }
+  table.chal .pct { color: var(--ink-mute); font-weight: 600; }
+  table.chal tbody td .sub { display: block; margin-top: 3px; font-weight: 600; }
+
+  /* ---- Leader cards ---- */
+  .leaders { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .lead {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+    padding: 12px 13px; box-shadow: var(--shadow);
+    display: flex; flex-direction: column; gap: 2px;
+  }
+  .lead .cat { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-mute); font-weight: 700; }
+  .lead .who { font-size: 15px; font-weight: 750; letter-spacing: -.01em; }
+  .lead .pname { color: inherit; font-weight: 750; }
+  .lead .pname:hover { color: var(--isles-bright); }
+  .lead .val { font-size: 15px; font-weight: 800; color: var(--isles-bright); font-variant-numeric: tabular-nums; }
+  .lead .row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-top: 2px; }
+  /* the whole tile is the target, not the surname - see section 11.2 */
+  button.lead, .lead .lrow {
+    appearance: none; -webkit-appearance: none; font: inherit; color: inherit;
+    text-align: left; width: 100%; cursor: pointer; -webkit-tap-highlight-color: transparent;
+  }
+  .lead .lrow { background: none; border: 0; padding: 0; }
+  button.lead:hover .pname, .lead .lrow:hover .pname { color: var(--isles-bright); }
+  button.lead:focus-visible, .lead .lrow:focus-visible {
+    outline: 2px solid var(--isles-bright); outline-offset: 2px; border-radius: 8px;
+  }
+
+  /* ---- Tables ---- */
+  .tbl-wrap { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; box-shadow: var(--shadow); }
+  .empty {
+    border: 1px dashed var(--line); border-radius: 14px; background: var(--surface);
+    color: var(--ink-mute); font-size: 13px; text-align: center; padding: 22px 16px; margin: 0;
+  }
+  .tbl-scroll { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  thead th {
+    position: sticky; top: 0;
+    background: var(--surface-2); color: var(--ink-mute);
+    font-size: 10px; letter-spacing: .08em; text-transform: uppercase; font-weight: 700;
+    text-align: right; padding: 9px 10px; white-space: nowrap;
+    border-bottom: 1px solid var(--line);
+  }
+  thead th:first-child { text-align: left; }
+  thead th.sortable {
+    cursor: pointer; user-select: none; -webkit-user-select: none;
+    transition: color .12s ease, background .12s ease;
+  }
+  thead th.sortable:hover { color: var(--ink-soft); }
+  thead th.sortable:focus-visible { outline: 2px solid var(--isles-bright); outline-offset: -2px; }
+  thead th .caret {
+    display: inline-block; width: 0; overflow: hidden; opacity: 0;
+    margin-left: 3px; transition: opacity .12s ease;
+    color: var(--isles-bright);
+  }
+  thead th[aria-sort] { color: var(--isles-bright); background: color-mix(in srgb, var(--isles) 12%, var(--surface-2)); }
+  thead th[aria-sort] .caret { width: auto; opacity: 1; }
+  thead th[aria-sort="ascending"] .caret::after { content: "\25B2"; font-size: 8px; }
+  thead th[aria-sort="descending"] .caret::after { content: "\25BC"; font-size: 8px; }
+  tbody td {
+    padding: 9px 10px; text-align: right; white-space: nowrap;
+    border-bottom: 1px solid var(--line);
+    font-variant-numeric: tabular-nums;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody td:first-child { text-align: left; font-weight: 650; letter-spacing: -.01em; }
+  tbody tr:nth-child(even) { background: color-mix(in srgb, var(--surface-2) 45%, transparent); }
+  tfoot td { padding: 9px 10px; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  tfoot td:first-child { text-align: left; }
+  .lead-cell { color: var(--orange); font-weight: 800; }
+  /* roster: freeze the name column while the rest scrolls sideways */
+  .roster th:first-child, .roster td:first-child {
+    position: sticky; left: 0; z-index: 2;
+    background: var(--ground);
+    box-shadow: inset -1px 0 0 var(--line);
+  }
+  .roster tbody tr:nth-child(even) td:first-child {
+    background: color-mix(in srgb, var(--surface-2) 45%, var(--ground));
+  }
+  .roster thead th:first-child { z-index: 3; background: var(--surface-2); }
+  .roster .lvl { font-weight: 700; color: var(--ink-mute); }
+  /* ---- Roster player card (MLB names are buttons) ---- */
+  .pname {
+    font: inherit; color: var(--isles-bright); background: none; border: 0; padding: 0;
+    cursor: pointer; text-align: left; letter-spacing: -.01em;
+  }
+  .pname:hover { text-decoration: underline; }
+  .pname:focus-visible { outline: 2px solid var(--isles-bright); outline-offset: 2px; border-radius: 3px; }
+  .pmodal { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 16px; }
+  .pmodal[hidden] { display: none; }   /* display:grid above beats the UA [hidden] rule */
+  .pmodal-back { position: absolute; inset: 0; background: rgba(0,0,0,.55); }
+  .pmodal-card {
+    position: relative; width: min(460px, 100%); max-height: 86vh; overflow-y: auto;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 18px;
+    box-shadow: 0 18px 50px rgba(0,0,0,.35); padding: 18px 18px 16px;
+  }
+  .pmodal-x {
+    position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border-radius: 9px;
+    border: 1px solid var(--line); background: var(--surface-2); color: var(--ink-mute);
+    font-size: 17px; line-height: 1; cursor: pointer;
+  }
+  .pmodal-x:hover { color: var(--ink); }
+  .pm-head { display: flex; align-items: center; gap: 13px; margin-bottom: 14px; padding-right: 34px; }
+  .pm-photo {
+    width: 74px; height: 74px; border-radius: 15px; flex: none; overflow: hidden;
+    background: var(--surface-2); border: 1px solid var(--line); display: grid; place-items: center;
+  }
+  .pm-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .pm-photo .tlogo { width: 40px; height: 40px; opacity: .5; box-shadow: none; background-color: transparent; }
+  .pm-name { font-size: 19px; font-weight: 800; letter-spacing: -.02em; line-height: 1.15; }
+  .pm-meta { font-size: 11.5px; color: var(--ink-mute); font-weight: 600; margin-top: 3px; font-variant-numeric: tabular-nums; }
+  .pm-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; }
+  .pm-stat { background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 7px 4px; text-align: center; }
+  .pm-stat .k { display: block; font-size: 9px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-mute); font-weight: 700; }
+  .pm-stat .v { display: block; font-size: 14px; font-weight: 750; margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .pm-photo .mlogo { width: 100%; height: 100%; display: block; background-color: #fff;
+    background-repeat: no-repeat; background-position: center; background-size: 72%; }
+  .mlogo.lv-aaa { background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4OS44IDcyIj48cGF0aCBkPSJNODMuNSAyOS40Yy0uMy0xLS44LTEuOC0xLjUtMi41LTEuMy0uOC01LjctLjUtMTAuMi4yIDMuNC0xLjggNy4zLTMuNyA4LTMuNyAxLjIgMS4xIDMgMS4yIDQuNC41IDIuOC0xLjYgMy43LTUuMiAxLjgtOXMtNS40LTQuNC03LjgtM2MtMS4zLjctMiAyLjEtMS45IDMuNiAwIDAtMiAxLjEtMy45IDIgLjMtLjQuNS0uOC44LTEuMyAxLjUtMi43LjctNC40LTEuMS01LjQgMS0yLjUtMS4zLTQuOC01LjgtNS4xIDEuMi0xLjkgMi43LTMuNiA0LjQtNUM2My43LS45IDU2LjMuMyA1MC4xIDRjLTQuNi0uNS0xMS43LjgtMTggMy42LjYtMy4yIDMuOC02LjYgMy44LTYuNkMxMS4zIDkuNyAzLjkgMjEuMyA4IDI4Yy45IDEuMyAyLjMgMi4xIDMuOSAyLjItLjQgMi45IDEuMyA0LjMgMy4zIDUtLjQgMi40IDEuMiA0LjYgMy41IDUtLjYgMi4yLS41IDQuNi40IDYuNy43IDIgMi4yIDMuNiA0LjEgNC40LTEuOCAxLjMtMy43IDIuNS01LjYgMy41LS45LTEuMS0xLjctMi40LTIuNS0zLjYgMC0uNi0uMS0xLjEtLjMtMS43LjktMi4xLjgtNS42LS43LTcuMy4xLTIuNS0xLjUtNy00LjMtNy41LTMuOS0uOS02LjMgNS42LTkuOSA2IDEuNyAyNS4xIDIwLjggMjUuMSAyMC44IDI1LjEgMy44LTIuMyA3LjItNS40IDkuOC05LjEuOCAxLjEgMS45IDEuOCAzLjIgMi4zIDEuNC4yIDIuOC4xIDQuMi0uMyAxIDEuMiAzIDIuNCA2LjkuOC44LjggMi42IDEuNSA2LS4yIDYuNCAyLTEuMyAxMi44LTEuMyAxMi44QzcyLjcgNTkuNSA3MC4xIDQ5LjMgNjggNDUuNmMxLjEtMS44IDEuOS0zLjggMi4zLTUuOS4xLS43LjItMS40LjItMiAyLjQtMSA0LjktMS44IDcuNC0yLjEgMCAuNCAwIC44LS4xIDEuMy0xLjcuMy00LjcgMS4yLTUuNiA0LjMtLjIuOC0uMSAxLjcuNCAyLjUtLjYuNy0xLjEgMS42LTEuNCAyLjUtLjcgMi4yLS40IDYuNSAyLjQgNy4xIDEuMS4zIDIuMy4xIDMuMy0uMy42LjIgMS4yLjQgMS44LjQuOCAxLjIgMi4zIDMgNC4xIDMgMy4yIDAgNi40LTMuNSA3LTEyIC40LTgtMy0xNC4zLTYuMy0xNXoiIGZpbGw9IiMyMzFmMjAiLz48cGF0aCBkPSJNMTUgMzAuMmM1LjEtLjUgMTEtMy4yIDExLjQtNC4xIDAgMC0xMi41IDQuMi0xNS0uMS01LjEtOSAxOC0xOSAxOC0xOS0uNi45LTEuMiAxLjgtMS43IDIuNy00LjIgMi42LTcuNiA1LjktOSAxMCAwIDAgOC45LTEwLjMgMjUuOS0xMi4zLTEuMiAxLTIuNCAyLTMuNiAzLjEtOC4yIDIuNy0xMS4xIDcuMi0xMS4xIDcuMiAyLS45IDQtMS44IDYtMi41LTMuMyAyLjYtNyA0LjQtMTEgNS41IDEuNi0yLjUgNC45LTYuNCAxMS45LTkuNi02LjYgMS42LTEyLjUgNS40LTE2LjcgMTAuNi0yLjEuMy00LjEuNC02LjIuMyAyLjYgMyAxNiAzLjIgMjguOC04LjhTNjQuNCAyLjkgNjQuNCAyLjljLTEgLjktMiAyLTIuOCAzLjEtNS45IDEuMS0xMy44IDUtMjIuMiAxNCAwIDAgMjAuMi0xNS42IDI4LjMtMTAuMS0zLjItLjEtNi4zLjctOS4xIDIuMiA0LjktMS4xIDE0LjQtMS4yIDEwLjggNC4yLTIuOSA0LjYtNy4zIDgtMTIuNCA5LjkgMi41LTMuOCA4LjgtNy42IDguOC03LjYtNC41LjktOC42IDMuMS0xMS44IDYuNC0uMS0xLjktLjgtMy44LTItNS4zLS41LS42LTEuMS0xLjItMS44LTEuNyAxLjgtMS43IDMuOS0zIDYuMi0zLjgtNC4xLS45LTkuOCAxLjgtMTQuMyAxMC42LTIuNSA1LTYuNCA3LjEtOS4xIDUuNy0yLjUtMS4zLS45LTMuOS0uOS0zLjktMS41LjUtMi41IDEuOC0yLjcgMy40LTcuMy0xLjYtMTAuOCAxLjYtMTAuOCAxLjYuOCAwIDEuNS0uMSAyLjEtLjEtLjIuNi0uMyAxLjMtLjMgMi01IC4xLTUuNS0yLjEtNS40LTMuM3oiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNNDggMjYuM2wtMi42IDMuOC41LTIuMi0xLjIuNXMxLjEtNC43IDEuNS01LjNjLjQtLjYuNy0xLjIgMS4yLTEuOCAyLjQuOCA0IDMuMyAzLjcgNS44LS41LjItMSAuNS0xLjQuOHYtLjRjLS4yLTEuMi0xLjEtMi4yLTIuMy0yLjZsLS45IDEuOCAxLjUtLjR6bS0yLjQgNS4zYy0uMi4zLS41LjctLjcgMS0xLjQgMC0yLjgtLjUtMy45LTEuNC43LS43IDEuMi0xLjQgMS43LTIuMi40IDEuNCAxLjUgMi40IDIuOSAyLjZ6bS0xOC41IDEuNmwuNi0xYy45LjIgMS44LjUgMi42LjktLjguMy0xLjcuNi0yLjYuOWwuNS0xLTEuMS4yem0tMS40IDEuNmwtMS40LjVjLS44LTEuMS0uOC0yLjYtLjEtMy43LjcuMSAxLjQuMiAyIC4zLS43LjgtLjkgMS45LS41IDIuOXptLTUuOCAzLjNjLTEuMS0uMy0xLjgtMS4zLTEuNy0yLjUuOSAwIDEuOCAwIDIuNi0uMS4yLjQuNC44LjcgMS4yLS42LjQtMS4yLjktMS42IDEuNHpNMTkuNiA2M0MzLjQgNjAuNyAzLjIgNDIuMyAzLjIgNDIuM2MxLjktLjUgMy4yLTMuNyA1LjUtNC42IDEuNC0uNiAyLjMgMS4xIDIuOCAyLjQtLjctLjMtMS41LS4zLTIuMS4ybC0uNC4yYy0uMi0uNC0uNC0uOC0uNS0xLjItLjUuNS0uNyAxLjItLjggMi0uOS40LTEuNy43LTIuNiAxIDEuMy40IDIuNy40IDQtLjFoLjFjLTEuMyAxLTIuMyAyLjctNCAzLjggMCAwIDEuOS43IDQuNy0yLjIgMS41LTEuNSAzLjYuNyAyLjkgMy42LS40LS4xLS43LS4yLTEuMS0uMS4xLS42IDAtMS4yLS4yLTEuOCAwIDAtLjQgMi43LTQuMiA0LjIgMS4xLjggMi43LjYgMy41LS41IDEuMi4yIDIgMS4yIDEuOCAyLjQgMCAuMSAwIC4yLS4xLjMtLjIuOS0xLjQgMS45LS43IDMuNyAwIDAgLjctLjggMS42LTEuOCAxLjQgMS43IDQuOSA1LjUgOC4xIDUuMS0uNy0uNi0xLjMtMS4yLTEuOS0xLjggMi41LTEuNSA0LjgtMy4zIDYuOS01LjJsLjQuNC00IDQuN2MxLjktLjcgMy43LTEuOCA1LjEtMy4yLjMuNC42LjggMSAxLjMtMi41IDMuMi01LjcgNS45LTkuNCA3Ljl6bTY3LjYtMTguN2MtLjMgNS41LTMuNCAxMS4yLTUuNiA4LjQuNy0uMyAxLjQtLjcgMi0xLjMtMS41LjEtMi45LS4xLTQuMy0uNS44LTEgMS4zLTIuMSAxLjctMy4zLTEuMSAxLTIuNCAxLjgtMy43IDIuNC0yLjEgMS0zLjguNC00LjEtMS41LS4xLTEuMS4yLTIuMi44LTMuMS40LjQuOC44IDEuMyAxLjJsLTEgMXMxLjMgMSAzLS44Yy45LTEuMSAxLjEtMi43LjQtNC0uMy44LS43IDEuNS0xLjIgMi4yLS43LS42LTIuNS0yLjUtMS44LTMuNy43LS45IDEuNy0xLjUgMi44LTEuOC0uMS4zLS4yLjctLjIgMSAwIDAgMi42LTEuMyAyLjYtMy44IDAtNC4yLTItNS41LTItNS41cy4xLjYuMSAxLjZjLTIuNC41LTExLjEgMi44LTEyLjMgNy4zIDAgMCAuNi0uNCAxLjYtLjktLjEgMi42LTEuMyA2LjQtNS4zIDExLjMgMS4xLS4zIDIuMS0uOCAzLTEuNSAyLjEgOC40LTkuOCAxNi4zLTkuOCAxNi4zIDMuMy01LjEgMS4yLTcuMi0xLjEtOGwuMi0uMWMzLjEtMi4zIDUuOS0xIDQuOSAxLjcgMCAwIDMuMS0zLjQuMS00LjgtMy4zLTEuNS04LjEgMi41LTEwLjEgMi44IDMtMi41IDMuNC01LjEgMy4zLTYuNS0xLjUgMi4xLTMuNCAzLjktNS43IDUuMy0zLjEgMS42LTQuOCAxLjgtNS44IDEuNCAxLjYtMS4xIDIuNy0yLjQgMi42LTMuNCAwIDAtNC43IDMuNS05IDIuMy0xLjYtLjUtMi44LTQuMi00LTUuOCAyLjUtMS40IDYuMi0zLjUgOC44LTUuMS0xLjIgMS42LTIuNSAzLjItNCA0LjUgMCAwIDYuMi4xIDkuOS0xMS42IDIuNy04LjggMTIuNi0xMi42IDE5LjEtMy43LjItLjYuMi0xLjIgMC0xLjggNC45LTIuMSAxMC4xLTMuMiAxNS40LTMuNCAxLjktLjEgMi43IDguOCAyLjcgOC44IDEtMS43IDEuNS0zLjcgMS40LTUuNyAxLjMgMS4zIDMuNyA0LjkgMy4zIDEyLjF6bS0zMC0xMC42Yy43LS4zIDEuNS0uNSAyLjItLjUgMCAwLTQuOC0xLjgtNy44LjhzLTQuMiA3LTUuOCAxMC43Yy0xLjEgMi40LTIuNSA0LjYtNC4yIDYuNiAwIDAgMS45LS4zIDQuNS0zLjUgMTAuMy02LjUgMTcuNS02LjcgMTguMi04LjIgMS4zLTIuMy00LjEtNC43LTcuMS01Ljl6TTQ4LjcgNDRjLjYtMS4yIDEuMi0yLjQgMS43LTMuNi43LTEuNiAxLjctMyAzLjEtNC4yIDEuMiAwIDIuNS4yIDMuNy41LTIuMyAxLjMtNC4zIDIuOS02IDQuOCAyLjUtMS43IDUuMi0zIDguMS00bDIuNCAxLjJjLTQuNyAxLjEtOS4xIDIuOC0xMyA1LjN6IiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTTc4LjIgMTcuMnMtLjItMi4yIDEuMy0zLjFjMS43LS45IDMuMi4yIDQuMiAyLjRzLjYgNC4xLTEgNC45Yy0uMS0yLjYtMS44LTIuOS0xLjgtMi45LjIuOC0uMSAxLjctLjcgMi4zLS4yLS44LS43LTEuNC0xLjMtMS45LS4xIDEtLjQgMS45LS44IDIuOS0uMS0uOC0uNy0xLjUtMS40LTEuOC0uMS45LS40IDEuOC0uNyAyLjctLjItLjgtLjctMS40LTEuMy0xLjgtLjIgMS0uNiAyLTEuMSAyLjktLjItLjctLjctMS4yLTEuMy0xLjUtLjIgMS0uNiAxLjktMS4xIDIuOC0uMi0uNy0uNy0xLjMtMS40LTEuNy0uMiAxLS41IDEuOS0uOSAyLjgtMi40IDEuMi00LjcgMi41LTYuMSAzLjMtLjYtLjctMS4zLTEuMy0yLTEuOCAzLjEtMS41IDUuOS0zLjUgOC4yLTYgMy4yLTEuMyA2LjItMi44IDkuMi00LjV6TTI4IDQ4LjNjLTYuNiAzLjUtOC45LTcuNi01LTkuNiAyLjItMS4yIDYuOS0yLjkgMTAuNS00LjIgMi42LS44IDUuNC0uNiA4IC4zIDAgMCAxLjMuMyAyIC4zLS44IDEuOC0xLjUgMy43LTIgNS42LTMuNSAyLjEtOS4yIDUuNC0xMy41IDcuNnpNNDIuMSAzOGwtOC41IDEuNyAyLjEgMS4xLTYuNyAyLjdjMC0uMi0uMi0xLS4yLTFsMi44LTEuNC00LjMtLjRjLS44LS40LTEuOC0uNy0yLjctLjggMi41IDEuNyAzLjMgNSAxLjkgNy43bDEzLTctMS42LS43IDQuMi0xLjl6IiBmaWxsPSIjYmE5NzY1Ii8+PHBhdGggZD0iTTU2LjEgMTguNnYtLjVjMC0uNi0uMS0xLjItLjMtMS44IDAtLjEtLjEtLjEtLjItLjJoLS4ybC0uNy41Yy0uMS4xLS4yLjItLjIuM3YuMWMuMi40LjMuOC4yIDEuMnYuNGMwIC4xIDAgLjMtLjEuNGwtLjIuMWMtLjEuMS0uMS4yLS4xLjMgMCAuMS4xLjIuMi4yLjQgMCAuNy4xIDEgLjQuMS4xLjEuMS4xLjJ2LjJjMCAuMS4xLjIuMi4yaC4yYy4xIDAgLjEgMCAuMi0uMWwuNi0uNWMuMSAwIC4xIDAgLjItLjEtLjEtLjYtLjUtMS4xLTEtMS4zLjEuMS4xLjEuMSAwem0uOS0uNmMuMy4yLjYuNC44LjcuMS4xLjEuMi4yLjN2LjFzLjEuMS4yLjFoLjJsLjctLjRjLjEgMCAuMi0uMS4yLS4zdi0uMWMtLjEtLjUtLjUtLjktLjktMS4yLjEgMCAuMS0uMS4yLS4ydi0uM2MwLS4yLjEtLjUuMS0uNyAwLS4zIDAtLjYtLjItLjktLjEtLjEtLjEtLjEtLjItLjFoLS4xbC0uNy4zYy0uMSAwLS4xLjEtLjIuMXYuMmMuMS4xLjEuMy4xLjVzMCAuNC0uMS42YzAgLjItLjEuNC0uMS41bC0uMi4zLS4yLjJjMCAuMi4xLjMuMi4zem0xLjQgMS4xem0tLjIuMXpNNTQgMjIuNGMwIC4xLjEuMS4yLjFoLjFjLjEgMCAuMSAwIC4yLS4xbC42LS42Yy4xLS4xLjEtLjIuMS0uM3YtLjFjMC0uMS0uMy0uOS0xLjYtMS4xdi0uNmMwLS42LS4xLTEuMy0uMy0xLjggMC0uMS0uMS0uMi0uMi0uMS0uMSAwLS4xIDAtLjIuMWwtLjcuNmMtLjEuMS0uMS4yLS4xLjN2LjFjLjEuNC4yLjcuMiAxLjEuNC42LjcgMS4yIDEgMS45LjEgMCAuMy4xLjQuMi4xLjIuMi4yLjMuM3ptNi4zLTQuOWMuMS4xLjEuMi4yLjN2LjFoLjJjLjMtLjEuNi0uMy45LS40bC4xLS4xdi0uMWMtLjItLjQtLjUtLjctLjgtMSAuMSAwIC4xLS4xLjItLjIuMS0uMi4xLS41LjItLjcuMS0uMi4xLS41LjEtLjd2LS4zYzAtLjEtLjEtLjItLjItLjJsLTEgLjJjLS4xIDAtLjEuMS0uMS4ydi4yYzAgLjIgMCAuMy0uMS41IDAgLjItLjEuNC0uMi42bC0uMS4xLS4yLjFjLS4xIDAtLjEuMS0uMi4ydi4xYzAgLjEgMCAuMi4xLjIuMy4yLjcuNS45Ljl6bTIuNy0uOWMuMS4xLjEuMi4yLjIgMCAuMS4xLjEuMi4xaC4xYy4zLS4xLjUtLjEuOS0uMi4xIDAgLjEtLjEuMS0uMXYtLjFjLS4yLS4zLS41LS42LS43LS45aC4xYy4xIDAgLjItLjEuMi0uMS4yLS4yLjMtLjUuNC0uNyAwLS4xLjEtLjMuMS0uNCAwLS4xIDAtLjEtLjEtLjEgMCAwLS4xLS4xLS4yLS4xLS4zIDAtLjUtLjEtLjktLjEtLjEgMC0uMS4xLS4yLjF2LjJjLS4xLjMtLjMuNy0uNS45bC0uNC4xYy0uMSAwLS4yLjEtLjIuMnYuMWMwIC4xIDAgLjIuMS4yLjQuMi42LjUuOC43em0xLjgtLjloLjJsLjQuNGMwIC4xLjEuMS4yLjFoLjhjLjEgMCAuMSAwIC4xLS4xVjE2Yy0uMS0uMi0uMi0uMy0uNC0uNS4zLS4yLjUtLjQuNy0uN3YtLjJjMC0uMS0uMS0uMS0uMi0uMS0uMi0uMS0uNC0uMS0uNi0uMi0uMSAwLS4xIDAtLjIuMXMtLjIuMy0uMy40Yy0uMi4yLS41LjQtLjguNS0uMSAwLS4xLjEtLjEuMnYuMWMwIC4xLjEuMS4yLjF6bTMuNCAwYy4yIDAgLjMtLjIuMi0uNC0uMi0uMi0uNS0uNC0uOC0uNC0uMi4xLS40LjMtLjUuNSAwIC4xLjEuMy4yLjQuMy4xLjYgMCAuOS0uMXptLTkuNyAzMC41bC0uMi0uMnMtLjEtLjEtLjItLjFINThjLS4zLjEtLjUuMi0uOS4zLS4xIDAtLjEuMS0uMS4xdi4yYy4yLjMuNS42LjcuOGgtLjFjLS4xIDAtLjIuMS0uMi4yLS4yLjItLjMuNS0uNC44IDAgLjEtLjEuMy0uMS41IDAgLjEgMCAuMS4xLjEgMCAwIC4xLjEuMi4xLjMgMCAuNS4xLjkgMCAuMSAwIC4xLS4xLjItLjJ2LS4zYy4xLS40LjItLjcuNC0xbC4zLS4xYy4xIDAgLjItLjEuMi0uMnYtLjFjMC0uMSAwLS4yLS4xLS4yLS4xLS4zLS40LS41LS42LS43em0yLjctMWMtLjEtLjEtLjEtLjItLjItLjJ2LS4xaC0uMmMtLjMuMi0uNi4zLS45LjUtLjEgMC0uMS4yLS4xLjIuMi40LjUuNy45IDEtLjEgMC0uMS4xLS4yLjItLjEuMi0uMS40LS4yLjcgMCAuMi0uMS41LS4xLjd2LjNjMCAuMSAwIC4xLjEuMWguMmwxLS4yYy4xIDAgLjEtLjEuMS0uMnYtLjdjMC0uMi4xLS40LjItLjZsLjEtLjIuMi0uMWMuMSAwIC4xLS4xLjItLjJ2LS4xYy4xLS4xIDAtLjMtLjEtLjMtLjUtLjItLjgtLjUtMS0uOHptMi41LTEuMmMtLjEtLjEtLjEtLjItLjItLjN2LS4xcy0uMS0uMS0uMi0uMWgtLjJsLS43LjRjLS4xLjEtLjIuMi0uMi4zdi4xYy4yLjUuNS45LjkgMS4yLS4xIDAtLjEuMS0uMi4ydi4zYzAgLjItLjEuNSAwIC43IDAgLjMuMS42LjIuOS4xLjEuMS4xLjIuMWguMWwuNy0uM2MuMSAwIC4xLS4xLjItLjJWNDdjLS4xLS4xLS4xLS4zLS4xLS41czAtLjQuMS0uNmMwLS4yLjEtLjQuMS0uNWwuMi0uMi4yLS4yYzAtLjEtLjEtLjItLjItLjItLjMtLjItLjctLjQtLjktLjh6bS0uNi0uNHptLjItLjF6bS4yLjF6bS02LjggMy41aC0uMmwtLjQtLjRjMC0uMS0uMS0uMS0uMi0uMS0uMyAwLS40IDAtLjcuMS0uMSAwLS4xIDAtLjEuMXYuMmMuMS4yLjMuMy40LjUtLjMuMi0uNS40LS43Ljd2LjJjMCAuMS4xLjEuMi4xLjIuMS40LjEuNi4xLjEgMCAuMSAwIC4yLS4xcy4yLS4zLjMtLjRjLjItLjIuNS0uNC43LS41LjEtLjEuMS0uMi4xLS4zIDAtLjEtLjEtLjItLjItLjJ6bTguOS00LjlWNDJjMC0uMS0uMS0uMS0uMi0uMmgtLjFjLS4xIDAtLjEgMC0uMi4xbC0uNi41Yy0uMS4xLS4xLjItLjEuMy4xLjYuNSAxLjEgMSAxLjJ2LjZjMCAuMiAwIC40LjEuNy40LS44LjgtMS42IDEuMS0yLjQtLjMgMC0uNS0uMi0uNy0uNC0uMSAwLS4yLS4xLS4zLS4yem0tMTIuMyA1Yy0uMiAwLS4zLjItLjEuMy4yLjIuNS4zLjguNC4yLS4xLjQtLjMuNS0uNSAwLS4xLS4xLS4zLS4yLS40LS40IDAtLjcgMC0xIC4yeiIgZmlsbD0iI2IzMjMxNyIvPjxwYXRoIGQ9Ik03MiA1NS40aC0uNnYxLjhINzF2LTEuOGgtLjZWNTVINzJ2LjR6bTIuOSAxLjhoLS40di0xLjdsLS42IDEuN2gtLjRsLS42LTEuN3YxLjdoLS40VjU1aC44bC41IDEuNC41LTEuNGguOGwtLjIgMi4yeiIgZmlsbD0iIzIzMWYyMCIvPjwvc3ZnPg=="); }
+  .mlogo.lv-aa { background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1Ny42NSA1NCI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTUyLjgwMiA1My40MTRoLS4wMDlsLS4zOS0xLjEwMmgtLjU5N1Y1NGguMzQzdi0xLjM0NGguMDA5TDUyLjYzMSA1NGguMzMzbC40ODgtMS4zNDRoLjAwOVY1NGguMzQzdi0xLjY4OGgtLjU5MXpNNTAuMTMzIDUyLjYxMmguNTA5VjU0aC4zNDV2LTEuMzg4aC41MDl2LS4zaC0xLjM2M3oiLz48cGF0aCBmaWxsPSIjZmZkYTAyIiBkPSJNNTIuNDc1IDBIMzYuMDA0bC01LjUzMiA1LjI2NC0uMjM0LjM0MkwyNi41NjEgMEgxMC40MDRMNC44NjcgNS4yNjcgMCAxMi40OTRjMy42ODYgMy40OTkgNC4yNTIgMy44OTQgNC4yNjcgNy4wNTN2MjAuMzU4YzAgMi40ODMtLjc1NSAzLjA0MS00LjE1NSA2LjU1MUw1LjI4NyA1NGgxNi40NzFsNS41MzItNS4yNjQuMTA4LS4xNThMMzAuOTYyIDU0aDE2LjY5Nmw1LjgzNC01LjU0OFYxNC4wOTVjMC0yLjQ2NS43MTEtMi45OTYgNC4xNTctNi41NTF6Ii8+PHBhdGggZmlsbD0iIzAwNTU5NiIgZD0iTTUxLjgwNCAxLjI3NWgtMTUuMjlsLTUuMDY2IDQuODItMS4yMzQgMS43OTktNC4zNDItNi42MTlIMTAuOTEzbC01LjA2NiA0LjgyLTQuMTg3IDYuMjE3YzMuMDMgMi44NzYgMy44NjUgMy43NTcgMy44ODMgNy4yMzV2MjAuMzU4YzAgMi44OTQtMS4wMyAzLjg0MS0zLjc4OSA2LjY4OWw0LjIwNSA2LjEzMWgxNS4yOWw1LjA2Ni00LjgyIDEuMTA2LTEuNjEzIDQuMjI5IDYuNDMzaDE1LjQ5OWw1LjA2OS00Ljgydi0zMy44MWMwLTIuODU0Ljk2OC0zLjc3NyAzLjc5MS02LjY4OXoiLz48cGF0aCBmaWxsPSIjZmZmIiBkPSJNNTEuMyAyLjIzMUgzNy4wMTdsLTMuNDc4IDUuMDcxYzIuNDM2IDIuNTE1IDMuNTEzIDMuNzYgMy41MTMgNi43OTN2NS45NjdMMjUuMzU2IDIuMjMxSDExLjQyMkw3Ljk3MSA3LjM1NWMyLjU5NSAyLjQ2NCAzLjU3NiAzLjc0MyAzLjU5NCA3LjM3MnYyMC4zNThjMCAzLjAzMy0xLjA3OSA0LjI3OC0zLjUxNSA2Ljc5M2wzLjQ3OCA1LjA3MWgxNC4yODNsMy40NzgtNS4wNzFjLTIuNDM2LTIuNTE1LTMuNTEzLTMuNzYxLTMuNTEzLTYuNzkzdi01LjU2MWwxMS40NTYgMTcuNDI1aDE0LjAzVjE0LjA5NWMwLTMuMDMzIDEuMDgtNC4yNzggMy41MTYtNi43OTN6bS0xLjIyMiAxMS44NjR2MzEuNjdIMzcuODdMMjQuNTkyIDI1LjU2OHY5LjUxN2MwIDMuMjcxIDEuMzI3IDUuMDMxIDMuMTczIDYuOTIybC0yLjU3OCAzLjc1OUgxMi4xNTJsLTIuNTc4LTMuNzU5YzEuODc4LTEuOTI5IDMuMTc1LTMuNjc5IDMuMTc1LTYuOTIyVjE0LjE4N2MwLTIuODkzLTEuMTM3LTUuMDEtMy4yMzYtNy4wMDFsMi41NC0zLjc3MWgxMi42NjVsMTMuNTIgMjAuNjF2LTkuOTI5YzAtMy4zODYtMS40MzEtNS4xMzItMy4xNjEtNi45MDhsLS4wMTMtLjAxMyAyLjU3OC0zLjc1OWgxMy4wMzZsMi41NzggMy43NTljLTEuODU0IDEuOTE1LTMuMTc4IDMuNjI5LTMuMTc4IDYuOTJ6Ii8+PGcgZmlsbD0iI2U1MGU2MyI+PHBhdGggZD0iTTQ1LjQgMTcuODc3Yy4zOTguMjM3LjYzNC41MS4zNTYuODU1LS4xMzguMTcyLS4zMTguMjQ0LS4xMDguMzY4LjIuMTE4LjE3NS40OS41MjkuNzU0LjM1NS4yNjUtLjkyNC40ODctLjE3Ny45My4zOS4yMzIgMS40MjIuNDIyIDEuNDM0Ljk3NC4wMTUuNjY0LTEuMzQuNzQ1LTEuNTI1IDEuMTMzLS4wNi4xMjUtLjAxMS4yNzkuMDk4LjMwNSAxLjYzLjM5NSAxLjE1Ny45OCAxLjQ2NyAxLjMyMi4wOTQuMTAzLjI1OC4zMzUtLjA3Mi40MjctLjM2Ny4xMDItLjM4OS40MjctLjI4NC40Ny4xNjEuMDY2LjI5LjIzOS40NzQuMzcuMDI1LS4wNjIuMDQ0LS4xMjEuMDA1LS4yMDktLjE2NC0uMzc0LjU1Mi0uNjMyLjY3NS0xLjI1Ny4wMDEtLjAwNy4wMTMtLjQxOS4xMDQtLjY5LjAyNC0uMDcyLjEzNy0uMDczLjE2NC0uMDAyLjExOS4zMTMuMzU2LjYyOS4zMTcuODQ1LS4wNDYuMjU4LjE3LjI3MS4yNjcuMzU3di03LjI5Yy0uNjQ3LS4yODUtMS4yMTgtLjQ3MS0xLjU0My0uNDMtLjM0OS4wNDUtMS4xNDkuMzU1LTIuMTg1Ljc2NHpNMTMuNzA1IDE4LjQzM2MuMTI0LS4zMDQuNTY3LS4yNTYuNTkxLS4zMzkuMDEtLjAzMy0uNDA1LS41ODQtLjAxOS0uNTA4LjEyOC4wMjUuMTc4LS4wNTcuMTI2LS4yMjEtLjIwNy0uNjUzLjIyOS0uNDQ2LjI0LS42MzIuMDEyLS4yMDYuMDkxLS40MDEuMDgyLS42MTItLjAwMy0uMDYyIDAtLjE1OS4wNzgtLjE1NC4wODUuMDA1LjA3NC4wNjMuMTI1LjcwNC4wMjguMzUzLjMxNi4xNjIuMzAxLjQxMi0uMDEuMzA5LjE1MS4yODIuMjc2LjMwNy4xODEuMDM3LS4wMDEuMjI3LjAwNi4zMThhLjgxNi44MTYgMCAwIDEtLjA5NS40ODRjLS4xMDcuMTkuMTIxLjI5LjI1Ni4zODkuMzYuMjY1LS4zMDguNTMyLS4xNDcuNjYuMTkyLjE1Mi4zNzguMDEuNDg0LjAxOS4wODguMDA3LjE1MS4wNzcuMTczLjE4Mi4wNDMuMTk2LS40MjMuMjgyLS4yNC41MDcuNDAxLjQ5NC0uMjE1IDEuMTU0LjEzNSAxLjE0OC45NDctLjAxNi40MDkuNzUyLjM1My44MzctLjA0LjA2MS0uMDgzLjIyNC4wNDYuMjYzLjE3LjA4Ni41MTUuMDg3LjUzMi4yNTEtLjAwNC4yMjMtLjIzNi4zODItLjM4Ny41ODctLjA4MS4xMS0uMDQ3LjE3Ny4wNjEuMjIyLjM0LjE0Mi42ODktLjE1Ni42MjcuMzI5LS4wMDcuMDU4LS4wMTMuMTA2LjAxOS4xNTguMjE5LjM1MS0uMDY4LjQzMi0uMzQ2LjgxOS0uMDQ5LjA2OC0uMDY0LjA5OC4wMTMuMTQxLjMxMy4xNzcuNTgzLjE2LjM2NC40MTktLjEwOS4xMjktLjI1LjE4My0uMDg1LjI3Ni4wNjIuMDM1LjA5Ny4xLjEzMy4xNzguMDkyLS4wNzguMjk1LS4xNjguNDctLjIyMWEuMDUzLjA1MyAwIDAgMCAuMDA2LS4xYy0uNTM5LS4yNDEuMDItLjQ3OS0uMTUtLjY0Mi0uMTE0LS4xMS0uMTYzLS4zMDgtLjA4Mi0uMzYyLjE1Ny0uMTA2LjIxNy0uMzk0LjQxNC0uNDY0YS4wNDIuMDQyIDAgMCAwIC4wMS0uMDc2Yy0uMDgyLS4wNTItLjE3NS0uMDY2LS4xNjctLjEzOC4wMDUtLjA0NS4wNDQtLjA2OC4wOC0uMDcyLjE2MS0uMDE5LjE4OC0uMTgxLjI5OS0uMjUzLjIxMS0uMTM3LS4xNi0uNS4wMTgtLjYzLjEyNS0uMDkxLjIwNi0uMjIzLjMyNi0uMzE4YS4xMDIuMTAyIDAgMCAwIC4wMjItLjEzNGMtLjIzMi0uMzY2LS4wMTgtLjM2NS0uMDgxLS41MTgtLjA5LS4yMTguMzAzLS4zNjkuMzY5LS43MzMuMDAxLS4wMDQuMDA3LS4yNDQuMDU3LS40MDMuMDEzLS4wNDIuMDc1LS4wNDMuMDktLjAwMS4wNjUuMTgzLjE5NS4zNjcuMTc0LjQ5My0uMDM2LjIxNC4yMi4xMzcuMTY0LjMwOS0uMDkyLjI4NS4yNzMuMzMzLjE3MS41NTEtLjA5MS4xOTQuMzMuMjUuMjE1LjQ1NC0uMDY1LjExNS0uMjU1LjM3LS4xNTcuNDkyLjUyNy4yMTYuNDYuMzU2LjM1NC41NjEuMzctLjIwOC43MTItLjE5Ljc0NS0uMzI1LjA4NC0uMzM5LTEuMDYxLS40MjctLjUwNC0uODM3LjgzNC0uNjE1LjgyOC0uNjcuODI4LS43NjkgMC0uMjU4LS40NzEtLjQ3OC0uMzM1LS42MzUuMTkxLS4yMi42NTktLjA5MSAxLjEwNS0uMjAzLjExMy0uMDI4LjEwMS0uMTQuMDMxLS4xNjQtLjMzNi0uMTE2LS4zMTItLjI3NC0xLjA0NC0uNDgzLS4yMjktLjA2NS0uMjc4LS4yMDYtLjE1Ny0uNDA2LjM2LS41OTUuNTIxLS4zMDkuNTkyLS42LjA1MS0uMjA4LjIwMi0uMzA2LjQyNC0uMzQuOTU1LS4xNDYtLjQ1MS0xLjEzNS41NTEtMS4wNDIuMDcyLjAwNy4zNi0uMDE1LjQ0LS4yMDMuMDM5LS4wOTEtLjAxNC0uMTQ5LS4xMDMtLjIwMy0xLjU0NS0uNjctNC4yMzEtMy4zNDktNS41NDUtMy45OC0uNjAzLS4yOS0yLjA0Mi0uODQtMy42MDEtMS40MTUuMTgyLjc2NC4yNyAxLjU2NS4yNyAyLjQxOHY0LjI0OHpNMjYuMDcgMTYuODg5Yy0uMjc3LjEzNi0uMjYuMzA0LS41MzguNDM5LS4yMzcuMTE1LjAzMS4zNjcuMzI0LjIwMi41NzQtLjE5Ni4xOTUuMzk1Ljc5Ni4yODMuMTkxLS4wMzYuODE2LS4xODYuNjM5LjI5MS0uMDc4LjIxMS0uMDU3LjI3Ny4xMjguMzk5LjE0Mi4wOTQuMTU5LjE3MS4wMi4yNzQtLjI1NC4xOTEtLjM0MS4zMDktLjUwMS41NTUtLjIyMS4zNDEuMTY4LjIzNy42NjcuNjYyLjI0Ni4yMDkuMzI3LjQ3Ny4wNTMuNDU5LS42Ny0uMDQyLS4zNTQuMzgzLS42NDMuNzIyLS4yOTcuMzUuNDQuNTIzLjc5NS41MzMuMTk3LjAwNS4yNjQuMTI5LjIwNi4yMTUtLjE0OC4yMi0xLjU2My44NjctMS4wMDkuOTI4LjM4Ny4wNDMuNDMzLS4yMDMgMS4wMTItLjE0NWEuNTM1LjUzNSAwIDAgMCAuMjc5LS4wNDRjLjEwOC0uMDUxLjIwOS0uMDM5LjI5OC4wNTcuMzI5LjM1Ni0xLjM4Ny43MDYtLjkyMi45NzguNDY4LjI3NC4yMzkuNDU0LjU5OS42NTkuNDM0LjI0OC0uMDMzLjQ4NC4yMy42NTkuMTM4LjA5Mi4zNTQuMTQ2LjQ2OS4yMjItLjA5Mi0uMjQ5LS4zMTYtLjUxNS4yMS0uNDcuMDY0LjAwNi4zMTgtLjAxMi4zODktLjE2Ni4xMDgtLjIzNC0uNTgzLS4xOTktLjU4OC0uNjU4LS4wMDItLjIwNS0uNzk5LS4zODMtLjA4NC0uNzA3LjIzNi0uMTA3LjMwOC0uMjQ1LjUyMy0uMzEuMjE3LS4wNjUuMjY3LS40NDYtLjEyNi0uNjAzLS4wNy0uMDI4LS41MzEtLjE2NC4yOS0uNTUxLjMyOC0uMTU1LjUxMy0uMTc2LjQ5Ni0uMzMxLS4wMzQtLjMxNi0uNTUzLS4zNzEtLjQ1Ni0uNjI4LjA0Ny0uMTI0LjI4MS0uMjI1LjQwMS0uMjU4LjE5MS0uMDU0LjM1OC0uNzA0LjAzMi0xLjA2Ny0uMTg3LS4yMDgtLjA1Ny0uNDkxLjI0My0uNTE3LjQxOC0uMDM2LS4zNjktLjY1OC4xMzItLjYzNi4xNDEuMDA2LjE5NC0uMDUxLjIzNS0uMTYyLjExNC0uMzA2LS4wMzYtLjY0LjEzOS0uNjQ4LjIwMy0uMDA5LjA3MS41OTcuMTYyLjczN2EuMTgzLjE4MyAwIDAgMSAuMDIyLjE0Yy0uMTUyLjQ1My40NS4yODguNDkzLjQ2LjA5NC4zNzUtLjMxNS4zOTgtLjI0Mi42NzMuMDczLjI3Ni0uMjg0LjM1OC0uMDc4LjQ4NC4xODYuMTE0LjYzNi4wMTkuNTEzLjI0NS0uMTEuMjAyLS4yMjEuMjktLjMxLjQ5My0uMTA4LjI0Ni43NTEuMTU0LjQ1MS41OTEtLjAwNS4wMDctLjIzNS4zODYtLjA2Ni4zODguMDEzIDAgLjgyMi4wMzUuNjUxLjMyNy0uMTEyLjE5MS4xMzcuMzExLS4xMDYuNTU3LS4xODYuMTg4LS4xMTcuMzA3LS4yNC40NDctLjA1Ni4wNjQuMDEzLjE1Ni4wOTcuMTMuNTM5LS4xNjYuMDc2LjIwNy40MDYuNDYuMzgzLjI5NS4yMzguNDQ2IDAgLjU1NC0uMjQ1LjExMS0uMjMuMjQ4LS40NzUuMzU5LS4yMDkuMDk0LjAyNy4zLjI4Ni4xNjUuNTA3LS4xNjEuMTMyLjM3My42NjQuMjgxLjE2OC0uMDI5LjcyMS0uMTUyLjU2NS4yMzgtLjA2OS4xNzItLjA1MS4yMjYuMTEzLjMyNi4xMjYuMDc3LjE0LjEzOS4wMTguMjI0YTEuNTA0IDEuNTA0IDAgMCAwLS40NDMuNDU0Yy0uMTY2LjIzNy4wNTkuMjEzLjQwMS40MTRhLjEzLjEzIDAgMCAxIC4wNzItLjAyOWMuMjEzLS4wMjQuMjQ5LS4yMjYuMzk2LS4zMTUuMjgtLjE3LS4yMTItLjYyMi4wMjQtLjc4NC4xNjYtLjExMy4yNzMtLjI3OC40MzItLjM5NmEuMTIyLjEyMiAwIDAgMCAuMDI5LS4xNjdjLS4zMDgtLjQ1NS0uMDI0LS40NTQtLjEwOC0uNjQ0LS4xMTktLjI3Mi40MDEtLjQ1OS40OS0uOTEyLjAwMS0uMDA1LjAwOS0uMzA0LjA3NS0uNTAxLjAxOC0uMDUyLjA5OS0uMDUzLjExOS0uMDAxLjA4Ni4yMjguMjU4LjQ1Ny4yMy42MTMtLjA0Ny4yNjYuMjkxLjE3LjIxOC4zODUtLjEyMi4zNTUuMzYyLjQxNS4yMjYuNjg2LS4xMjEuMjQxLjQzNy4zMTEuMjg0LjU2NS0uMDg2LjE0My0uMzM5LjQ2MS0uMjA5LjYxMi43MjYuMjc5LjYwMi40NTYuNDU0LjcyOC0uMzM0LjYxMS41OTEuNTcyLjU5Ny44MjUuMDAyLjA5OC0uMjEyLjE0Ny0uMzE1LjE5OC0uMDg1LjA0My0uMTA0LjA5My0uMDQ0LjE4NC4wNzQuMTEyLjM4OS4yNTEuNjA0LjM4Mi0uMDA0LS4wMTMtLjAwOS0uMDI3LS4wMDktLjA0Mi4wMS0uNTEuOTYzLS4zMTQgMS4wMDQtLjgzLjAyMy0uMjgyLS4yMjQtLjQxNC0uNzItLjcwNC0uNDA1LS4yMzctLjExMy0uMzYxLS4xMDgtLjM2My4yMzYtLjA4OC40MDYtLjMzOC42NjItLjYxNWwtNi4zODEtOS43MjdjLTEuMjExLS4wMTQtMy4zMTYuMDUzLTUuNDg4LjU0MS4yMjIuMjY2LjA3NC40MTYtLjE1NC41Mjh6Ii8+PC9nPjxwYXRoIGZpbGw9IiMwMGE0YzciIGQ9Ik00OS4xMTkgNDMuNWMtMy41MzItMi4xNjktMTEuNzA4LTEuNzk1LTExLjcxNS0zLjc5My0uMDA1LTEuMzcxIDcuOTQxLTEuMSA3LjkyNi0yLjYwNi0uMDExLTEuMTM2LTQuNjI1LTEuNDgzLTQuNjI1LTIuNTMzIDAtLjc2OSAzLjgyLS45MjQgMy44Mi0xLjk5NyAwLTEuNjY0LTEwLjEyNi0xLjg3NC0xMC4xNDQtMS44NzMuMDQzLjAwOCAzLjk2OC42ODkgMy45NjggMS41MjkgMCAuOC00Ljk4IDEuMDUyLTcuMTM1IDEuNjc2bDcuMTUyIDEwLjg3OWgxMC43NTJWNDMuNXpNMjYuNTM4IDQyLjEwNWMtLjk2OS0xLjA0NC0xLjgzNi0yLjE3Ny0yLjM2NS0zLjY2OS0yLjgzMi40MTgtNS41NjcuOTA5LTYuNTg3IDEuNjgtMi40NTcgMS44NTggNi40ODQgMS43MzctNC45MzkgNC42NjVoMTIuMDU2eiIvPjxwYXRoIGZpbGw9IiNmZmRhMDIiIGQ9Ik01MC4xNzMgNC4zNzFIMzguMTQ0bC0xLjg1NyAyLjcwN2MxLjc5NCAxLjk1NCAyLjkwNCAzLjgyIDIuOTA0IDcuMDE4djQuODQ1Yy4xMjktLjAzLjI2Mi0uMDY2LjM5My0uMS41NzQtLjQyOCAxLjQzOS0xLjIzLjI3MS0xLjEyNy0uMjcuMDI0LS40NjctLjEzLjE3Ny0uNTEzLjIxMi0uMTI2LjEzMy0uMjYzLS4wNjctLjM2MS0uMTcyLS4wODUtLjY0NC0uMDUyLS40MzgtLjQ5MS40MzYtLjkyMS44OC0uNTk5IDEuMTEzLTEuMzE2LjA4MS0uMjQ3LjEtLjMxOS0uMDU4LS40NzgtLjE2Ny0uMTY4LS40NC0uMTItLjMwNy0uMzk5LjA1My0uMTEzLjAxOC0uMjU0LS4wODUtLjMwOWEzLjc0IDMuNzQgMCAwIDEtLjE2My0uMDkxYy0uNDI0LS4yNDctLjAxMy0uNTY2LjcyMi0uNDc2LjE5MS4wMjMuMzA0LS40MTEuNDYzLS41MDcuMDA0LS4wMDIuMTk4LS4xOTMtLjA1Ny0uMjgzLS4xOTMtLjA2OC0uMzU4LS4wNDctLjM3LS4yMzktLjAxOC0uMjk2LjM2OC0uMjE1LjM2OS0uNDggMC0uMi0uMTU0LS4yMjEtLjMwNy0uMzg2LS4xOTUtLjIwOS0uMTYzLS41MTUuMDU2LS43MDEuMTU4LS4xMzQuMTk0LS4yOTYuMTY5LS41MjYtLjA4NS0uNzkyLjc0OS0uNjY1Ljc4Ni0uODAxLjAxMi0uMDQ0LS41MTQtLjc3OS0uMDI1LS42NzguMTYyLjAzMy4yMjctLjA3Ni4xNi0uMjk1LS4yNjMtLjg3MS4yOTItLjU5NS4zMDUtLjg0My4wMTUtLjI3NS4xMTUtLjUzNC4xMDQtLjgxNi0uMDAzLS4wODMgMC0uMjEyLjA5OS0uMjA2LjEwOC4wMDcuMDk0LjA4NC4xNTkuOTM5LjAzNi40NzEuNDAxLjIxNy4zODMuNTUtLjAxMy40MTIuMTkzLjM3Ni4zNTEuNDEuMjMuMDUtLjAwMS4zMDMuMDA4LjQyNC4wMTYuMjMyLS4wMS40MzktLjEyLjY0Ni0uMTM2LjI1My4xNTQuMzg2LjMyNi41MTguNDU4LjM1My0uMzkxLjcxLS4xODcuODguMjQ0LjIwMy40ODEuMDEzLjYxNS4wMjUuMTEyLjAxLjE5MS4xMDIuMjIuMjQyLjA1NC4yNjItLjUzNy4zNzctLjMwNS42NzYuNTEuNjU5LS4yNzQgMS41MzkuMTcyIDEuNTMxIDEuMjA0LS4wMjEuNTE5IDEuMDAyLjQ0OSAxLjExNi0uMDUuMDgyLS4xMDYuMjk4LjA1OC4zNTEuMjE2LjExNC42NTQuMTE1LjY3Ni4zMzUtLjAwNS4yOTctLjMuNTEtLjQ5Mi43ODMtLjEwMy4xNDctLjA2LjIzNi4wNzguMjk3LjQzMi4xOS44NzYtLjIwNy43OTcuNDQuODgyLS4zNDIgMS4zOTQtLjUxOCAxLjc2Mi0uNTY1LjQxNy0uMDU0IDEuMDA5LjA5MiAxLjY3Mi4zNDV2LTIuMzY2YzAtMy4xOTcgMS4xMS01LjA2NCAyLjkwNS03LjAxOHpNMTIuNTYgNC4zNzFsLTEuODE0IDIuNjk0YzEuMDYgMS4xMTMgMS44MTkgMi4yNjIgMi4zMDQgMy40OTcgMS44NDkuNjc0IDMuNjkyIDEuMzcgNC40MiAxLjcxOS43MTUuMzQzIDEuNjE1IDEuMDczIDIuNjU4IDEuOTE4LjUwNS40MDkgMS4yNTYgMS4wMTggMS45MDcgMS40NzguMjY2LS4xMzEuMjM4LS4yODIuNDgxLS4zNjEuMjQ1LS4wOC4zMzItLjM2Ni0uMTEzLS41NTgtLjA4LS4wMzQtLjU3My0uMjcyLjMzNi0uOTE3LjM2Ny0uMjYuNTUxLS4wNzUuNTI1LS4zNDItLjAzOC0uMzg3LS42MjYtLjQ1My0uNTE2LS43NjguMDUzLS4xNTIuMzE4LS4yNzUuNDU0LS4zMTYuMjE2LS4wNjYuNDA1LS44NjIuMDM2LTEuMzA1LS4yMTEtLjI1NC0uMDY1LS42MDEuMjc1LS42MzMuNDczLS4wNDQtLjQxOC0uODA1LjE0OS0uNzc4LjE1OS4wMDguMjE5LS4wNjIuMjY2LS4xOTguMTI5LS4zNzQtLjA0MS0uNzg0LjE1Ny0uNzkzLjIzLS4wMTEuMDguNzMxLjE4NC45MDIuMDI3LjA0NS4wNC4xMjEuMDI1LjE3Mi0uMTcyLjU1NS41MS4zNTMuNTU4LjU2My4xMDYuNDU5LS4zNTYuNDg4LS4yNzQuODI0LjA4Mi4zMzgtLjMyMi40MzgtLjA4OS41OTMuMjEuMTQuNzIuMDI0LjU4MS4zLS4xMjUuMjQ3LS4yNS4zNTUtLjM1MS42MDQtLjEyMy4zMDEuODUxLjE4OC41MTEuNzIzLS4wMDUuMDA4LS4yNjYuNDcyLS4wNzUuNDc1LjAxNSAwIC45My4wNDIuNzM2LjQwMS0uMTI3LjIzNC4xNTUuMzgxLS4xMi42ODEtLjIxLjIzLS4xMzMuMzc1LS4yNzIuNTQ3LS4wMDUuMDA3LS4wMDQuMDE0LS4wMDguMDIxIDIuMDktLjUzMSA0LjE1NS0uNjcxIDUuNTYzLS42ODlMMjQuMiA0LjM3MXoiLz48cGF0aCBmaWxsPSIjZmZmIiBkPSJtMTUuNjU5IDcuMjMyLS40OTctMi4zNTEtLjQ5NyAyLjM1MS0yLjM1My40OTcgMi4zNTIuNDk4LjQ5OCAyLjM1Mi40OTgtMi4zNTMgMi4zNS0uNDk3eiIvPjwvc3ZnPg=="); }
+  .mlogo.lv-a { background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbDpzcGFjZT0icHJlc2VydmUiIGlkPSJMYXllcl8xIiB4PSIwIiB5PSIwIiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCA3MC43OCA1NCIgdmVyc2lvbj0iMS4xIiB2aWV3Qm94PSIwIDAgNzAuNzggNTQiPjxzdHlsZT4uc3Qwe2ZpbGw6I2FkODUwNX0uc3Qxe2ZpbGw6IzlmYTFhNH0uc3Qye2ZpbGw6IzAwNTQ5ZX0uc3Qze2ZpbGw6I2ZmZn0uc3Q0e2ZpbGw6IzVmNjA2Mn08L3N0eWxlPjxwYXRoIGQ9Ik02OS40MzUgMjAuNzU5Yy0xLjQ4MS0yLjI2Ni00LjY3MS0yLjE4MS03LjI1LTEuNzg4LTIuMTUzLjMyOC00LjM5Mi45NzItNi4wNDEgMS4zMzZsLjEyMi0zLjc1OGMuMTExLTIuOTg3LjI1Ni02LjMzLjMxMS03LjA1LjI4Ni0zLjc2My0xLjM5OC01LjI3LTMuNzcxLTUuOTc3LTEuMDItLjMwMy0yLjIwMS0uNDczLTMuNDE4LS43MDktMS4xNjMtLjIyNS00LjQxLS45OC01LjQyMi0xLjQ4NiAwIDAtMS41MjQtLjYzNy0yLjUyMi0uOTY4LTQuMzExLTEuNC02LjgxNCAxLjcxNi03LjEwMiAyLjA4Ny0uMjY2LjM0Mi00LjgxNCA1LjQyNS02Ljg4MSA3Ljc3NC01Ljk2Ni0zLjg3Ni0xNS4xNTYtNy41MDktMjAuMzQ1LS4xMzhsLS43Ni0yLjA3N3MtMy40MDIgMy43OTYtMS44NDkgNy44MzhsLS4wMjItLjA2MUMyLjcyNiAxNC43NDYuMjI2IDEwLjk0OC4yMjYgMTAuOTQ4cy0uMjc2IDMuMjczLS4yMTggNC4yMDRjLjA1Ni45MDMuMjEzIDIuMTM5LjYyNyAzLjQ1NC44MzIgMi42NDUgMi43MyA1LjY3IDYuOTA5IDYuODQ1YTkuNyA5LjcgMCAwIDAgMS42NTMuMzM2Yy4yMzkuMDIzIDEuMDAyLjA3MSAxLjc5Ni4xNTIuMzc2LjAzOS44NTMuMTAyIDEuMTg1LjE1OC4xNzEuODU3LjY4MSAxLjY0NSAxLjQwOSAyLjE5NGwuMzMzLjIyNGMuMDk1IDIuNTE4Ljc0MiA0LjYzNiAxLjQ3OSA2LjQ2Ny43NTkgMS44ODQgMS42NDIgMy40OTUgMi4xMyA0Ljk5Mi43ODEgMi4zOTguNjQ1IDQuNTY2LTUuNDk2IDcuODM1bC0xLjc5OS45NTggMS44ODkuNzY0YzMuMzk2IDEuMzc0IDEwLjgyMyAzLjc2OCAxOC4yMjEgNC4zNDMgNy4yMDMuNTU5IDE0Ljg5LS41NzcgMTguMzY1LTYuNzM5IDEuMDUxLS42MiAxLjUxOC0xLjQ5MiAxLjcwOS0yLjI2NC44MDEuMjIgMS44NTkuNjkyIDMuNDA5IDEuNjE3bDEuMzA5Ljc4LjEyNi0xLjUxOGMuMTc2LTIuMTA4LjQ3LTUuOTk5LS40MzItMTAuMDg1IDkuNDA4LjM2MyAxOS42ODMtNy4xMzcgMTQuNjA1LTE0LjkwNnoiIGNsYXNzPSJzdDAiLz48cGF0aCBkPSJNNjguNjg5IDIxLjI3OGMtMi4yMTctMy4zOTItMTAuMTMzLS4zMTMtMTMuNDI2LjE3NC0uMTcxIDEuNDE1LjMwNi0xMC41NzkuNDE2LTEyLjAyNy40OTgtNi41NDktNS40MzEtNC41MDgtOS45NTYtNi43NzEgMS4yMjUgMS40NjYgMS41NjcgMi42MTEgNS43MSAzLjE0LTUuMzYyIDIuMDgyLTcuMDQ0LTMuNDc2LTEwLjIzNi00LjUzMi0zLjY4My0xLjE5Ni01LjgwMSAxLjQ0LTYuMDUzIDEuNzY2LS4yOTUuMzc5LTUuODIxIDYuNTUzLTcuNDY2IDguNDQ0LTYuNDgyLTQuNDE0LTE2LjEyNS04LjE5OC0yMC43MDYuNzg0YTUuODYzIDUuODYzIDAgMCAxLS41MTgtMS4yMmwtLjI2Mi0uODk4cy0yLjE2MSAyLjcyLS4xMTEgNy40NjRjLTEuMzU3LS4zODktMy41NTUtMS42NjUtNC41NTUtMy4xMzJMMSAxMy42OThzLS43MDMgOC43MTEgNi44NTIgMTAuODM1Yy41MDguMTQzIDEgLjI1NyAxLjQ4OS4zMDUuNDc5LjA0NyAzLjA2MS4xOSAzLjc4LjUxMy0uMDQzLjc5OS4zNjQgMS42MzEgMS4wOSAyLjE3OS4yMTguMTY0LjQ1NS4yOTIuNy4zODYuMDI1IDEwLjQ3MiAxMC4yOTkgMTMuOTgzLTIuMzgxIDIwLjczMyA2LjY3OCAyLjcwMyAyOS4zMTMgOS40MzggMzUuNTI5LTIuMjE2IDEuNDE5LS43MSAxLjYwMS0xLjk1NiAxLjU3NS0yLjY3IDEuMTIuMDc2IDIuNDg2LjU2OSA0LjczMSAxLjkwNy4xOTQtMi4zMjcuNTE0LTYuNjkzLS43MzMtMTEuMDYxIDkuODk1IDEuMjIxIDE5LjQ3OS02LjU2NiAxNS4wNTctMTMuMzMxeiIvPjxwYXRoIGQ9Ik0yNi41NjMgMzUuMzAzek0yNS42MDYgMzQuNjIxbC0uMTQzLS4xMDdjLjE5NC4xNDcuMzkyLjI5Mi41OTQuNDM2bC0uMDYxLS4wNDRhMTkuNTY3IDE5LjU2NyAwIDAgMS0uMzktLjI4NXpNMjguNDA4IDM2LjQ3MnpNMjcuMzI1IDM1LjgwOGwtLjE0Ni0uMDk0YTMxLjI0NCAzMS4yNDQgMCAwIDEgLjY0LjQwNGwtLjA3Mi0uMDQ0YTc3Ljc3NiA3Ny43NzYgMCAwIDEtLjQyMi0uMjY2ek0yMy45MjEgMzMuMjU1bC0uMjk3LS4yNjdjLjA5OC4wODkuMTk3LjE3OS4yOTcuMjY3ek0yMi4zMDkgMzEuNjcyYTE4LjA2OCAxOC4wNjggMCAwIDEtLjM3OC0uNDI4bC0uMDItLjAyM2ExOS43ODIgMTkuNzgyIDAgMCAwIC4zOTguNDUxek0yNS4wNzIgMzQuMjE0Yy4xMjcuMDk5LjI1Ni4xOTkuMzg3LjI5OC0uMTI3LS4wOTYtLjI1MS0uMTkyLS4zNzUtLjI4OGEuMTA2LjEwNiAwIDAgMC0uMDEyLS4wMXpNMjIuNzMyIDMyLjEyMXpNMjQuMDYgMzMuMzc4Yy4xNDEuMTIzLjI4NC4yNDUuNDMuMzY3bC0uMDQyLS4wMzVhMjYuNzQgMjYuNzQgMCAwIDEtLjM4OC0uMzMyek0yNC45MzQgMzQuMTA1YTIwLjg1MSAyMC44NTEgMCAwIDEtLjM5Mi0uMzE4Yy4xMjkuMTA3LjI2LjIxMi4zOTIuMzE4ek0yMy4xMyAzMi41MjFsLS4wMTUtLjAxNWMuMTQ5LjE0Ni4zMDIuMjkuNDU4LjQzNWwtLjA4OC0uMDgxYy0uMTItLjExMy0uMjM5LS4yMjUtLjM1NS0uMzM5ek0zNy40OTQgNDAuMzI5ek0zNC42NDIgMzkuMzkxek00MC41MTIgNDEuMTAxek0zMS45NzQgMzguMzA1ek0yMS44MDkgMzEuMXpNMjEuMTg5IDMwLjMxMXoiIGNsYXNzPSJzdDEiLz48cGF0aCBkPSJNMzAuMTIxIDEyLjcwOGMzLjE3NyAxLjg2OCAxNC40MTEgOS4zNyAyMy4wODUgOC43MTcgMCAwLS4xOTkgMi4xOC0uMzg1IDMuNDY2LTIuODE4IDEuNzg5LTkuMDY5LS4xNDEtMTMuNjItNC4wMzctMS45NDYtMS45MDEtOS4wOC04LjE0Ni05LjA4LTguMTQ2eiIgY2xhc3M9InN0MiIvPjxwYXRoIGQ9Ik00Mi42MyA0MC4wMTljLS4wMzYtLjI2MS41MzgtLjMyNSAxLjI4My0uMTQyLjc0NS4xODMgMS4zNzkuNTQzIDEuNDE2LjgwNS4wMzYuMjYxLS41MzguMzI1LTEuMjgyLjE0MS0uNzQ2LS4xODItMS4zNzktLjU0Mi0xLjQxNy0uODA0eiIgY2xhc3M9InN0MyIvPjxwYXRoIGQ9Ik0xNC4xNjEgOS43OGM2Ljc3IDEuMDggMTAuNjMzIDMuNjE4IDE0LjkxNSA2Ljg2OSA1LjE0NSAzLjkwNiA4LjY0OSA4LjIyMiAxNC4zMjYgMTEuNTc4IDUuMjM3IDMuMDk2IDE2LjQ4NSA3LjQ1NyAyNC40MzItMy40MzQtMTYuNTgzIDE2Ljk3Ni0zMy4xMzMtNS40My0zOS4zNDctOS41MTgtMy43MjktMi40NTMtNy44NS01LjQ5NS0xNC4zMjYtNS40OTV6TTMwLjc5MyAxMS40Yy42ODItLjg0NCAyLjM1NS0yLjg0NiA0LjM2Ny01LjM5NyAxLjk2OS0yLjI5MiAzLjc5My0zLjk4MyA1LjU5My0yLjg5NC41MzkuMjk0Ljg4MyAxLjU3IDIuMzA2IDIuMjU3IDAgMC0xLjMyNS4zNDQtMi44OTUtMS4yNzUtLjQ1LS4wMzItMi44OTQuMTk2LTcuNjA0IDguNjM1TDMwLjc5MyAxMS40eiIgY2xhc3M9InN0NCIvPjxwYXRoIGQ9Ik0xNi4wMjUgNDguMDQ5YzQuODg3LTIuNjUzIDUuMTQzLTYuMjA3IDIuODk0LTExLjMwMy0uNTMyLTEuMjA2LTEuOTE2LTMuMjI2LTIuMjgyLTUuNTY5IDIuNDE2IDMuOTU0IDQuMSA0LjQ2NyA0LjE3NCA0LjQ2Ny0xLjkwNC0xLjY4NC0zLjIyMS02LjI5Ny0zLjE0OS04Ljc4NiAyLjEyNCA1LjM0NSA4LjQyMSAxNC43MTcgMzAuMDAyIDE2LjUzLS44MSAzLjIxNC0xMC4yMDggMi41MDUtMTUuMTY5IDIuMjU3IDMuMTExIDEuMzYxIDguOTk5IDIuMTg5IDEyLjQ0NiAyLjAyNS00Ljg3NiA2LjQ2Mi0yMi4zNTUgMy4zMTQtMjguOTE2LjM3OXpNOC4zNTEgMjMuMDkyYy0xLjg5My0uNjYxLTMuMTczLTIuMjU0LTQuMzItNC40NTkuNDU3LjI3MiA2LjkzIDMuNzU5IDguNzExIDQuOTk0LTIuMzUxLjE3NC0zLjkxNy0uMzctNC4zOTEtLjUzNXptNS45MjcgMS4xMzljLS44NDEtMi4xNzEtNi43MDYtNi42ODEtNy40MDQtOS4zOTNhNC4wOSA0LjA5IDAgMCAxLS4wNDUtLjI0Yy40MjcuNDYzLjkwMy45MTEgMS4zOTcgMS4zNDYuOTk2Ljg3NyAyLjExMyAxLjc0MiAzLjEzNCAyLjYyIDIuMDk0IDEuOCAzLjQyOCAzLjM4MSAzLjA1OSA1LjA0OWwtLjE0MS42MTh6bTIuMTI2IDEuNzQxYy0uOTM1LjgxOS0xLjg3OC0uMTA1LTEuNjcyLTEuMDIxbC4wMTEtLjA1MWMuMjk0LS4yMjQgMS4zMy0uNzQyIDEuNjYxIDEuMDcyeiIgY2xhc3M9InN0MiIvPjxwYXRoIGQ9Ik0yMS40NzggMTcuMjE0ek0yMS4zMTYgMTcuMTE3ek0yMS4xMjEgMTcuMDIyek0yMS41MTUgMTcuMjM4ek0yMC4zODEgMTYuODczek0yMC44MDUgMjkuNzY3bC4wMDcuMDEtLjAwNi0uMDF6IiBjbGFzcz0ic3QxIi8+PHBhdGggZD0ibTI3LjcwMyAyNS4wMTktLjgxOS0xLjg1MyAxLjY0Mi0uMDY2LS4yOTItMS4wNTVjNS43MDUgMS42MTYgOC42ODYgMy41MTYgMTIuMDA3IDkuMjIuNTQyLS4yODQgMS4zNTItLjYzMiAyLjI5OC0uOTU3LTIuMTA2LTEuMzAzLTMuOTA2LTIuNzE5LTUuMDg1LTMuOTg0LTIuOTI4LTMuMTQxLTYuNzE3LTUuOTEyLTkuMzQyLTcuNTM3LTMuNjc0LjQ1MS00Ljc1OC00LjIyNi02LjYyNy00LjM0MS0yLjUxOS4wOTItMy4xODQgMi40OTEtMy4yOTMgNC40NDkuMzMtMS41OTcgMS4xODctMy4yMjcgMi44NC0zLjM1NiAxLjU1NS4wOTUgMi43MTcgMy41ODMgNS44NjggNC43NzZsLTEuMTM5LjExMmMtLjQ2NC4xODQtMS4xNjktLjA5Mi0xLjkyMS0uNTU5LjUzNi43NCAxLjA0NiAxLjQzIDEuNTM5IDEuODE2LS43MzMtLjA1NC0xLjU4Mi0uMjg5LTIuMjAyLS42OTgtLjM3Mi44NzUtLjU2MyAxLjg2Mi0uNjUxIDIuODA0bC0uNzE3LS4zMjkuNTk0LjI3MmMtLjA2NS4xMjctLjI4NC40ODYtLjg2MS45MjItLjYzNSAxLjI4MS0xLjM0NCAxLjgxLTIuMTYyIDIuMjE2LjMwMS45NjYuNzgyIDEuOTM3IDEuNDI1IDIuODk2LjY0NC0xLjIxNiAyLjMwNS0zLjQwNSA2Ljg5OC00Ljc0OHpNMjEuNjcxIDE3LjM0NnpNMjAuNzU1IDE2LjkwNXpNMjAuNDIzIDE2Ljg3MnpNMjAuOTU2IDE2Ljk1OHpNMjIuMDEzIDE3LjYzMXpNMjMuMzE4IDE5LjE1bC0uMTM5LS4xODUuMTM5LjE4NXpNMjMuMDAzIDE4LjczNWwtLjE0My0uMTgxLjE0My4xODF6TTIzLjE1MSAxOC45MjhsLS4xNDctLjE5MS4xNDcuMTkxek0yMy40NjggMTkuMzUzbC0uMTQ3LS4yLjE0Ny4yeiIgY2xhc3M9InN0MSIvPjxwYXRoIGQ9Ik0yMy43OTggMTkuODA4Yy0uMTAyLS4xNDEtLjIwNS0uMjg0LS4zMS0uNDI2LjEwNS4xNDIuMjA4LjI4NS4zMS40MjZ6TTIyLjgzIDE4LjUxOHpNMjIuNTAzIDE4LjEzMnpNMjIuMjAyIDE3LjgxMnpNMjIuNjc4IDE4LjMzNHpNMjIuMTY5IDE3Ljc3OWMtLjA1MS0uMDUtLjEwMi0uMS0uMTU0LS4xNDcuMDUyLjA0Ny4xMDMuMDk3LjE1NC4xNDd6IiBjbGFzcz0ic3QxIi8+PHBhdGggZD0ibTIyLjQwNCAyMy43MzMtLjU5NC0uMjcyYy0zLjA4NS0yLjY5MS0uMzc0LTQuMDk5LTEuNTk4LTYuNTc0IDEuMzYzLS4yMDEgMi41NDkgMS40OSAzLjYzIDIuOTguNzUyLjQ2NyAxLjQ1OC43NDQgMS45MjEuNTU5bDEuMTM5LS4xMTJjLTMuMTUxLTEuMTkzLTQuMzEzLTQuNjgxLTUuODY4LTQuNzc2LTIuNDM0LjE5LTMuMTQzIDMuNjM1LTIuOTg1IDUuNDM0bC42OTYtLjE3NGMtLjA5OSAxLjUwNS4yMzIgMy40MjYuNzE1IDQuOTM2IDIuMjI2LS44MTcgMi44MjgtMS43NzUgMi45NDQtMi4wMDF6TTUwLjk5MSA0MC4zODdsLS4wMzctLjAyLjAzMy4wMzdhLjA4NS4wODUgMCAwIDAgLjAwNC0uMDE3ek0zOS44MiAzMi4zNTRjMS41NjgtLjU2MSAzLjIxNy0uNzk4IDQuODc2LS44MTNhMzYuMTk2IDM2LjE5NiAwIDAgMS0yLjE1Ni0xLjIzM2MtLjk0Ni4zMjUtMS43NTcuNjczLTIuMjk5Ljk1Ny0zLjMyMS01LjcwNC02LjMwMi03LjYwNC0xMi4wMDctOS4yMmwuMjkyIDEuMDU1LTEuNjQyLjA2Ni44MTkgMS44NTNjLTQuNTk0IDEuMzQyLTYuMjU1IDMuNTMyLTYuODk4IDQuNzQ4bC4wNDEuMDU5YzIuNjQ5LTIuMjg4IDUuMTEyLTIuOTMgOC42NjMtMy4xNjUtLjQyNi0uODAyLS42NDItMS43MDMtMS4xNjMtMi40NTYgNS4wMjcuMzI2IDguNTIxIDQuNTMxIDExLjQ3NCA4LjE0OXpNNTEuMDEgNDAuM2MuNDM4LTEuODc4LS4wMzUtNC41OTItMS40ODYtNi42NjZhMzAuNjIgMzAuNjIgMCAwIDEtLjc4NS0uMjc3Yy0uMjQuMzc3LS4zNDcuNjQ2LS4zODkuNjg4IDEuOTUyIDEuNzc1IDIuMzEgMy42NTQgMi42NiA2LjI1NXpNNDcuMzI4IDM5LjIyOGMtLjUxNC4wMDQtMS4wNjQuMDUtMS42ODUuMTE2LjYxOC40MDYgMS4wNDQuNzgxIDEuMzA0IDEuMTIxbC4wMTQuMDEyYzEuMjY4LS40OTggMi43NDctLjQ2OCA0LjA2My0uMDQ3LS4wNjMtLjA0NC0uMTIzLS4wODMtLjE4NS0uMTI0LTEuMzMzLS43MTEtMi4yOC0xLjAzNS0zLjUxMS0xLjA3OHpNMzcuMjE0IDM3Ljg2NWMtMi41MjktMy4wMjctNC45MDItMi4wNTktNi41MDUtLjE1NSAzLjMgMS42MjYgNy4xNTUgMi45MjggMTEuMzc0IDMuNzExbC0uMDM4LS4yMTVjLS42NzgtMS42NzUtMS43MzUtLjQzNi0xLjczNS0uNDM2LS43MTktLjY3Mi0uOTUxLTIuMTQ0IDAtMi40NzguOTUxLS4zMzMgMi4yMjMuNTQ2IDMuNTE5LjQ3OC0xLjA0NC0xLjM0OS0yLjA2NC0yLjAwMS0yLjM4OC00LjAzOC0xLjM4OS0uMzM4LTMuMzMzLS42MDYtNC4yMjcgMy4xMzN6TTI4Ljk3MSAzNi42NTVsLS4xNjItLjI1NS0uMDQtLjA2M2ExNC4xMTIgMTQuMTEyIDAgMCAwLS4yMS0uMzFsLS4wNzQtLjEwNmEyOS4xMyAyOS4xMyAwIDAgMC0uMjQtLjMzMyAxNy42MyAxNy42MyAwIDAgMC0uMTc1LS4yMzJsLS4wNjYtLjA4N2MtLjA4LS4xMDItLjE2MS0uMjA0LS4yNDQtLjMwNmwtLjA3OS0uMDk2YTM1LjYyIDM1LjYyIDAgMCAwLS4xODQtLjIxOWwtLjA5Ny0uMTEzYTE5LjQ0MSAxOS40NDEgMCAwIDAtLjE5LS4yMTVsLS4wODUtLjA5NWExOC43NyAxOC43NyAwIDAgMC0uMzQ4LS4zNzFjLS4wNzEtLjA3NS0uMTQ0LS4xNDgtLjIxNi0uMjIybC0uMTA1LS4xMDRhMTkuMjQyIDE5LjI0MiAwIDAgMC0uMjA1LS4xOTlsLS4wOTgtLjA5M2EyNS42MTYgMjUuNjE2IDAgMCAwLS4zNDctLjMxOCAxNC40MTkgMTQuNDE5IDAgMCAwLS4yNjMtLjIzbC0uMTA0LS4wODhhMTIuNjYgMTIuNjYgMCAwIDAtLjMyNS0uMjY2IDE1LjI5IDE1LjI5IDAgMCAwLS4yOTItLjIyN2wtLjAyOS0uMDIzYy0uMTA3LS4wOC0uMjE1LS4xNTktLjMyMi0uMjM1bC0uMDk3LS4wNjhjLS4wOC0uMDU1LS4xNTktLjExLS4yMzktLjE2M2wtLjEwNC0uMDY5YTkuMTgyIDkuMTgyIDAgMCAwLS4yNzgtLjE3NWwtLjA1NC0uMDM0YTEwLjMwNiAxMC4zMDYgMCAwIDAtLjMzNC0uMTk0bC0uMDgxLS4wNDRhMTAuNzM2IDEwLjczNiAwIDAgMC0uMjU4LS4xMzdsLS4wOTktLjA1YTkuNDM3IDkuNDM3IDAgMCAwLS4yNzEtLjEyOWwtLjA2Ni0uMDMxYTguMTM3IDguMTM3IDAgMCAwLS4zMzktLjE0MmwtLjA1Ny0uMDIxYTYuMjggNi4yOCAwIDAgMC0uMjgtLjEwMWwtLjA5LS4wM2E3LjI2IDcuMjYgMCAwIDAtLjI2Ni0uMDhsLS4wNy0uMDJhNS4zMyA1LjMzIDAgMCAwLS4zMTYtLjA3NGwuMDI5LjA0MWMuMDk0LjEyNy4xOS4yNTQuMjg5LjM4bC4wMjEuMDI4YTE3LjYwNSAxNy42MDUgMCAwIDAgLjY4Ni44MTNsLjExMi4xMjRjLjA5Mi4xMDEuMTg2LjIwMi4yODEuMzAybC4wOTUuMWMuMTI4LjEzMy4yNTguMjY0LjM5MS4zOTZsLjA1NC4wNTJjLjExNi4xMTMuMjM1LjIyNi4zNTUuMzM5bC4xMjcuMTE3YTI5LjMwOCAyOS4zMDggMCAwIDAgLjQ0Mi4zOTdjLjEyOS4xMTIuMjYuMjI1LjM5My4zMzZsLjA1NC4wNDVjLjE1NC4xMjguMzExLjI1NS40Ny4zODFsLjExMi4wODdjLjEyNC4wOTcuMjUuMTk0LjM3Ny4yOWwuMTQ1LjEwOGMuMTI5LjA5Ni4yNTkuMTkxLjM5MS4yODZsLjExOS4wODVjLjE3NC4xMjMuMzUuMjQ2LjUyOS4zNjhsLjAyNi4wMThjLjE2OC4xMTMuMzM4LjIyNi41MS4zMzdsLjE0Ni4wOTRhMjUuMTY1IDI1LjE2NSAwIDAgMCAuNTc1LjM2Yy4xNjcuMTAyLjMzNi4yMDQuNTA4LjMwNGwuMDY0LjAzOGMuMTk1LjExNC4zOTQuMjI3LjU5NC4zMzlsLjAzMi4wMTgtLjA1OS0uMTAxLS4wNjktLjExNHoiIGNsYXNzPSJzdDMiLz48cGF0aCBkPSJNMzUuMDIgMzMuMzk0Yy42NjMgMCAyLjAwNC0uMDIyIDIuNjE0LS4xNS0xLjI3LS4zNzItMi4xMDItMS4xNDEtMi44MTctMS45ODVhMi4wOTkgMi4wOTkgMCAwIDEtLjc2Ny43MTVsLTEuMDYzLTEuMzAzLjMxOSAxLjUwMS0uMDM1LjAwMmMtMS4xIDAtMS45OTItMS4xMDktMS45OTItMi40NzggMC0uNTY4LjE1My0xLjA5MS40MTEtMS41MDlhNC4wODIgNC4wODIgMCAwIDAtMS4yMjYtLjMyYy40ODkuOTc4LjQzMyAxLjkxOS42NTIgMi44OTEuMzgzIDEuNjg4IDEuOTMzIDIuNjM2IDMuOTA0IDIuNjM2ek00NS41ODYgMzMuOTIzYS42Mi42MiAwIDAgMC0uMTYzLjA0MWMwIC41MTEtLjE4OC45NjktLjQ4NSAxLjI4MmwtLjkxMi0uNTY3LjM3Ny45MjFjLS4xMjguMDQ1LS4yNjIuMDctLjQwMi4wNy0uNjAyIDAtMS4xMTctLjQ0OS0xLjMyNS0xLjA4M2ExLjYwOCAxLjYwOCAwIDAgMS0uNTA0LS4xMzZjLjEyMiAxLjMwMS44NzQgMS44NyAxLjgyOSAxLjg3LjgxNiAwIDIuMjM1LTEuNzQ4IDMuMjkyLTIuMTk0LS40MjctLjAxMy0uODU0LS4zMjYtMS43MDctLjIwNHoiIGNsYXNzPSJzdDMiLz48cGF0aCBkPSJNNDMuMjI0IDM0LjE3MmEuMzQ2LjM0NiAwIDEgMCAuNjkxLS4wMDEuMzQ2LjM0NiAwIDAgMC0uNjkxLjAwMXpNMzIuMjE3IDI5Ljk0MmEuNTE3LjUxNyAwIDEgMCAxLjAzNS4wMDEuNTE3LjUxNyAwIDAgMC0xLjAzNS0uMDAxeiIgY2xhc3M9InN0MyIvPjxwYXRoIGQ9Ik00OS4wMTIgMzQuNzE5YS4wNjUuMDY1IDAgMCAxLS4wMDgtLjAwOWwuMDA4LjAwOXpNNDQuNjk1IDMxLjU0MWgtLjAxOC4wMTh6TTUwLjgwNCAzOC45MjNhLjMxMy4zMTMgMCAwIDEtLjAwNS0uMDNsLjAwNS4wM3pNNTAuNTMyIDM3LjY1OGwtLjAwOC0uMDMuMDA4LjAzek01MC42MzQgMzguMDY3bC0uMDA3LS4wMzFhLjI4Mi4yODIgMCAwIDAgLjAwNy4wMzF6TTUwLjcyNCAzOC40ODlhLjM2Ni4zNjYgMCAwIDAtLjAwNy0uMDMybC4wMDcuMDMyek00NC4wNzUgMzEuNTU3bC0uMDExLjAwMS4wMTEtLjAwMXpNMjEuOTQ0IDMwLjUwMWMuMDYyLjAyMS4xMjQuMDQ0LjE4Ni4wNjdhMTMuODQ4IDEzLjg0OCAwIDAgMC0uMTg2LS4wNjd6TTIyLjI3NCAzMC42MjJ6TTIyLjcxNiAzMC44MTV6TTQwLjcyIDMyLjA3M2MuMDk5LS4wMjcuMTk4LS4wNTcuMjk3LS4wODItLjA5OS4wMjUtLjE5OC4wNTUtLjI5Ny4wODJ6TTM5LjgyIDMyLjM1NHpNNTAuNDE2IDM3LjI2ek0yMS42MTEgMzAuMzk3Yy4wNTkuMDE3LjExOC4wMzQuMTc3LjA1My0uMDU5LS4wMTktLjExOC0uMDM2LS4xNzctLjA1M3pNMjMuMDU4IDMwLjk4MmwuMTcyLjA5MWE3LjE0IDcuMTQgMCAwIDAtLjE3Mi0uMDkxek00My40NTcgMzEuNTk1bC0uMDI2LjAwM2ExLjk5IDEuOTkgMCAwIDEgLjAyNi0uMDAzek00Mi44NDIgMzEuNjU3bC0uMDU4LjAwOC4wNTgtLjAwOHpNNDEuNjIyIDMxLjg1M2MtLjA2My4wMTMtLjEyNS4wMjktLjE4Ny4wNDIuMDYyLS4wMTMuMTI0LS4wMjkuMTg3LS4wNDJ6TTQyLjIzIDMxLjc0MmwtLjExMi4wMi4xMTItLjAyek01MC4yODQgMzYuODczbC0uMDEtLjAyNi4wMS4wMjZ6TTQ4LjczOSAzMy4zNTdjLS4yMS4zMy0uMzE5LjU3OC0uMzcxLjY2Mi4wNTItLjA4NC4xNjEtLjMzMS4zNzEtLjY2MnpNNDguNjk5IDM0LjM4bC0uMDA1LS4wMDVhLjAxMi4wMTIgMCAwIDAgLjAwNS4wMDV6TTUwLjgzOCA0MC4zMDVjLTEuODg3LTEuMDA3LTIuOTk0LTEuMjM4LTUuMjQ0LS45OTRsLjA1LjAzM2ExNy40MTYgMTcuNDE2IDAgMCAxIDEuNjg0LS4xMTZjMS4yMzEuMDQzIDIuMTc4LjM2NyAzLjUxIDEuMDc3ek00OS45NjEgMzYuMTI2bC0uMDExLS4wMjEuMDExLjAyMXpNNDkuNzY1IDM1Ljc2NGEuMTg2LjE4NiAwIDAgMS0uMDExLS4wMTlsLjAxMS4wMTl6TTUwLjEzMyAzNi40OTVsLS4wMTEtLjAyNC4wMTEuMDI0ek00OS41NDMgMzUuNDFsLS4wMTEtLjAxNi4wMTEuMDE2ek00OS4yOTMgMzUuMDYybC0uMDEtLjAxMy4wMS4wMTN6TTQxLjI3NSA0MS4yNjNsLjIwOC4wNDEtLjIwOC0uMDQxek0zMS4yNzIgMzcuOTgxek00MS4yNzUgNDEuMjYzek0zMS4wNjkgMzcuODgzbC4yMDMuMDk4LS4yMDMtLjA5OHpNMjEuMTcxIDMwLjI4NnpNMzAuNzA5IDM3LjcxYy4xMTkuMDU5LjI0LjExNi4zNi4xNzNsLS4zNTktLjE3NS0uMDAxLjAwMnpNNDEuNDgzIDQxLjMwNGMuMTg1LjAzNy4zNjkuMDczLjU1NS4xMDhsLS41NTUtLjEwOHpNMjkuODM2IDM3LjI2NXpNMjMuMzg2IDMxLjE1OHoiIGNsYXNzPSJzdDEiLz48cGF0aCBkPSJNNTEuNTYyIDM0LjIyNWEyNC4xNiAyNC4xNiAwIDAgMS0yLjAzOC0uNTljMS40NTEgMi4wNzQgMS45MjQgNC43ODggMS40ODYgNi42NjZsLjAxNC4xMDQtLjA2OS0uMDM3LjAzNi4wMTktLjAwNC4wMTgtLjAzMy0uMDM3YTEzLjYxNiAxMy42MTYgMCAwIDAtLjExNS0uMDYxYy4wNjIuMDQxLjEyMi4wOC4xODUuMTI0LTEuMzE2LS40Mi0yLjc5NS0uNDUxLTQuMDYzLjA0N2wtLjAxLS4wMDhjLjM3My40OS40MDIuOTA5LjE2NSAxLjI0OSAxLjE5Ni0uNDU2IDIuNzgyLS40MDkgNS4xMzMuNjYyLjU1Ni0zLjY5LS4wNzktNi4yNDgtLjY4Ny04LjE1NnpNNTAuODc3IDM5LjM2OWwtLjAwNC0uMDI0LjAwNC4wMjR6TTUwLjk0NCAzOS44MjZsLS4wMDEtLjAxLjAwMS4wMXpNNDIuMDgzIDQxLjQybC0uMDQ1LS4wMDguMDQ1LjAwOHpNMjkuMDk3IDM2Ljg2NGwuMDAxLjAwMnpNMzAuMTI2IDM3LjQxM2MuMTYuMDgyLjMyLjE2NS40ODMuMjQ1LS4xNjMtLjA4LS4zMjMtLjE2Mi0uNDgzLS4yNDV6TTI0Ljk1MyAzMi4yMDhsLjEzMy4xMDMtLjEzMy0uMTAzek0yNS41NzcgMzIuNzE4bC4wOTguMDg2LS4wOTgtLjA4NnpNMjMuODM1IDMxLjQyNWMuMDU2LjAzNS4xMTMuMDcuMTY5LjEwN2wtLjE2OS0uMTA3ek0yNi4wNzUgMzMuMTY0bC4wNDYuMDQyLS4wNDYtLjA0MnpNMjQuMTc0IDMxLjY0NXpNMjQuNDk1IDMxLjg2N2wuMTUzLjExMS0uMTUzLS4xMTF6TTI1LjI2OSAzMi40NnpNMjcuNTUxIDM0LjcxNGwuMDE4LjAyMmEuMTI0LjEyNCAwIDAgMC0uMDE4LS4wMjJ6TTI4LjM5MSAzNS43ODlsLjAwMi4wMDMtLjAwMi0uMDAzek0yNi4zMjIgMzMuMzk5bC4wNzkuMDc3YTUuOTY2IDUuOTY2IDAgMCAwLS4wNzktLjA3N3pNMjcuMzA5IDM0LjQzNGwuMDMzLjAzNy0uMDMzLS4wMzd6TTI3LjMyMiAyNi44ODd6TTI2LjYwMSAzMy42NzVsLjA1OC4wNi0uMDU4LS4wNnoiIGNsYXNzPSJzdDEiLz48cGF0aCBkPSJNNDguMzM0IDUyLjI4M2gtLjYzVjU0aC0uNDMxdi0xLjcxN2gtLjYyOHYtLjM3MWgxLjY4OXYuMzcxek01MS4xOTYgNTRoLS40Mjd2LTEuNjY0aC0uMDFMNTAuMTQ5IDU0aC0uNDA4bC0uNTg3LTEuNjY0aC0uMDEyVjU0aC0uNDI3di0yLjA4N2guNzM4bC40OTIgMS4zNjVoLjAwN2wuNTA2LTEuMzY1aC43MzhWNTR6IiBjbGFzcz0ic3QwIi8+PC9zdmc+"); }
+  .pm-note { margin: 14px 0 0; font-size: 13.5px; line-height: 1.5; color: var(--ink-soft); }
+  .pm-note b { color: var(--ink); }
+  .roster .lvl.mlb { color: var(--isles-bright); }
+  td .pos { font-size: 10px; color: var(--ink-mute); font-weight: 600; margin-left: 5px; }
+
+  footer {
+    margin-top: 36px; text-align: center; font-size: 11px; color: var(--ink-mute);
+    letter-spacing: .02em;
+  }
+  footer b { color: var(--ink-soft); }
+
+  /* ---- Schedule ---- */
+  .sched-month {
+    font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--orange); margin: 24px 2px 10px;
+  }
+  .sched-month:first-child { margin-top: 4px; }
+  .sched { display: flex; flex-direction: column; gap: 5px; }
+  .sgame {
+    display: grid; grid-template-columns: 38px 72px auto 1fr; align-items: center; gap: 10px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+    padding: 9px 12px; box-shadow: var(--shadow);
+  }
+  .sgame.upcoming { background: color-mix(in srgb, var(--surface) 60%, transparent); }
+  /* home and away read differently: royal accent for home, grey for away */
+  .sgame, .sgamed { position: relative; overflow: hidden; }
+  .sgame > *:not(.wm), .sgamed > summary > *:not(.wm) { position: relative; z-index: 1; }
+  .sgame { padding: 13px 12px; border-left-width: 3px; }
+  .sgame.home, .sgamed.home { border-left-color: var(--isles); }
+  .sgame.away, .sgamed.away { border-left-color: color-mix(in srgb, var(--ink-mute) 55%, transparent); }
+  .sgame.home { background: color-mix(in srgb, var(--isles) 6%, var(--surface)); }
+  .sgame.upcoming.home { background: color-mix(in srgb, var(--isles) 4%, transparent); }
+  .sgamed .sgame { border-left-width: 0; }
+  /* club wordmark behind each schedule row: an alpha mask, coloured by CSS */
+  .wm {
+    position: absolute; top: 0; bottom: 0; right: 11px; width: 54%;
+    z-index: 0; pointer-events: none; opacity: .13; background-color: var(--ink);
+    -webkit-mask-image: var(--wm); mask-image: var(--wm);
+    -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+    -webkit-mask-position: right center; mask-position: right center;
+    -webkit-mask-size: contain; mask-size: contain;
+  }
+  .wm-ARI { --wm: url(DATAURI); }
+  .wm-ATH { --wm: url(DATAURI); }
+  .wm-ATL { --wm: url(DATAURI); }
+  .wm-BAL { --wm: url(DATAURI); }
+  .wm-BOS { --wm: url(DATAURI); }
+  .wm-CHC { --wm: url(DATAURI); }
+  .wm-CIN { --wm: url(DATAURI); }
+  .wm-CLE { --wm: url(DATAURI); }
+  .wm-COL { --wm: url(DATAURI); }
+  .wm-CWS { --wm: url(DATAURI); }
+  .wm-DET { --wm: url(DATAURI); }
+  .wm-HOU { --wm: url(DATAURI); }
+  .wm-LAA { --wm: url(DATAURI); }
+  .wm-LAD { --wm: url(DATAURI); }
+  .wm-MIA { --wm: url(DATAURI); }
+  .wm-MIL { --wm: url(DATAURI); }
+  .wm-MIN { --wm: url(DATAURI); }
+  .wm-NYM { --wm: url(DATAURI); }
+  .wm-NYY { --wm: url(DATAURI); }
+  .wm-PHI { --wm: url(DATAURI); }
+  .wm-PIT { --wm: url(DATAURI); }
+  .wm-SD { --wm: url(DATAURI); }
+  .wm-SEA { --wm: url(DATAURI); }
+  .wm-SF { --wm: url(DATAURI); }
+  .wm-STL { --wm: url(DATAURI); }
+  .wm-TB { --wm: url(DATAURI); }
+  .wm-TEX { --wm: url(DATAURI); }
+  .wm-TOR { --wm: url(DATAURI); }
+  .wm-WSH { --wm: url(DATAURI); }
+  .sgame.next {
+    border-color: color-mix(in srgb, var(--orange) 55%, transparent);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--orange) 40%, transparent), var(--shadow);
+  }
+  .sgame .g { font-size: 11px; font-weight: 700; color: var(--ink-mute); font-variant-numeric: tabular-nums; }
+  .sgame .mu { font-size: 14px; font-weight: 650; letter-spacing: -.01em; }
+  .sgame .mu .loc { color: var(--ink-mute); font-weight: 500; }
+  .sgame.upcoming .mu { color: var(--ink-soft); font-weight: 600; }
+  .sgame .out { display: flex; align-items: center; gap: 8px; justify-self: start; }
+  .sres { width: 22px; height: 22px; border-radius: 6px; display: grid; place-items: center; font-weight: 800; font-size: 11px; }
+  .sres.w { background: var(--win-bg); color: var(--win); }
+  .sres.l { background: var(--loss-bg); color: var(--loss); }
+  .sscore { font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink-soft); }
+  .sgamed {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+    box-shadow: var(--shadow); overflow: hidden;
+  }
+  .sgamed .sgame {
+    background: none; border: 0; border-radius: 0; box-shadow: none;
+    grid-template-columns: 38px 72px auto 1fr 14px;
+    cursor: pointer; list-style: none; -webkit-tap-highlight-color: transparent;
+  }
+  .sgamed .chev { grid-column: 5; }
+  .sgamed .sgame::-webkit-details-marker { display: none; }
+  .sgamed .sgame:focus-visible { outline: 2px solid var(--isles-bright); outline-offset: -2px; }
+  .sgamed[open] .chev { transform: rotate(90deg); }
+  .sgamed.next {
+    border-color: color-mix(in srgb, var(--orange) 55%, transparent);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--orange) 40%, transparent), var(--shadow);
+  }
+  .sgamed.upcoming { background: color-mix(in srgb, var(--surface) 60%, transparent); }
+  @media (max-width: 560px) { .wm { width: 34%; } }
+  .rnotes {
+    padding: 0 13px 12px; border-top: 1px solid var(--line);
+    font-size: 12.5px; line-height: 1.5; color: var(--ink-soft);
+  }
+  .rn-k {
+    font-size: 9.5px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase;
+    color: var(--orange); margin: 10px 0 4px;
+  }
+  .rnotes p { margin: 0; }
+  .nextchip {
+    font-size: 9px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--orange); border: 1px solid color-mix(in srgb, var(--orange) 45%, transparent);
+    padding: 3px 6px; border-radius: 5px;
+  }
+
+  /* ---- Divisions ---- */
+  .div-head { display: flex; align-items: baseline; justify-content: space-between; margin: 24px 2px 10px; }
+  .div-head:first-child { margin-top: 4px; }
+  .div-name { font-size: 13px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--ink); }
+  .div-rec { font-size: 13px; font-weight: 700; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .div-rec.pos { color: var(--win); }
+  .teams { display: flex; flex-direction: column; gap: 5px; }
+  .teamrow {
+    display: grid; grid-template-columns: 34px 1fr auto; align-items: center; gap: 11px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+    padding: 8px 12px; box-shadow: var(--shadow);
+  }
+  .teamrow.you { border-color: color-mix(in srgb, var(--isles) 42%, transparent); background: color-mix(in srgb, var(--isles) 6%, var(--surface)); }
+  .teamrow.rk { grid-template-columns: 24px 34px 1fr auto; }
+  .teamrow .rank { font-size: 12.5px; font-weight: 800; color: var(--ink-mute); font-variant-numeric: tabular-nums; text-align: right; }
+  .tier-range { font-size: 11px; font-weight: 700; letter-spacing: .02em; color: var(--ink-mute); margin-left: 5px; }
+  .badge {
+    width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center;
+    color: #fff; font-size: 10px; font-weight: 800; letter-spacing: -.02em;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.14);
+  }
+  .tlogo {
+    width: 30px; height: 30px; border-radius: 7px; flex: none;
+    background-color: #fff; background-repeat: no-repeat; background-position: center; background-size: 76%;
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+  /* vs. Ranked only (.teamrow.rk): logos at 250% of the vs. Divisions size.
+     The logo grid column widens to match so the name column doesn't collapse. */
+  .teamrow.rk { grid-template-columns: 24px 75px 1fr auto; }
+  .teamrow.rk .tlogo { width: 75px; height: 75px; border-radius: 17px; }
+  .teamrow.rk .badge { width: 75px; height: 75px; border-radius: 20px; font-size: 25px; }
+  /* ---- Opp Pitching: one logo-headed table per club ---- */
+  .opp-head { display: flex; align-items: center; gap: 11px; margin: 24px 2px 10px; }
+  .opp-head:first-child { margin-top: 4px; }
+  .opp-head .tlogo, .opp-head .badge { width: 44px; height: 44px; border-radius: 10px; }
+  .opp-name { font-size: 15px; font-weight: 800; letter-spacing: -.01em; }
+  .opp-meta { margin-left: auto; font-size: 12px; font-weight: 700; color: var(--ink-mute); }
+  table.opp-pit td:first-child, table.opp-pit th:first-child { text-align: left; white-space: nowrap; }
+  table.opp-pit .sub { font-size: 11px; font-weight: 700; color: var(--ink-mute); margin-left: 5px; }
+  .teamname { font-size: 14px; font-weight: 600; letter-spacing: -.01em; }
+  .teamrec { font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink-soft); }
+  .teamrec.pos { color: var(--win); }
+  .teamrec.muted { color: var(--ink-mute); font-weight: 600; }
+  .youchip {
+    font-size: 9px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--isles-bright); border: 1px solid color-mix(in srgb, var(--isles) 45%, transparent);
+    padding: 3px 6px; border-radius: 5px;
+  }
+
+
+.lg-ARI{background-image:url(DATAURI)}
+.lg-ATH{background-image:url(DATAURI)}
+.lg-ATL{background-image:url(DATAURI)}
+.lg-BAL{background-image:url(DATAURI)}
+.lg-BOS{background-image:url(DATAURI)}
+.lg-CHC{background-image:url(DATAURI)}
+.lg-CIN{background-image:url(DATAURI)}
+.lg-CLE{background-image:url(DATAURI)}
+.lg-COL{background-image:url(DATAURI)}
+.lg-CWS{background-image:url(DATAURI)}
+.lg-DET{background-image:url(DATAURI)}
+.lg-HOU{background-image:url(DATAURI)}
+.lg-KC{background-image:url(DATAURI)}
+.lg-LAA{background-image:url(DATAURI)}
+.lg-LAD{background-image:url(DATAURI)}
+.lg-MIA{background-image:url(DATAURI)}
+.lg-MIL{background-image:url(DATAURI)}
+.lg-MIN{background-image:url(DATAURI)}
+.lg-NYM{background-image:url(DATAURI)}
+.lg-NYY{background-image:url(DATAURI)}
+.lg-PHI{background-image:url(DATAURI)}
+.lg-PIT{background-image:url(DATAURI)}
+.lg-SD{background-image:url(DATAURI)}
+.lg-SEA{background-image:url(DATAURI)}
+.lg-SF{background-image:url(DATAURI)}
+.lg-STL{background-image:url(DATAURI)}
+.lg-TB{background-image:url(DATAURI)}
+.lg-TEX{background-image:url(DATAURI)}
+.lg-TOR{background-image:url(DATAURI)}
+.lg-WSH{background-image:url(DATAURI)}
+
+  /* ---- Islanders additions (kept out of chrome.css so the port stays diffable) ---- */
+  .bg-crest img { filter: grayscale(1); }
+  .bg-wordmark { width: 96vw; max-width: 900px; }
+  .record b { font-size: 44px; }
+  .record .dash { font-size: 34px; }
+  .tabbr {
+    width: 34px; height: 34px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 800; letter-spacing: .04em; color: var(--isles-bright);
+    background: color-mix(in srgb, var(--isles) 12%, var(--surface-2)); border: 1px solid color-mix(in srgb, var(--isles) 30%, transparent);
+  }
+  .teamrow.you .tabbr { color: #fff; background: var(--isles); border-color: var(--isles); }
+  .line-card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow);
+    padding: 11px 13px 12px; margin-top: 8px;
+  }
+  .line-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+  .line-k { font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-mute); }
+  .chem { font-size: 11px; font-weight: 800; color: var(--ink-mute); font-variant-numeric: tabular-nums; }
+  .chem.up { color: var(--win); }
+  .chem.down { color: var(--loss); }
+  .lps { display: grid; gap: 6px; margin-top: 8px; }
+  .lps.n2 { grid-template-columns: repeat(2, 1fr); }
+  .lps.n3 { grid-template-columns: repeat(3, 1fr); }
+  .lps.n4 { grid-template-columns: repeat(4, 1fr); }
+  .lps.n5 { grid-template-columns: repeat(5, 1fr); }
+  .lp {
+    background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 8px 9px;
+    display: grid; grid-template-columns: auto 1fr auto; align-items: baseline; gap: 6px; min-width: 0;
+  }
+  .lp .slot { font-size: 9.5px; font-weight: 800; letter-spacing: .08em; color: var(--orange); }
+  .lp .nm { font-size: 12.5px; font-weight: 700; letter-spacing: -.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lp .ov { font-size: 12px; font-weight: 800; color: var(--isles-bright); }
+  @media (max-width: 560px) {
+    .lps.n4, .lps.n5 { grid-template-columns: repeat(2, 1fr); }
+    .lps.n3 { grid-template-columns: 1fr; }
+    .lp .nm { white-space: normal; }
+  }
+  .starter { margin-top: 8px; }
+  .starter .empty { margin-top: 10px; }
+  .story-lead-txt { font-size: 13px; color: var(--ink-soft); line-height: 1.4; }
+
+</style>
+</head>
+<body>
+<div class="bg-crest bg-crest" aria-hidden="true"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyOTQuOTg1NiIgaGVpZ2h0PSIyODQuNTgzMDMiIHZpZXdCb3g9IjAgMCAyOTQuOTg1NiAyODQuNTgzMDMiPjxwYXRoIGQ9Ik0xNDcuNDkzMzcsMEM2Ni4wMzE3MywwLDAsNjMuNzA3MzcsMCwxNDIuMjk0MzJTNjYuMDMyMjcsMjg0LjU4MywxNDcuNDkzOTQsMjg0LjU4MywyOTQuOTg1NiwyMjAuODc3OTIsMjk0Ljk4NTYsMTQyLjI5NDMyLDIyOC45NTEwOS4wMDA1NiwxNDcuNDkyODEuMDAwNTZaIiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTTE0Ny40OTMzNywxMC40ODQyMmMtNzUuNjYyNDgsMC0xMzYuOTk0Niw1OS4wMTI3OS0xMzYuOTk0NiwxMzEuODEwNjVTNzEuODMwODgsMjc0LjEwMDUsMTQ3LjQ5Mzk0LDI3NC4xMDA1czEzNi45OTI5MS01OS4wMTMzNSwxMzYuOTkyOTEtMTMxLjgwNjE4UzIyMy4xNTAyNSwxMC40ODM2NiwxNDcuNDkzMzcsMTAuNDgzNjYiIGZpbGw9IiNmYzRjMDIiLz48cGF0aCBkPSJNNDcuNDY4MTYsMTczLjYwODg2di04LjYwNDVMMzguOTY2NTgsMTU3LjUzOHYxNi42MDc3N2MyLjU5MzM3LS42OTIzOSw1Ljc4OTEuMTkyOTUsOC41MDE1OC0uNTM2OSIgZmlsbD0iIzAwMzA4NyIvPjxwYXRoIGQ9Ik0yNzUuNzczODcsMTM0LjQ2NTU0Yy0xMi4wNjQxOCw0LjIzMi0yNy4wODU4Myw5LjE2ODI1LTM4LjcyODM0LDEzLjE2NzY0LTMuOTItLjYzNzU4LTYuNjAxNzIsMS41NTctOS4zODM1NywzLjM5NzYyLTQuMTQ4MTYsMS43OTI0OC05LjM3NTE4LDEuMDczODMtMTMuNDY3NDMsMi44MTQ4NC0zLjgxNTQsMy4xNTQzNC05LjQ2NDY0LDQuNDg2LTE0LjE0OCwyLjQ4NzY3LTEuMjU4MzgtMS40MzQtMi45MTQ0LTMuMTcwNTUtNC44OTQ4MS0yLjcxNTg0LTMuMTEyMzguMzA4NzItMy43NjI4NCw1Ljk1MDcyLTcuNjE1MTUsMy4wMS0yLjM3NzQ3LDEuMjUyNzgtNC40NTc0MywyLjk5MzI1LTcuMDg0MzcsMy42Mjc0OGwtMy45NTYzMi45NzkzLTEuNDg4MjQsMy4xNzI3OC0xLjM1NzM3LDIuODgzNjQtLjkwODI4LDEuOTM2MjMtMS4zNTQ1NywyLjg4MzY0LS45MDgyOCwxLjkzOS0xLjM2MDE3LDIuODgzNjQtLjkxMTYyLDEuOTM3OS0xLjM1MTc4LDIuODg1ODgtMTAuODk1MjgsMjMuMTk1NDlhNS4yNjg0Nyw1LjI2ODQ3LDAsMCwxLTMuNTUxNDIsMi44ODU4OGwtMTcuNTYzLDQuMTg1MDhhMS4xMDU0NSwxLjEwNTQ1LDAsMCwxLC4yMjQ4My4yNjUxbDExLjYyMTgsMjQuMTMxNzNWMjE0LjM4ODA2YTEuMDkzMzMsMS4wOTMzMywwLDAsMSwxLjIyNTkzLTEuMDkwNmw2LjMwNy43NDM4M2ExLjA5MjI2LDEuMDkyMjYsMCwwLDEsLjk2ODY3LDEuMDg3OHYzOS44NDg1NmExLjA5NDUzLDEuMDk0NTMsMCwwLDEtMS4wMzM1NCwxLjA5MjgybC03LjAzMTI0LjQxOTQ2YTEuMDk2MTgsMS4wOTYxOCwwLDAsMS0xLjA0MDI1LS41OTYxOEwxMzIuMzM4NTcsMjI5LjA4MnYyNS41NGExLjEwMTgsMS4xMDE4LDAsMCwxLS43ODMsMS4wNTMxMiwxLjA2MjczLDEuMDYyNzMsMCwwLDEtLjQ2Mi4wMzYzNWwtNi4zMDY0Mi0uODY0MDdhMS4wOTYxOSwxLjA5NjE5LDAsMCwxLS45NDg1NC0xLjA5MDZWMjE0LjY0NTMybC03LjM2MzQ3LDEuNzU1NTgsNS44MzMyNywzNi45NTk4OGEuODc5NDIuODc5NDIsMCwwLDEtMS4xNDA5My45NjgwOWwtNy4wNjc2LTIuMzAwM2EuODY5MTIuODY5MTIsMCwwLDEtLjU5NC0uNjk4NTVsLTEuMzMzMzItOC4zNzUxOS05LjI0OTMzLTMuMDE0NTItMS43NDMyOCw2Ljg5NzU4YS45MDYuOTA2LDAsMCwxLS40MjY3My41NTI1Ny44OTQ3OC44OTQ3OCwwLDAsMS0uNjk1MTkuMDY2NTVsLTYuNzYyMjMtMi4xOTU3MmEuODcyNDkuODcyNDksMCwwLDEtLjU3OTQyLTEuMDUxNDVsNi4wNDU4LTIzLjU4NzU0TDkyLjkwNSwyMjIuMDIwNDlhMS45ODU0MywxLjk4NTQzLDAsMCwxLTIuMzg0ODMtMS40ODJxLS4wMTctLjA3Mjc0LS4wMjg0NS0uMTQ2NTZsLTMuNTk5NTItMjMuNjIwNTVhMS45NzU5MywxLjk3NTkzLDAsMCwxLDEuNjU3LTIuMjUwMDdsLjAyNjM4LS4wMDM4Miw1OS4wNDMtOC4xMjg1NWE1LjI1NzE4LDUuMjU3MTgsMCwwLDAsNC4wMS0yLjg5MzE1bDMuNzQxNTctNy41OTc3OCwxLjQwODgzLTIuODU3OTEuOTQ0NjItMS45MTk0NCwxLjQwNDktMi44NjAxNi45NDY4Ni0xLjkxNTUyLDEuNDAzNzktMi44NTg0Ni4zNzg2My0uNzY1MWMtMi43NDY2Mi0uMTczMzgtNi43Nzg0NCwxLjkwMTU0LTguODMxLDIuMzYyMzktMy4xMTg1My45NDUxOC03LjgzODI5LS42NTA0NC04Ljk3NTMsMy40NjM2YTcuMjQ3NDksNy4yNDc0OSwwLDAsMS02Ljk3OTc5LjcwMDIzYy0yLjU0MDgtMy44OTkzLTYuOTc3LS42NDk4OC05LjkxNDg4LS42MDAxMS00LjY3NzI1LjcxMTQxLTguMzk0NzctMy4xODktMTIuNzU3MTQtLjk2Mi01LjY0MTQ0LDMuMzk5ODYtMTIuMzc1Ny0yLjk1NzQ2LTE3LjEyNCwyLjQwODgyLTMuMDI1NjkuMjI5My01Ljg2NTE1LTEuMjA0MTQtOS4xMTczNS0uOTc3NjEtNC43NjcyOC0uMDE0NTQtOC44ODEzNCwxLjQ4NDg4LTEzLjMyMzEyLDIuMjgwNzQtNS4wMTgzOSwzLjMwMjUzLTExLjkxNiwxLjcwOC0xNy42OTc4LDEuMjgxODYtMi45MDkzNiwxLjE3NDQ4LTYuNTEyMjQuODQ4NDItOS42Njg3OS45Mjk1MXYzMS43MDgyN2MwLDEuODczNTktLjk2NzU2LDIuMzk4MTgtMi40NzY0OS4yMjU0bC02LjAyNTY2LTguNjU3NjNWMTc0LjE0NDYzYy0xLjk2ODY1LTEuMDIxMjMtMy42MjQxMiwxLjQ5NzE5LTUuNDQ3MzYsMi4yNzczOC0xLjgyMzI1Ljg2NDA5LTMuNDI1LS42MzQyMy00LjE5NTE1LTIuMTI5NzRhMi4yNTUyOCwyLjI1NTI4LDAsMCwwLTEuMzU0LTEuOTIsOS45NDgzMSw5Ljk0ODMxLDAsMCwwLTQuMDMyMzkuOTQ4cS0uOTA1MDUtMy4zMjA3LTEuNjA5Ni02LjY5MTJjMS4yMTItLjc2MTczLDIuNjkwMTItMS43ODgsMi4yNjUwNy0zLjE1NDMzLS44MDM2OS0xLjY1ODI2LTIuOTk2MDUtMS41LTMuNTU5MjUtMy40OTgyOS4yMzgyNS0xLjk4NTQzLjgyMDQ2LTQuNTg4ODcsMy4xODIyOS01LjA1OTIyLDEuNzUwNTQtMS42NTcxNSwxLjUyNTcxLTQuOTkyMTIuOTg0MzMtNy4yODQtMS41ODE2NC0yLjA2Ni0zLjcyMTQ0LTMuNzQ0OTQtMi44NTQ1NS02LjY2ODI4LDAtLjc4NDY3LS44MDE0NS0xLjc0MzgzLjAwNjctMi40NjEzOCwxLjkxMjc0LS43Nzk2NCwzLjgxMTQ4LDEuMDI2MjcsNS4xNjIxNSwyLjMxMTQ5LDEuMjY3ODguMjYwMDYsMS41OTYxOC0xLjE4OTU5LDIuMTI5NzMtMS45MDI2N2ExLjg2NTQ0LDEuODY1NDQsMCwwLDAtMS4zMzc3OS0yLjQ1NzQ3LDEuMzU2LDEuMzU2LDAsMCwxLTEuNzE3LTEuMTk5NjVjLjMxOTkxLTEuMzM2NjguNzY0NTQtMi42MDY4LDIuMjkxOTItMi45Nzk4M2E1LjE5ODQ3LDUuMTk4NDcsMCwwLDEsNC41ODcyLjk0MzUxYzEuNTc3MTcsMS40MzA2NCwxLjQxMzMsMy43Mjc1OSwzLjAwODkyLDQuOTI2MTMsMi4wNTA4Ny0xLjg5OTg3LjQ4ODgtNS43OTA3NywyLjg3ODYtNy42MDc4NiwzLjQwODI0LTEuNSw2LjcyMDg1LTQuMDM2MzIsMTAuODU3MjYtMy4zODkyMywxLjExNTc2LDIuMTUxLjM2NzQ2LDYuMTIzLDMuOTMxNzMsNi4yODI5NC45NzY1LS44NjM1MywxLjA1NDI0LTMuMDkzOTMsMi44ODAyOC0yLjIxMzA2LDEuNTk5NTIuNjUxNTYsMS40OTcxOSwzLjQxNTUsMy4zOTgxNiwzLjAyNDU3LDEuOTIwNTYtMy41NjI2LTEuNzIzMTMtNi41MDY2NS0xLjI1NTU3LTkuOTA1OTQsMi41NTU5LTEuNjc0NDcsNS45NDYyNC0uMjMxLDcuNzYyMjIsMS43NTU1OC44MTMxOSwxLjY1OTkzLTIuMzc3NSwyLjYwNC0uMTcyMjcsMy45NzMxMSwzLjE4MDYyLTEuMTkxMjYsNC42MDY3NywyLjQ2NzUzLDcuNDEwNDQsMS43NTM4OSwxLjgwNDIzLTMuMzE4MjEsNS42ODMzNy0zLjcxNDE2LDguOTI3MTktMi44MzE2Miw0Ljc2OTU0LS4wNjM3Niw3LjUzNTcyLDcuMDgwNDYsMTIuNTIsNC4yNDkzOSwyLjcxODA4LTEuODI2Niw3Ljk5OTM1LjcxMzA4LDguODI1NC0zLjYzMzYzYTMuODY3ODYsMy44Njc4NiwwLDAsMSwyLjYzOTIzLTQuMTc1NThjMi42ODA2Mi0uODE3NjYsNS4yMDM1Miw0Ljc0NDM2LDcuNDQxNzYuNTUyNTgsNC4xNzIyMSwxLjY3NjE2LDkuMDkyNzQsMS42MDczNiwxMy42ODMyOSwyLjM0MjI0LDcuMDYyLDMuNzQyNjksMTYuMzQ5OTQsMy4yMTU4NSwyNC4zMjEzMywzLjQ2MzA1LDYuOTI5NDYsMy42ODE3MywxNi43ODExNC0xLjU2NzY2LDI0LjcxMjgzLS4zMDc2bDMuNzA5NjgtNy41NDAxOEwxNDkuODczLDU3LjAwMzI3djYyLjIzNDgxYTEuOTc5ODMsMS45Nzk4MywwLDAsMS0xLjk3NDgyLDEuOTc1OTJIMTE3LjY3OTI4YTEuOTc0MjYsMS45NzQyNiwwLDAsMS0xLjY5NDYxLS45NTg1OUw5Ni4xNDQ4NCw4Ny4xNjU3MnYzMi4wNzIzNmExLjk3NjQ2LDEuOTc2NDYsMCwwLDEtMS45NzQyNSwxLjk3NTkySDY3LjIzMTg1YTEuOTc0NDMsMS45NzQ0MywwLDAsMS0xLjk3NjQ5LTEuOTc2NDhWNDcuNDc3MTFDMzYuOTQ5MTgsNzAuMTA4MywxOC45MjcsMTA0LjE3NjczLDE4LjkyNywxNDIuMjk0ODdjMCw2OC4xMzAxMyw1Ny41NTUzLDEyMy4zNiwxMjguNTY2MjgsMTIzLjM2czEyOC41NjQtNTUuMjMwMzgsMTI4LjU2NC0xMjMuMzZjMC0yLjYzMi0uMTEzLTUuMjM4Mi0uMjgzNTctNy44Mjg3N1pNNzIuMzU2LDIwMC42NTMzYzAsMS40ODU0NC0uOTI2MTYsMi43MTgwOC0yLjgyMDQzLDEuMDEwMDVsLTQuNDc0MjMtNC4wMjI4OGEzLjE2NzY5LDMuMTY3NjksMCwwLDEtMS4yMDU4MS0yLjYxNDA3di0xLjcyMDlhMy4zNDE5MiwzLjM0MTkyLDAsMCwwLTEuMDIyOTItMi40NjUyOWwtMi4zODM2NC0yLjE0MmMtMS40NjQ3NC0xLjMyMS0xLjc5MjQ4LjUwODk1LTEuNzkyNDguNTA4OTV2MS4yNjIyOGE0LjY3MjI4LDQuNjcyMjgsMCwwLDAsLjgzNzI1LDIuNTM5NjhsOS4zNTU2LDEyLjE3MTU3YTE2Ljg2MiwxNi44NjIsMCwwLDEsMy41MDY2Niw5Ljc0ODc3djcuMzAxMzdjMCw2LjM1OS0yLjY2ODg3LDkuMDM4NS01Ljc1NjA4LDYuMjg1MTdMNTMuODg3LDIxNy4wNjU4OGExMS42MzMsMTEuNjMzLDAsMCwxLTMuNzMwOTQtNy41NDQ2NlYyMDIuODk2cTAtMy4yNDQ5MywxLjI2NDUyLTIuMDI3OTVsNS41NTI1Miw1LjA3NDMzYTQuODM5NzMsNC44Mzk3MywwLDAsMSwxLjY4MzQzLDIuODgwODR2MS40NjQyYzAsMS4xNzYxNi0uMDg2NjksMi41MzYzMy43NzIzNywzLjE5NTE2bDIuNDAyMTEsMi4wNTI1NmMuODg1MzQuNzk3LDIuMDI1MTQuOTE1LDIuMDI1MTQtLjM3ODA3di0xLjYwNzkyYTMuOTkzNSwzLjk5MzUsMCwwLDAtLjg2My0yLjYxMTg0TDUxLjg4MDkxLDE5Ni40MjU3NGE3LjE0NzA3LDcuMTQ3MDcsMCwwLDEtMS43MjQyNi00Ljc3NFYxODAuMjMwMTZjMC0yLjc0NzE3LDMuMzEwOTMtNi41MDEsOC4wNjM2Ny0yLjIyMDMzbDEyLjI3NjE2LDExLjA0OTY1YTYuMjI5NDYsNi4yMjk0NiwwLDAsMSwxLjg1OTYxLDQuNzI5ODFaTTkxLjc3NywyNDIuODQ5NzFhMS4xMDAwNywxLjEwMDA3LDAsMCwxLTEuNjU4ODIuOTQyOTRMNzYuNTQzOTEsMjM1Ljc0MjRhMS4xMDE4LDEuMTAxOCwwLDAsMS0uNTM2OS0uOTQ3NDJWMTk1LjA4NzkxYTEuMDk3OTIsMS4wOTc5MiwwLDAsMSwxLjY1NzE1LS45NDIzOGw2LjMwMzYyLDMuNzM3NjZhMS4wOTYyMiwxLjA5NjIyLDAsMCwxLC41MzguOTQyMzl2MzMuNTY3ODZsNi43MzQyNiwzLjk4ODIyYTEuMTA3MzYsMS4xMDczNiwwLDAsMSwuNTM2OS45NDkwOVptOTUuMjQ5NTMsMS43NjM0MWMwLDEuMDg5NDcsMCw2LjIwNjg4LTguNTAyMTYsNy43MjI1bC0xNy4yMjY4OCwzLjA3ODgzYTEuMTAwOTUsMS4xMDA5NSwwLDAsMS0xLjI5MTkzLTEuMDc5OTV2LTM5LjY0NWExLjA5NzU5LDEuMDk3NTksMCwwLDEsLjg4NDc4LTEuMDc5NDFsMTcuNjM0LTMuNTEyMjZjOC41MDIxNi0xLjY5MTI1LDguNTAyMTYsMy40MDEsOC41MDIxNiwzLjQwMVptLTE0LjQwOTgtNTcuNTUxNFYxNzcuMDM4MzRjMC0zLjM3MjQ0LDguMDkxMDYtNi4xMDYxOSwxOC4wNzI1Mi02LjEwNjE5czE4LjA3MzYyLDIuNzM0MzEsMTguMDczNjIsNi4xMDU2M3YxMC4wMjMzOGMwLDMuMzczLTguMDkyNzQsNi4xMDM0LTE4LjA3MzYyLDYuMTAzNHMtMTguMDcyNTItMi43MzAzOS0xOC4wNzI1Mi02LjEwMzRtMzYuNjc5NjgsMTcuNzY4MjZhLjg3ODA2Ljg3ODA2LDAsMCwxLS40OTMyOS43ODc0NWwtOC4xNzEwNSwzLjk5OTRhLjg2Njg3Ljg2Njg3LDAsMCwwLS40ODgyNC43ODg1OVYyMTguNDc4YS44NzgwNy44NzgwNywwLDAsMCwuODMuODc1ODQuODY3NDMuODY3NDMsMCwwLDAsLjQzMDA4LS4wODg5Mmw2LjYyNTIxLTMuMjQxYS44ODAzMi44ODAzMiwwLDAsMSwxLjI2NzkuNzg5NzF2NS42NzE2NGEuODcxNTguODcxNTgsMCwwLDEtLjUyMDcxLjc5OTc2TDIwMC42NiwyMjYuOTQxNTlhLjg2Njg3Ljg2Njg3LDAsMCwwLS41MTYyLjgwMTQ1djcuNTU0NzJhLjg4MzU1Ljg4MzU1LDAsMCwwLC4zOTk5LjczNTQ2Ljg2MTI3Ljg2MTI3LDAsMCwwLC44MzY2Ni4wNjE1MWw2LjY3NjY2LTMuMDA2NjhhLjg4NjU2Ljg4NjU2LDAsMCwxLDEuMjM5MzIuODA1OTJ2NS42Mzg2NGEuODc1Ljg3NSwwLDAsMS0uNTIwMTIuNzk5NzdsLTE1Ljg5NDY3LDcuMTU2NTFhLjg3Ny44NzcsMCwwLDEtMS4yMzg4Mi0uODAzMTJWMjA2Ljc1NjEyYS44NzM1My44NzM1MywwLDAsMSwuNDkwNS0uNzg2MzVsMTUuODk1OC03Ljc4MTIzYS44ODE5MS44ODE5MSwwLDAsMSwxLjI2NzMxLjc4OTY5Wm0yNS45NDIxMiwxNy4zMDQwNi00Ljk0MDExLDMuMzUyODdhLjg3NTI3Ljg3NTI3LDAsMCwxLTEuMTkwMTQtLjE5NDYybC03LjM5ODY5LTkuNjc3NzQtMS4zOTQyNy45Njc1NXYxNS4yMjA3NWEuODg2MjcuODg2MjcsMCwwLDEtLjM4NjQ1LjcyODE5bC02Ljc0NTQ0LDQuNTc2YS44NzQxNC44NzQxNCwwLDAsMS0xLjIxNTUzLS4yMjUyNnEtLjAxNi0uMDIzMzItLjAzMDU1LS4wNDc2N2EuODk1Ljg5NSwwLDAsMS0uMTI2NDEtLjQ1MTM0VjE5Ni45MDExMWEuODc0OS44NzQ5LDAsMCwxLC4zODA4OS0uNzI0ODJsMTMuMjUzNzctOS4xNDU4N2M0LjA1MDg0LTIuNzkyNDgsNy41OTYwOS0yLjI3NjI3LDcuNTk2MDksMy4yNjg0MnYxMC40NjUyMWExMy43NTgsMTMuNzU4LDAsMCwxLTQuOTcyNTMsMTAuNDYzNTRsNy4zNjkwNiw5LjY0ODY4YS44NjY4Mi44NjY4MiwwLDAsMSwuMDQ3NTUsMS4wMDM5MS44OTQ2MS44OTQ2MSwwLDAsMS0uMjQ3MjEuMjU0NDZabTE4LjIxOS00OS45NDYzMmE0LjQ3Nyw0LjQ3NywwLDAsMS0uOTM0NTYsMy4xMzE0bC00Ljk1MzUzLDUuMTIzYy0uNTcxLjU5LS45MjUuMjEyLS45MjUtLjQyMzM3di0zLjExMTI2YzAtMS41MzUyMS0uNTk4NDMtMS41Mzg1OC0xLjQzNC0uNjg3OTJsLS43OTI0OS44MTZhNS4wNjYwNyw1LjA2NjA3LDAsMCwwLTEuMTU3MTMsMy41NjgxOXYyLjE2NDQxYzAsMS4zNTI4OS4zODI1NiwyLjMzMjE5LDEuNzk4MDksMi41ODA1MWwzLjk0OTYzLjY4NzkyYzEuODcwMjIuMzI2NjMsNC40NDkwNywxLjU3MSw0LjQ0OTA3LDQuNTk2NzFhMTcuNDIwNDIsMTcuNDIwNDIsMCwwLDEtMy4zMjM3OSwxMS4zMTkyM2wtOC4wOTUsMTAuNjg5NDljLTMuMzU2NzksNC40MTgyOS02LjY0ODcsMy4xNzY2OS02LjY0ODctMy4xOTM0OHYtMy41NDk3NGEyLjkxNTk0LDIuOTE1OTQsMCwwLDEsLjkzNTExLTIuNDAzNzhsNS4zOTg3Mi01LjU1NjQzYy45MjUtLjkzNCwxLjUzNjg5LS45MzUxMSwxLjUzNjg5LjUzMDJ2MS43NTYxNGMwLDIuMDU5ODMsMS42MDUxMy40MTM4NiwyLjMwMTQzLS4yNzY4NGEzLjA0ODQzLDMuMDQ4NDMsMCwwLDAsMS4wODIyLTIuNzZWMTk2LjE2MDFjMC0xLjA4ODM3LS44NDU2NC0xLjUwNzI2LTIuMzU2NzktMS44NDU2MkwyMzkuNjA3LDE5My4yNjNjLTMuNjQ2NTEtLjc2NTEtNC4yMTctMy4yODgtNC4yMTctNi4xMDUwOXYtNC4wMTg0MWMwLTMuMDIwMS40OTUtNS42Mzc1MiwyLjY4OS04LjEwNjE3bDguNTY1MzUtOS40NDczMmMzLjEyNDY3LTMuNDU2MzQsNi44MTMxMy0zLjk2OTc1LDYuODEzMTMsMS40MDkzN1oiIGZpbGw9IiMwMDMwODciLz48cGF0aCBkPSJNMTEwLjgyMDk0LDIzNC40NjMzNGwtMi41MS0xNS44MDI0MS0zLjUwODM2LDEzLjg0MjdaTTIyMy40NTksMTk2LjkxMzRsLTIuNzY3MzEsMS45MDc3YS44ODM2Ny44ODM2NywwLDAsMC0uMzc2MzguNzIzNzF2Ny4wMTY3YS44NzQ2NS44NzQ2NSwwLDAsMCwxLjM3MTkxLjcyMzE1bDEuOTA4ODMtMS4zMjE1OGE1LjA0Mjg1LDUuMDQyODUsMCwwLDAsMS44NTAwOC0zLjc5OTc0di00LjA5MDU2YzAtMS4xNzc4My0uODgxNDEtMS45MjM5Mi0xLjk4NzEtMS4xNTk5NE0xNzQuODI4MSwyMTguOTIzMjNsLTYuMzE4MTYsMS4yNTg5NHYyNi42Njg2MWw2LjcwNzQxLTEuMTk4NTRjMy4zMDctLjU5NCwzLjMwNy00LjMzMzI4LDMuMzA3LTQuMzMzMjhWMjIxLjYyNTFzMC0zLjQzOTU2LTMuNjk2MjgtMi43MDEzMU0xMjAuMjE5NjQsMjkuNjcyNDhhMS45Nzk4NCwxLjk3OTg0LDAsMCwxLDEuOTc4NzItMS45Nzg3Mmg0Ny40NDY5YTEuOTc0MjUsMS45NzQyNSwwLDAsMSwxLjc5MTkxLDEuMTQ2NTJMMTk4Ljc3NDY5LDg3LjczLDIyMS41NTAxOCw0MS40ODIyQTEzMy4xNDE3OCwxMzMuMTQxNzgsMCwwLDAsOTkuMzM3MzEsMjcuOTA2MjhsMjAuODgyMzMsNDAuMzM0Wm05MC4yNjE4OSw4Ni40OTU3MWEzOS41MjQxOSwzOS41MjQxOSwwLDAsMCwxNC45OTItOC42ODU1OCwyOS42OTA3MiwyOS42OTA3MiwwLDAsMSwxMy4xNDk3Ni0xLjQ4MDQxbC40MDcxNy41NjkzNGMtLjMwNTkyLDEuNjU5OTMtMi4zODkyMiwyLjkzMDYyLTMuODIxNTUsMy43OTM1OC0zLjA4MzMuMDYxNTEtNi44MTY0Ny0uNDc0ODMtOS4yMDQ2LDEuODg0NzctMy4zMzMzMSwzLjQ3OTI3LTcuNTMzNDYsNS44Mzg4Ni0xMC42NTE0NCw5LjI0MDM5LjI0NDQxLDEuMTA0LDEuNTA1NTgsMS45ODQzMi43OTI0OSwzLjIzNDMtMi4zNzkxOCwxLjY3OS02LjE4MjgxLjQxMDUxLTcuNDQ3MzMsMy44MDUzMi0xLjA1MjU4LDYuNTExMTEtOS4yMDg1MywxLjQ2NzU0LTEyLjQwMTQ0LDUuNjc4MzQtMS41NTY0OCwyLjA0NDE2LTYuMTc3OCw0LjUyNjIzLTkuNjcwNDksNS40NTEyOWwtMy4zNDUwNSw3LjExNzkyYzMuODg3NTQsMS4zNzYzOSw5LjI1NzcyLDMuNDQzNDksMTIuODI1OTEsMi44ODQ3NSw4LjMyODc5LTIuNjY3MiwxMS41Mzg0Ni0xNS4zNDIxMSwyMS4yNzM4NC0xNC41OTA0NWExNS44MDY1NSwxNS44MDY1NSwwLDAsMCwxNC4xMjg0OS00LjM0YzMuNzMxLTEuNDE2NjUsNC4wMjEyMSw0LjU5ODk0LDcuNDU4LDMuOTY2NC4yOTgxLTIuMTk3OTUuNDkwNDktNC45MTA0NiwzLjAxMTE0LTUuODQxNjYsMS4xOTQwNi0uNDY5MjMsMy4xMTEyNS0uMzA4NzIsMy4yNjcyOSwxLjI3MDEyLTIuNjMzNjQsMy43MjQ3OSwzLjA3ODgyLDQuOTMwNiwyLjI2ODQ1LDguNDI4MzIuNDYwMjgsMS40OTcxOSwyLjIwMTMsMS40OTcxOSwzLjQwNzExLDEuMTIxOTIsMS45OTEtMy44MDUzMiw2LjExNTctNC4xMzMwNyw5Ljg5ODEtNC4zNDU1OCwyLjk2NDc0LTQuMzQyOCw5Ljk4Ny0uMjkwMjcsMTEuNjE0NTQtNi4zOTI1NWwyLjc0MS0uOTI1QzI3MS4zMDA4LDk1Ljc5MiwyNTQuNTExMjcsNjcuMzU3NzMsMjI5Ljg3NDUzLDQ3LjU5OWwtMzYuMzUzNjIsNzcuMzg0NTFjNS41MjQtMS44OTYsMTMuMjQ1MzctNC4xMDIzLDE2Ljk2MDY2LTguODE1MzMiIGZpbGw9IiMwMDMwODciLz48cGF0aCBkPSJNMTUxLjYyODEyLDE4My40OTYzM2E1LjI1NzE5LDUuMjU3MTksMCwwLDEtNC4wMDk0NywyLjg5MzE0bC01OS4wNDMsOC4xMjg1NWExLjk3NjY5LDEuOTc2NjksMCwwLDAtMS42ODM0MywyLjI1NDQ1bDMuNTk5NTIsMjMuNjJhMS45ODQxMiwxLjk4NDEyLDAsMCwwLDIuNDEyNzIsMS42MjkxOGw1Ljg1ODQ0LTEuMzk4NzYsMy40OTA0NS0xMy42Mjg1YS44NzI0OC44NzI0OCwwLDAsMSwxLjA1OTMyLS42MzI2OGwuMDAwNTEuMDAwMTMsMTEuNDc3NSwyLjgwN2EuODY2ODkuODY2ODksMCwwLDEsLjY1Ni43MTJsMS4wMjgsNi41MjA2Miw3LjM2MzQ2LTEuNzU2MTR2LTIuOTU3NDZhMS4wOTA2MSwxLjA5MDYxLDAsMCwxLDEuMjI4MTktMS4wODk0N2w5LjE0NDIsMS4wODIyYTEuMDE2NywxLjAxNjcsMCwwLDEsLjYzNDc4LjM0NGwxNy41NjQxMy00LjE4NjE4YTUuMjcyOSw1LjI3MjksMCwwLDAsMy41NTA4NS0yLjg4NTMyTDE2Ni44NTU1OSwxODEuNzU3bC0xMS40ODUzNC01Ljg1ODQ0Wm01LjE1MDk0LTEwLjQ1NjgyLDExLjQyNzcyLDUuODMxNTkuOTExNjMtMS45Mzc4OS0xMS4zOTUyOS01LjgxMjU4Wm0xNi44NzExOS01Ljc0ODI1LTExLjIyMzU4LTUuNzI3LS41Njg3OSwxLjE1ODgxLS4zNzgwNy43NjUxLDExLjI2MTYyLDUuNzM5ODdabS0xNC41MjE2NS45NzAzNCwxMS4zNSw1Ljc4ODUzLjkwODgyLTEuOTM5LTExLjMxMi01Ljc2NTU5Wm0zOS42NDU1NC04MC41MzA0NS0yNy4zMzctNTguODkwM2ExLjk3OTgxLDEuOTc5ODEsMCwwLDAtMS43OTE5MS0xLjE0NjUySDEyMi4xOTg5MWExLjk3ODIzLDEuOTc4MjMsMCwwLDAtMS45NzkyOSwxLjk3ODcyVjY4LjI0MDg3TDk5LjMzNzI5LDI3LjkwNzQxQTEyOS43MDgsMTI5LjcwOCwwLDAsMCw2NS4yNTU0NSw0Ny40Nzc2N3Y3MS43NjFhMS45NzQ0MSwxLjk3NDQxLDAsMCwwLDEuOTc2NDksMS45NzU5M0g5NC4xNzA2OGExLjk3NTk0LDEuOTc1OTQsMCwwLDAsMS45NzQyNS0xLjk3NTkzVjg3LjE2NjI4TDExNS45ODQ3NiwxMjAuMjU2YTEuOTc0MjksMS45NzQyOSwwLDAsMCwxLjY5NDA1Ljk1ODZoMzAuMjE5NDZhMS45NzcsMS45NzcsMCwwLDAsMS45NzQyNS0xLjk3NTkzVjU3LjAwMzg1bDMxLjA3Njg1LDY2LjkzNDQtMy43MTAyMyw3LjUzOTYyLTEzLjQwNjQ2LDI3LjIyNzMyTDE3NS4wMDcsMTY0LjQwN2wxLjQ4ODI1LTMuMTcyNzksNi43ODU3Mi0xNC40NTY3OCwzLjM0NS03LjExNzkyLDYuODk0NzgtMTQuNjc1NDYsMzYuMzUzNjItNzcuMzg1NjJjLTIuNjgzNC0yLjE1MS01LjQ2MzU4LTQuMTc4OTItOC4zMjQyOC02LjExNjgyWm0tOC4wODU1LDk1LjQxMTE1YzkuOTgyLDAsMTguMDczNjItMi43MzMxOCwxOC4wNzM2Mi02LjEwNTA4cy04LjA5MTY1LTYuMTA1NjQtMTguMDczNjItNi4xMDU2NC0xOC4wNzMwNywyLjczMzc1LTE4LjA3MzA3LDYuMTA1NjQsOC4wOTE2NCw2LjEwNTA4LDE4LjA3MzA3LDYuMTA1MDgiIGZpbGw9IiNmZmYiLz48L3N2Zz4=" alt=""></div>
+
+<header class="mast">
+  <div class="mast-in">
+    <button type="button" class="mast-home" aria-label="Back to Overview">
+      <div class="crest"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyOTQuOTg1NiIgaGVpZ2h0PSIyODQuNTgzMDMiIHZpZXdCb3g9IjAgMCAyOTQuOTg1NiAyODQuNTgzMDMiPjxwYXRoIGQ9Ik0xNDcuNDkzMzcsMEM2Ni4wMzE3MywwLDAsNjMuNzA3MzcsMCwxNDIuMjk0MzJTNjYuMDMyMjcsMjg0LjU4MywxNDcuNDkzOTQsMjg0LjU4MywyOTQuOTg1NiwyMjAuODc3OTIsMjk0Ljk4NTYsMTQyLjI5NDMyLDIyOC45NTEwOS4wMDA1NiwxNDcuNDkyODEuMDAwNTZaIiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTTE0Ny40OTMzNywxMC40ODQyMmMtNzUuNjYyNDgsMC0xMzYuOTk0Niw1OS4wMTI3OS0xMzYuOTk0NiwxMzEuODEwNjVTNzEuODMwODgsMjc0LjEwMDUsMTQ3LjQ5Mzk0LDI3NC4xMDA1czEzNi45OTI5MS01OS4wMTMzNSwxMzYuOTkyOTEtMTMxLjgwNjE4UzIyMy4xNTAyNSwxMC40ODM2NiwxNDcuNDkzMzcsMTAuNDgzNjYiIGZpbGw9IiNmYzRjMDIiLz48cGF0aCBkPSJNNDcuNDY4MTYsMTczLjYwODg2di04LjYwNDVMMzguOTY2NTgsMTU3LjUzOHYxNi42MDc3N2MyLjU5MzM3LS42OTIzOSw1Ljc4OTEuMTkyOTUsOC41MDE1OC0uNTM2OSIgZmlsbD0iIzAwMzA4NyIvPjxwYXRoIGQ9Ik0yNzUuNzczODcsMTM0LjQ2NTU0Yy0xMi4wNjQxOCw0LjIzMi0yNy4wODU4Myw5LjE2ODI1LTM4LjcyODM0LDEzLjE2NzY0LTMuOTItLjYzNzU4LTYuNjAxNzIsMS41NTctOS4zODM1NywzLjM5NzYyLTQuMTQ4MTYsMS43OTI0OC05LjM3NTE4LDEuMDczODMtMTMuNDY3NDMsMi44MTQ4NC0zLjgxNTQsMy4xNTQzNC05LjQ2NDY0LDQuNDg2LTE0LjE0OCwyLjQ4NzY3LTEuMjU4MzgtMS40MzQtMi45MTQ0LTMuMTcwNTUtNC44OTQ4MS0yLjcxNTg0LTMuMTEyMzguMzA4NzItMy43NjI4NCw1Ljk1MDcyLTcuNjE1MTUsMy4wMS0yLjM3NzQ3LDEuMjUyNzgtNC40NTc0MywyLjk5MzI1LTcuMDg0MzcsMy42Mjc0OGwtMy45NTYzMi45NzkzLTEuNDg4MjQsMy4xNzI3OC0xLjM1NzM3LDIuODgzNjQtLjkwODI4LDEuOTM2MjMtMS4zNTQ1NywyLjg4MzY0LS45MDgyOCwxLjkzOS0xLjM2MDE3LDIuODgzNjQtLjkxMTYyLDEuOTM3OS0xLjM1MTc4LDIuODg1ODgtMTAuODk1MjgsMjMuMTk1NDlhNS4yNjg0Nyw1LjI2ODQ3LDAsMCwxLTMuNTUxNDIsMi44ODU4OGwtMTcuNTYzLDQuMTg1MDhhMS4xMDU0NSwxLjEwNTQ1LDAsMCwxLC4yMjQ4My4yNjUxbDExLjYyMTgsMjQuMTMxNzNWMjE0LjM4ODA2YTEuMDkzMzMsMS4wOTMzMywwLDAsMSwxLjIyNTkzLTEuMDkwNmw2LjMwNy43NDM4M2ExLjA5MjI2LDEuMDkyMjYsMCwwLDEsLjk2ODY3LDEuMDg3OHYzOS44NDg1NmExLjA5NDUzLDEuMDk0NTMsMCwwLDEtMS4wMzM1NCwxLjA5MjgybC03LjAzMTI0LjQxOTQ2YTEuMDk2MTgsMS4wOTYxOCwwLDAsMS0xLjA0MDI1LS41OTYxOEwxMzIuMzM4NTcsMjI5LjA4MnYyNS41NGExLjEwMTgsMS4xMDE4LDAsMCwxLS43ODMsMS4wNTMxMiwxLjA2MjczLDEuMDYyNzMsMCwwLDEtLjQ2Mi4wMzYzNWwtNi4zMDY0Mi0uODY0MDdhMS4wOTYxOSwxLjA5NjE5LDAsMCwxLS45NDg1NC0xLjA5MDZWMjE0LjY0NTMybC03LjM2MzQ3LDEuNzU1NTgsNS44MzMyNywzNi45NTk4OGEuODc5NDIuODc5NDIsMCwwLDEtMS4xNDA5My45NjgwOWwtNy4wNjc2LTIuMzAwM2EuODY5MTIuODY5MTIsMCwwLDEtLjU5NC0uNjk4NTVsLTEuMzMzMzItOC4zNzUxOS05LjI0OTMzLTMuMDE0NTItMS43NDMyOCw2Ljg5NzU4YS45MDYuOTA2LDAsMCwxLS40MjY3My41NTI1Ny44OTQ3OC44OTQ3OCwwLDAsMS0uNjk1MTkuMDY2NTVsLTYuNzYyMjMtMi4xOTU3MmEuODcyNDkuODcyNDksMCwwLDEtLjU3OTQyLTEuMDUxNDVsNi4wNDU4LTIzLjU4NzU0TDkyLjkwNSwyMjIuMDIwNDlhMS45ODU0MywxLjk4NTQzLDAsMCwxLTIuMzg0ODMtMS40ODJxLS4wMTctLjA3Mjc0LS4wMjg0NS0uMTQ2NTZsLTMuNTk5NTItMjMuNjIwNTVhMS45NzU5MywxLjk3NTkzLDAsMCwxLDEuNjU3LTIuMjUwMDdsLjAyNjM4LS4wMDM4Miw1OS4wNDMtOC4xMjg1NWE1LjI1NzE4LDUuMjU3MTgsMCwwLDAsNC4wMS0yLjg5MzE1bDMuNzQxNTctNy41OTc3OCwxLjQwODgzLTIuODU3OTEuOTQ0NjItMS45MTk0NCwxLjQwNDktMi44NjAxNi45NDY4Ni0xLjkxNTUyLDEuNDAzNzktMi44NTg0Ni4zNzg2My0uNzY1MWMtMi43NDY2Mi0uMTczMzgtNi43Nzg0NCwxLjkwMTU0LTguODMxLDIuMzYyMzktMy4xMTg1My45NDUxOC03LjgzODI5LS42NTA0NC04Ljk3NTMsMy40NjM2YTcuMjQ3NDksNy4yNDc0OSwwLDAsMS02Ljk3OTc5LjcwMDIzYy0yLjU0MDgtMy44OTkzLTYuOTc3LS42NDk4OC05LjkxNDg4LS42MDAxMS00LjY3NzI1LjcxMTQxLTguMzk0NzctMy4xODktMTIuNzU3MTQtLjk2Mi01LjY0MTQ0LDMuMzk5ODYtMTIuMzc1Ny0yLjk1NzQ2LTE3LjEyNCwyLjQwODgyLTMuMDI1NjkuMjI5My01Ljg2NTE1LTEuMjA0MTQtOS4xMTczNS0uOTc3NjEtNC43NjcyOC0uMDE0NTQtOC44ODEzNCwxLjQ4NDg4LTEzLjMyMzEyLDIuMjgwNzQtNS4wMTgzOSwzLjMwMjUzLTExLjkxNiwxLjcwOC0xNy42OTc4LDEuMjgxODYtMi45MDkzNiwxLjE3NDQ4LTYuNTEyMjQuODQ4NDItOS42Njg3OS45Mjk1MXYzMS43MDgyN2MwLDEuODczNTktLjk2NzU2LDIuMzk4MTgtMi40NzY0OS4yMjU0bC02LjAyNTY2LTguNjU3NjNWMTc0LjE0NDYzYy0xLjk2ODY1LTEuMDIxMjMtMy42MjQxMiwxLjQ5NzE5LTUuNDQ3MzYsMi4yNzczOC0xLjgyMzI1Ljg2NDA5LTMuNDI1LS42MzQyMy00LjE5NTE1LTIuMTI5NzRhMi4yNTUyOCwyLjI1NTI4LDAsMCwwLTEuMzU0LTEuOTIsOS45NDgzMSw5Ljk0ODMxLDAsMCwwLTQuMDMyMzkuOTQ4cS0uOTA1MDUtMy4zMjA3LTEuNjA5Ni02LjY5MTJjMS4yMTItLjc2MTczLDIuNjkwMTItMS43ODgsMi4yNjUwNy0zLjE1NDMzLS44MDM2OS0xLjY1ODI2LTIuOTk2MDUtMS41LTMuNTU5MjUtMy40OTgyOS4yMzgyNS0xLjk4NTQzLjgyMDQ2LTQuNTg4ODcsMy4xODIyOS01LjA1OTIyLDEuNzUwNTQtMS42NTcxNSwxLjUyNTcxLTQuOTkyMTIuOTg0MzMtNy4yODQtMS41ODE2NC0yLjA2Ni0zLjcyMTQ0LTMuNzQ0OTQtMi44NTQ1NS02LjY2ODI4LDAtLjc4NDY3LS44MDE0NS0xLjc0MzgzLjAwNjctMi40NjEzOCwxLjkxMjc0LS43Nzk2NCwzLjgxMTQ4LDEuMDI2MjcsNS4xNjIxNSwyLjMxMTQ5LDEuMjY3ODguMjYwMDYsMS41OTYxOC0xLjE4OTU5LDIuMTI5NzMtMS45MDI2N2ExLjg2NTQ0LDEuODY1NDQsMCwwLDAtMS4zMzc3OS0yLjQ1NzQ3LDEuMzU2LDEuMzU2LDAsMCwxLTEuNzE3LTEuMTk5NjVjLjMxOTkxLTEuMzM2NjguNzY0NTQtMi42MDY4LDIuMjkxOTItMi45Nzk4M2E1LjE5ODQ3LDUuMTk4NDcsMCwwLDEsNC41ODcyLjk0MzUxYzEuNTc3MTcsMS40MzA2NCwxLjQxMzMsMy43Mjc1OSwzLjAwODkyLDQuOTI2MTMsMi4wNTA4Ny0xLjg5OTg3LjQ4ODgtNS43OTA3NywyLjg3ODYtNy42MDc4NiwzLjQwODI0LTEuNSw2LjcyMDg1LTQuMDM2MzIsMTAuODU3MjYtMy4zODkyMywxLjExNTc2LDIuMTUxLjM2NzQ2LDYuMTIzLDMuOTMxNzMsNi4yODI5NC45NzY1LS44NjM1MywxLjA1NDI0LTMuMDkzOTMsMi44ODAyOC0yLjIxMzA2LDEuNTk5NTIuNjUxNTYsMS40OTcxOSwzLjQxNTUsMy4zOTgxNiwzLjAyNDU3LDEuOTIwNTYtMy41NjI2LTEuNzIzMTMtNi41MDY2NS0xLjI1NTU3LTkuOTA1OTQsMi41NTU5LTEuNjc0NDcsNS45NDYyNC0uMjMxLDcuNzYyMjIsMS43NTU1OC44MTMxOSwxLjY1OTkzLTIuMzc3NSwyLjYwNC0uMTcyMjcsMy45NzMxMSwzLjE4MDYyLTEuMTkxMjYsNC42MDY3NywyLjQ2NzUzLDcuNDEwNDQsMS43NTM4OSwxLjgwNDIzLTMuMzE4MjEsNS42ODMzNy0zLjcxNDE2LDguOTI3MTktMi44MzE2Miw0Ljc2OTU0LS4wNjM3Niw3LjUzNTcyLDcuMDgwNDYsMTIuNTIsNC4yNDkzOSwyLjcxODA4LTEuODI2Niw3Ljk5OTM1LjcxMzA4LDguODI1NC0zLjYzMzYzYTMuODY3ODYsMy44Njc4NiwwLDAsMSwyLjYzOTIzLTQuMTc1NThjMi42ODA2Mi0uODE3NjYsNS4yMDM1Miw0Ljc0NDM2LDcuNDQxNzYuNTUyNTgsNC4xNzIyMSwxLjY3NjE2LDkuMDkyNzQsMS42MDczNiwxMy42ODMyOSwyLjM0MjI0LDcuMDYyLDMuNzQyNjksMTYuMzQ5OTQsMy4yMTU4NSwyNC4zMjEzMywzLjQ2MzA1LDYuOTI5NDYsMy42ODE3MywxNi43ODExNC0xLjU2NzY2LDI0LjcxMjgzLS4zMDc2bDMuNzA5NjgtNy41NDAxOEwxNDkuODczLDU3LjAwMzI3djYyLjIzNDgxYTEuOTc5ODMsMS45Nzk4MywwLDAsMS0xLjk3NDgyLDEuOTc1OTJIMTE3LjY3OTI4YTEuOTc0MjYsMS45NzQyNiwwLDAsMS0xLjY5NDYxLS45NTg1OUw5Ni4xNDQ4NCw4Ny4xNjU3MnYzMi4wNzIzNmExLjk3NjQ2LDEuOTc2NDYsMCwwLDEtMS45NzQyNSwxLjk3NTkySDY3LjIzMTg1YTEuOTc0NDMsMS45NzQ0MywwLDAsMS0xLjk3NjQ5LTEuOTc2NDhWNDcuNDc3MTFDMzYuOTQ5MTgsNzAuMTA4MywxOC45MjcsMTA0LjE3NjczLDE4LjkyNywxNDIuMjk0ODdjMCw2OC4xMzAxMyw1Ny41NTUzLDEyMy4zNiwxMjguNTY2MjgsMTIzLjM2czEyOC41NjQtNTUuMjMwMzgsMTI4LjU2NC0xMjMuMzZjMC0yLjYzMi0uMTEzLTUuMjM4Mi0uMjgzNTctNy44Mjg3N1pNNzIuMzU2LDIwMC42NTMzYzAsMS40ODU0NC0uOTI2MTYsMi43MTgwOC0yLjgyMDQzLDEuMDEwMDVsLTQuNDc0MjMtNC4wMjI4OGEzLjE2NzY5LDMuMTY3NjksMCwwLDEtMS4yMDU4MS0yLjYxNDA3di0xLjcyMDlhMy4zNDE5MiwzLjM0MTkyLDAsMCwwLTEuMDIyOTItMi40NjUyOWwtMi4zODM2NC0yLjE0MmMtMS40NjQ3NC0xLjMyMS0xLjc5MjQ4LjUwODk1LTEuNzkyNDguNTA4OTV2MS4yNjIyOGE0LjY3MjI4LDQuNjcyMjgsMCwwLDAsLjgzNzI1LDIuNTM5NjhsOS4zNTU2LDEyLjE3MTU3YTE2Ljg2MiwxNi44NjIsMCwwLDEsMy41MDY2Niw5Ljc0ODc3djcuMzAxMzdjMCw2LjM1OS0yLjY2ODg3LDkuMDM4NS01Ljc1NjA4LDYuMjg1MTdMNTMuODg3LDIxNy4wNjU4OGExMS42MzMsMTEuNjMzLDAsMCwxLTMuNzMwOTQtNy41NDQ2NlYyMDIuODk2cTAtMy4yNDQ5MywxLjI2NDUyLTIuMDI3OTVsNS41NTI1Miw1LjA3NDMzYTQuODM5NzMsNC44Mzk3MywwLDAsMSwxLjY4MzQzLDIuODgwODR2MS40NjQyYzAsMS4xNzYxNi0uMDg2NjksMi41MzYzMy43NzIzNywzLjE5NTE2bDIuNDAyMTEsMi4wNTI1NmMuODg1MzQuNzk3LDIuMDI1MTQuOTE1LDIuMDI1MTQtLjM3ODA3di0xLjYwNzkyYTMuOTkzNSwzLjk5MzUsMCwwLDAtLjg2My0yLjYxMTg0TDUxLjg4MDkxLDE5Ni40MjU3NGE3LjE0NzA3LDcuMTQ3MDcsMCwwLDEtMS43MjQyNi00Ljc3NFYxODAuMjMwMTZjMC0yLjc0NzE3LDMuMzEwOTMtNi41MDEsOC4wNjM2Ny0yLjIyMDMzbDEyLjI3NjE2LDExLjA0OTY1YTYuMjI5NDYsNi4yMjk0NiwwLDAsMSwxLjg1OTYxLDQuNzI5ODFaTTkxLjc3NywyNDIuODQ5NzFhMS4xMDAwNywxLjEwMDA3LDAsMCwxLTEuNjU4ODIuOTQyOTRMNzYuNTQzOTEsMjM1Ljc0MjRhMS4xMDE4LDEuMTAxOCwwLDAsMS0uNTM2OS0uOTQ3NDJWMTk1LjA4NzkxYTEuMDk3OTIsMS4wOTc5MiwwLDAsMSwxLjY1NzE1LS45NDIzOGw2LjMwMzYyLDMuNzM3NjZhMS4wOTYyMiwxLjA5NjIyLDAsMCwxLC41MzguOTQyMzl2MzMuNTY3ODZsNi43MzQyNiwzLjk4ODIyYTEuMTA3MzYsMS4xMDczNiwwLDAsMSwuNTM2OS45NDkwOVptOTUuMjQ5NTMsMS43NjM0MWMwLDEuMDg5NDcsMCw2LjIwNjg4LTguNTAyMTYsNy43MjI1bC0xNy4yMjY4OCwzLjA3ODgzYTEuMTAwOTUsMS4xMDA5NSwwLDAsMS0xLjI5MTkzLTEuMDc5OTV2LTM5LjY0NWExLjA5NzU5LDEuMDk3NTksMCwwLDEsLjg4NDc4LTEuMDc5NDFsMTcuNjM0LTMuNTEyMjZjOC41MDIxNi0xLjY5MTI1LDguNTAyMTYsMy40MDEsOC41MDIxNiwzLjQwMVptLTE0LjQwOTgtNTcuNTUxNFYxNzcuMDM4MzRjMC0zLjM3MjQ0LDguMDkxMDYtNi4xMDYxOSwxOC4wNzI1Mi02LjEwNjE5czE4LjA3MzYyLDIuNzM0MzEsMTguMDczNjIsNi4xMDU2M3YxMC4wMjMzOGMwLDMuMzczLTguMDkyNzQsNi4xMDM0LTE4LjA3MzYyLDYuMTAzNHMtMTguMDcyNTItMi43MzAzOS0xOC4wNzI1Mi02LjEwMzRtMzYuNjc5NjgsMTcuNzY4MjZhLjg3ODA2Ljg3ODA2LDAsMCwxLS40OTMyOS43ODc0NWwtOC4xNzEwNSwzLjk5OTRhLjg2Njg3Ljg2Njg3LDAsMCwwLS40ODgyNC43ODg1OVYyMTguNDc4YS44NzgwNy44NzgwNywwLDAsMCwuODMuODc1ODQuODY3NDMuODY3NDMsMCwwLDAsLjQzMDA4LS4wODg5Mmw2LjYyNTIxLTMuMjQxYS44ODAzMi44ODAzMiwwLDAsMSwxLjI2NzkuNzg5NzF2NS42NzE2NGEuODcxNTguODcxNTgsMCwwLDEtLjUyMDcxLjc5OTc2TDIwMC42NiwyMjYuOTQxNTlhLjg2Njg3Ljg2Njg3LDAsMCwwLS41MTYyLjgwMTQ1djcuNTU0NzJhLjg4MzU1Ljg4MzU1LDAsMCwwLC4zOTk5LjczNTQ2Ljg2MTI3Ljg2MTI3LDAsMCwwLC44MzY2Ni4wNjE1MWw2LjY3NjY2LTMuMDA2NjhhLjg4NjU2Ljg4NjU2LDAsMCwxLDEuMjM5MzIuODA1OTJ2NS42Mzg2NGEuODc1Ljg3NSwwLDAsMS0uNTIwMTIuNzk5NzdsLTE1Ljg5NDY3LDcuMTU2NTFhLjg3Ny44NzcsMCwwLDEtMS4yMzg4Mi0uODAzMTJWMjA2Ljc1NjEyYS44NzM1My44NzM1MywwLDAsMSwuNDkwNS0uNzg2MzVsMTUuODk1OC03Ljc4MTIzYS44ODE5MS44ODE5MSwwLDAsMSwxLjI2NzMxLjc4OTY5Wm0yNS45NDIxMiwxNy4zMDQwNi00Ljk0MDExLDMuMzUyODdhLjg3NTI3Ljg3NTI3LDAsMCwxLTEuMTkwMTQtLjE5NDYybC03LjM5ODY5LTkuNjc3NzQtMS4zOTQyNy45Njc1NXYxNS4yMjA3NWEuODg2MjcuODg2MjcsMCwwLDEtLjM4NjQ1LjcyODE5bC02Ljc0NTQ0LDQuNTc2YS44NzQxNC44NzQxNCwwLDAsMS0xLjIxNTUzLS4yMjUyNnEtLjAxNi0uMDIzMzItLjAzMDU1LS4wNDc2N2EuODk1Ljg5NSwwLDAsMS0uMTI2NDEtLjQ1MTM0VjE5Ni45MDExMWEuODc0OS44NzQ5LDAsMCwxLC4zODA4OS0uNzI0ODJsMTMuMjUzNzctOS4xNDU4N2M0LjA1MDg0LTIuNzkyNDgsNy41OTYwOS0yLjI3NjI3LDcuNTk2MDksMy4yNjg0MnYxMC40NjUyMWExMy43NTgsMTMuNzU4LDAsMCwxLTQuOTcyNTMsMTAuNDYzNTRsNy4zNjkwNiw5LjY0ODY4YS44NjY4Mi44NjY4MiwwLDAsMSwuMDQ3NTUsMS4wMDM5MS44OTQ2MS44OTQ2MSwwLDAsMS0uMjQ3MjEuMjU0NDZabTE4LjIxOS00OS45NDYzMmE0LjQ3Nyw0LjQ3NywwLDAsMS0uOTM0NTYsMy4xMzE0bC00Ljk1MzUzLDUuMTIzYy0uNTcxLjU5LS45MjUuMjEyLS45MjUtLjQyMzM3di0zLjExMTI2YzAtMS41MzUyMS0uNTk4NDMtMS41Mzg1OC0xLjQzNC0uNjg3OTJsLS43OTI0OS44MTZhNS4wNjYwNyw1LjA2NjA3LDAsMCwwLTEuMTU3MTMsMy41NjgxOXYyLjE2NDQxYzAsMS4zNTI4OS4zODI1NiwyLjMzMjE5LDEuNzk4MDksMi41ODA1MWwzLjk0OTYzLjY4NzkyYzEuODcwMjIuMzI2NjMsNC40NDkwNywxLjU3MSw0LjQ0OTA3LDQuNTk2NzFhMTcuNDIwNDIsMTcuNDIwNDIsMCwwLDEtMy4zMjM3OSwxMS4zMTkyM2wtOC4wOTUsMTAuNjg5NDljLTMuMzU2NzksNC40MTgyOS02LjY0ODcsMy4xNzY2OS02LjY0ODctMy4xOTM0OHYtMy41NDk3NGEyLjkxNTk0LDIuOTE1OTQsMCwwLDEsLjkzNTExLTIuNDAzNzhsNS4zOTg3Mi01LjU1NjQzYy45MjUtLjkzNCwxLjUzNjg5LS45MzUxMSwxLjUzNjg5LjUzMDJ2MS43NTYxNGMwLDIuMDU5ODMsMS42MDUxMy40MTM4NiwyLjMwMTQzLS4yNzY4NGEzLjA0ODQzLDMuMDQ4NDMsMCwwLDAsMS4wODIyLTIuNzZWMTk2LjE2MDFjMC0xLjA4ODM3LS44NDU2NC0xLjUwNzI2LTIuMzU2NzktMS44NDU2MkwyMzkuNjA3LDE5My4yNjNjLTMuNjQ2NTEtLjc2NTEtNC4yMTctMy4yODgtNC4yMTctNi4xMDUwOXYtNC4wMTg0MWMwLTMuMDIwMS40OTUtNS42Mzc1MiwyLjY4OS04LjEwNjE3bDguNTY1MzUtOS40NDczMmMzLjEyNDY3LTMuNDU2MzQsNi44MTMxMy0zLjk2OTc1LDYuODEzMTMsMS40MDkzN1oiIGZpbGw9IiMwMDMwODciLz48cGF0aCBkPSJNMTEwLjgyMDk0LDIzNC40NjMzNGwtMi41MS0xNS44MDI0MS0zLjUwODM2LDEzLjg0MjdaTTIyMy40NTksMTk2LjkxMzRsLTIuNzY3MzEsMS45MDc3YS44ODM2Ny44ODM2NywwLDAsMC0uMzc2MzguNzIzNzF2Ny4wMTY3YS44NzQ2NS44NzQ2NSwwLDAsMCwxLjM3MTkxLjcyMzE1bDEuOTA4ODMtMS4zMjE1OGE1LjA0Mjg1LDUuMDQyODUsMCwwLDAsMS44NTAwOC0zLjc5OTc0di00LjA5MDU2YzAtMS4xNzc4My0uODgxNDEtMS45MjM5Mi0xLjk4NzEtMS4xNTk5NE0xNzQuODI4MSwyMTguOTIzMjNsLTYuMzE4MTYsMS4yNTg5NHYyNi42Njg2MWw2LjcwNzQxLTEuMTk4NTRjMy4zMDctLjU5NCwzLjMwNy00LjMzMzI4LDMuMzA3LTQuMzMzMjhWMjIxLjYyNTFzMC0zLjQzOTU2LTMuNjk2MjgtMi43MDEzMU0xMjAuMjE5NjQsMjkuNjcyNDhhMS45Nzk4NCwxLjk3OTg0LDAsMCwxLDEuOTc4NzItMS45Nzg3Mmg0Ny40NDY5YTEuOTc0MjUsMS45NzQyNSwwLDAsMSwxLjc5MTkxLDEuMTQ2NTJMMTk4Ljc3NDY5LDg3LjczLDIyMS41NTAxOCw0MS40ODIyQTEzMy4xNDE3OCwxMzMuMTQxNzgsMCwwLDAsOTkuMzM3MzEsMjcuOTA2MjhsMjAuODgyMzMsNDAuMzM0Wm05MC4yNjE4OSw4Ni40OTU3MWEzOS41MjQxOSwzOS41MjQxOSwwLDAsMCwxNC45OTItOC42ODU1OCwyOS42OTA3MiwyOS42OTA3MiwwLDAsMSwxMy4xNDk3Ni0xLjQ4MDQxbC40MDcxNy41NjkzNGMtLjMwNTkyLDEuNjU5OTMtMi4zODkyMiwyLjkzMDYyLTMuODIxNTUsMy43OTM1OC0zLjA4MzMuMDYxNTEtNi44MTY0Ny0uNDc0ODMtOS4yMDQ2LDEuODg0NzctMy4zMzMzMSwzLjQ3OTI3LTcuNTMzNDYsNS44Mzg4Ni0xMC42NTE0NCw5LjI0MDM5LjI0NDQxLDEuMTA0LDEuNTA1NTgsMS45ODQzMi43OTI0OSwzLjIzNDMtMi4zNzkxOCwxLjY3OS02LjE4MjgxLjQxMDUxLTcuNDQ3MzMsMy44MDUzMi0xLjA1MjU4LDYuNTExMTEtOS4yMDg1MywxLjQ2NzU0LTEyLjQwMTQ0LDUuNjc4MzQtMS41NTY0OCwyLjA0NDE2LTYuMTc3OCw0LjUyNjIzLTkuNjcwNDksNS40NTEyOWwtMy4zNDUwNSw3LjExNzkyYzMuODg3NTQsMS4zNzYzOSw5LjI1NzcyLDMuNDQzNDksMTIuODI1OTEsMi44ODQ3NSw4LjMyODc5LTIuNjY3MiwxMS41Mzg0Ni0xNS4zNDIxMSwyMS4yNzM4NC0xNC41OTA0NWExNS44MDY1NSwxNS44MDY1NSwwLDAsMCwxNC4xMjg0OS00LjM0YzMuNzMxLTEuNDE2NjUsNC4wMjEyMSw0LjU5ODk0LDcuNDU4LDMuOTY2NC4yOTgxLTIuMTk3OTUuNDkwNDktNC45MTA0NiwzLjAxMTE0LTUuODQxNjYsMS4xOTQwNi0uNDY5MjMsMy4xMTEyNS0uMzA4NzIsMy4yNjcyOSwxLjI3MDEyLTIuNjMzNjQsMy43MjQ3OSwzLjA3ODgyLDQuOTMwNiwyLjI2ODQ1LDguNDI4MzIuNDYwMjgsMS40OTcxOSwyLjIwMTMsMS40OTcxOSwzLjQwNzExLDEuMTIxOTIsMS45OTEtMy44MDUzMiw2LjExNTctNC4xMzMwNyw5Ljg5ODEtNC4zNDU1OCwyLjk2NDc0LTQuMzQyOCw5Ljk4Ny0uMjkwMjcsMTEuNjE0NTQtNi4zOTI1NWwyLjc0MS0uOTI1QzI3MS4zMDA4LDk1Ljc5MiwyNTQuNTExMjcsNjcuMzU3NzMsMjI5Ljg3NDUzLDQ3LjU5OWwtMzYuMzUzNjIsNzcuMzg0NTFjNS41MjQtMS44OTYsMTMuMjQ1MzctNC4xMDIzLDE2Ljk2MDY2LTguODE1MzMiIGZpbGw9IiMwMDMwODciLz48cGF0aCBkPSJNMTUxLjYyODEyLDE4My40OTYzM2E1LjI1NzE5LDUuMjU3MTksMCwwLDEtNC4wMDk0NywyLjg5MzE0bC01OS4wNDMsOC4xMjg1NWExLjk3NjY5LDEuOTc2NjksMCwwLDAtMS42ODM0MywyLjI1NDQ1bDMuNTk5NTIsMjMuNjJhMS45ODQxMiwxLjk4NDEyLDAsMCwwLDIuNDEyNzIsMS42MjkxOGw1Ljg1ODQ0LTEuMzk4NzYsMy40OTA0NS0xMy42Mjg1YS44NzI0OC44NzI0OCwwLDAsMSwxLjA1OTMyLS42MzI2OGwuMDAwNTEuMDAwMTMsMTEuNDc3NSwyLjgwN2EuODY2ODkuODY2ODksMCwwLDEsLjY1Ni43MTJsMS4wMjgsNi41MjA2Miw3LjM2MzQ2LTEuNzU2MTR2LTIuOTU3NDZhMS4wOTA2MSwxLjA5MDYxLDAsMCwxLDEuMjI4MTktMS4wODk0N2w5LjE0NDIsMS4wODIyYTEuMDE2NywxLjAxNjcsMCwwLDEsLjYzNDc4LjM0NGwxNy41NjQxMy00LjE4NjE4YTUuMjcyOSw1LjI3MjksMCwwLDAsMy41NTA4NS0yLjg4NTMyTDE2Ni44NTU1OSwxODEuNzU3bC0xMS40ODUzNC01Ljg1ODQ0Wm01LjE1MDk0LTEwLjQ1NjgyLDExLjQyNzcyLDUuODMxNTkuOTExNjMtMS45Mzc4OS0xMS4zOTUyOS01LjgxMjU4Wm0xNi44NzExOS01Ljc0ODI1LTExLjIyMzU4LTUuNzI3LS41Njg3OSwxLjE1ODgxLS4zNzgwNy43NjUxLDExLjI2MTYyLDUuNzM5ODdabS0xNC41MjE2NS45NzAzNCwxMS4zNSw1Ljc4ODUzLjkwODgyLTEuOTM5LTExLjMxMi01Ljc2NTU5Wm0zOS42NDU1NC04MC41MzA0NS0yNy4zMzctNTguODkwM2ExLjk3OTgxLDEuOTc5ODEsMCwwLDAtMS43OTE5MS0xLjE0NjUySDEyMi4xOTg5MWExLjk3ODIzLDEuOTc4MjMsMCwwLDAtMS45NzkyOSwxLjk3ODcyVjY4LjI0MDg3TDk5LjMzNzI5LDI3LjkwNzQxQTEyOS43MDgsMTI5LjcwOCwwLDAsMCw2NS4yNTU0NSw0Ny40Nzc2N3Y3MS43NjFhMS45NzQ0MSwxLjk3NDQxLDAsMCwwLDEuOTc2NDksMS45NzU5M0g5NC4xNzA2OGExLjk3NTk0LDEuOTc1OTQsMCwwLDAsMS45NzQyNS0xLjk3NTkzVjg3LjE2NjI4TDExNS45ODQ3NiwxMjAuMjU2YTEuOTc0MjksMS45NzQyOSwwLDAsMCwxLjY5NDA1Ljk1ODZoMzAuMjE5NDZhMS45NzcsMS45NzcsMCwwLDAsMS45NzQyNS0xLjk3NTkzVjU3LjAwMzg1bDMxLjA3Njg1LDY2LjkzNDQtMy43MTAyMyw3LjUzOTYyLTEzLjQwNjQ2LDI3LjIyNzMyTDE3NS4wMDcsMTY0LjQwN2wxLjQ4ODI1LTMuMTcyNzksNi43ODU3Mi0xNC40NTY3OCwzLjM0NS03LjExNzkyLDYuODk0NzgtMTQuNjc1NDYsMzYuMzUzNjItNzcuMzg1NjJjLTIuNjgzNC0yLjE1MS01LjQ2MzU4LTQuMTc4OTItOC4zMjQyOC02LjExNjgyWm0tOC4wODU1LDk1LjQxMTE1YzkuOTgyLDAsMTguMDczNjItMi43MzMxOCwxOC4wNzM2Mi02LjEwNTA4cy04LjA5MTY1LTYuMTA1NjQtMTguMDczNjItNi4xMDU2NC0xOC4wNzMwNywyLjczMzc1LTE4LjA3MzA3LDYuMTA1NjQsOC4wOTE2NCw2LjEwNTA4LDE4LjA3MzA3LDYuMTA1MDgiIGZpbGw9IiNmZmYiLz48L3N2Zz4=" alt="New York Islanders crest"></div>
+    <div>
+      <div class="mast-title">Islanders <span>S1</span> Tracker</div>
+    </div>
+    </button>
+    <div class="mast-right">
+      <div class="updated">Preseason<br>Sep 29, 2026</div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="hero"><div class="hero-top"><div class="record num"><b>0</b><span class="dash">&ndash;</span><b>0</b><span class="dash">&ndash;</span><b>0</b></div><div class="streak-pill" style="background:var(--surface-2);color:var(--ink-soft);border-color:var(--line)"><span class="dot" style="background:var(--orange)"></span>Preseason</div></div></div>
+  <nav class="tabs" role="tablist" aria-label="Views"><button class="tab is-active" role="tab" aria-selected="true" data-panel="p-overview">Overview</button><button class="tab" role="tab" aria-selected="false" data-panel="p-roster">Roster</button><button class="tab" role="tab" aria-selected="false" data-panel="p-lines">Lines</button><button class="tab" role="tab" aria-selected="false" data-panel="p-front">Front Office</button><button class="tab" role="tab" aria-selected="false" data-panel="p-schedule">Schedule</button><button class="tab" role="tab" aria-selected="false" data-panel="p-goalies">Goalies</button><button class="tab" role="tab" aria-selected="false" data-panel="p-divisions">vs. Divisions</button></nav>
+  <div class="panel is-active" id="p-overview" role="tabpanel"><div class="strip"><div class="stat"><div class="k">Goals For</div><div class="v num">0</div></div><div class="stat"><div class="k">Goals Ag.</div><div class="v num">0</div></div><div class="stat"><div class="k">Goal Diff</div><div class="v num">0</div></div><div class="stat"><div class="k">1-Goal</div><div class="v num">0-0</div></div><div class="stat"><div class="k">OT/SO</div><div class="v num">0-0</div></div><div class="stat"><div class="k">Shutouts</div><div class="v num">0</div></div><div class="stat"><div class="k">Comebacks</div><div class="v num">0 <small>0.0%</small></div></div><div class="stat"><div class="k">PP</div><div class="v num">0/0</div></div><div class="stat"><div class="k">PK</div><div class="v num">0/0</div></div><div class="stat"><div class="k">Most Goals</div><div class="v num">0</div></div><div class="stat"><div class="k">Most Goals Allowed</div><div class="v num">0</div></div><div class="stat"><div class="k">BLL</div><div class="v num">0</div></div></div><section class="story"><div class="sec-head"><h2>Inside the Numbers</h2></div><div class="story-card"><div class="story-lead"><div class="story-big num">0&ndash;0&ndash;0</div></div><p class="empty">No games played</p></div></section><section><div class="sec-head"><h2>Recent Headlines</h2></div><p class="empty">No games played</p></section><section><div class="sec-head"><h2>Game Log</h2><div class="meta">0 played &middot; 82 season</div></div><p class="empty">0 of 82 played</p></section><section><div class="sec-head"><h2>Skating Leaders</h2></div><p class="empty">None yet</p></section><section><div class="sec-head"><h2>Team Skating</h2></div><p class="empty">No games played</p></section><section><div class="sec-head"><h2>Goaltending Leaders</h2></div><p class="empty">None yet</p></section><section><div class="sec-head"><h2>Team Goaltending</h2></div><p class="empty">No games played</p></section></div><div class="panel" id="p-roster" role="tabpanel"><section><div class="sec-head"><h2>Main Roster</h2><div class="meta">21 skaters &middot; 18 dressed &middot; 3 scratched</div></div><div class="tbl-wrap"><div class="tbl-scroll"><table class="num roster"><thead><tr><th>Player</th><th>Pos</th><th>#</th><th>OVR</th><th>POT</th><th>Age</th><th>Ht</th><th>Wt</th><th>Shoots</th><th>Type</th><th>Clause</th><th>Ext</th><th>Salary</th><th>Through</th><th>Then</th></tr></thead><tbody><tr><td>M. Schaefer</td><td>LD/RD</td><td>48</td><td>91</td><td>Elite <span class="pos">High</span></td><td>19</td><td></td><td></td><td></td><td></td><td>-</td><td>-</td><td>$0.975M</td><td>27-28</td><td>RFA</td></tr><tr><td>M. Barzal</td><td>C/RW</td><td></td><td>88</td><td>Elite <span class="pos">Exact</span></td><td>29</td><td></td><td></td><td></td><td></td><td>M-NTC</td><td>-</td><td>$9.150M</td><td>30-31</td><td>UFA</td></tr><tr><td>B. Horvat</td><td>C</td><td>14</td><td>88</td><td>Elite <span class="pos">Exact</span></td><td>31</td><td>6&#x27;1&quot;</td><td>225</td><td></td><td>TWF</td><td>NTC</td><td>-</td><td>$8.500M</td><td>30-31</td><td>UFA</td></tr><tr><td>R. Pulock</td><td>RD</td><td></td><td>88</td><td>Elite <span class="pos">Exact</span></td><td>31</td><td></td><td></td><td></td><td></td><td>NTC</td><td>-</td><td>$6.150M</td><td>29-30</td><td>UFA</td></tr><tr><td>A. Pelech</td><td>LD</td><td></td><td>87</td><td>Top 4 D <span class="pos">Exact</span></td><td>32</td><td></td><td></td><td></td><td></td><td>M-NTC</td><td>-</td><td>$5.750M</td><td>28-29</td><td>UFA</td></tr><tr><td>M. Weegar</td><td>LD/RD</td><td></td><td>86</td><td>Top 6 D <span class="pos">Exact</span></td><td>32</td><td></td><td></td><td></td><td></td><td>NTC</td><td>-</td><td>$6.250M</td><td>30-31</td><td>UFA</td></tr><tr><td>M. Coronato</td><td>RW/LW</td><td>27</td><td>85</td><td>Top 6 F <span class="pos">Med</span></td><td>23</td><td>5&#x27;10&quot;</td><td>183</td><td>R</td><td>SNP</td><td>-</td><td>-</td><td>$6.500M</td><td>31-32</td><td>UFA</td></tr><tr><td>S. Holmstrom</td><td>RW</td><td></td><td>84</td><td>Top 9 F <span class="pos">Med</span></td><td>25</td><td></td><td></td><td></td><td></td><td>-</td><td>No</td><td>$3.625M</td><td>26-27</td><td>RFA</td></tr><tr><td>B. Schenn</td><td>C/LW</td><td></td><td>84</td><td>Top 6 F <span class="pos">Exact</span></td><td>35</td><td></td><td></td><td></td><td></td><td>M-NTC</td><td>-</td><td>$6.500M</td><td>27-28</td><td>UFA</td></tr><tr><td>T. DeAngelo <span class="pos">SCR</span></td><td>RD</td><td></td><td>83</td><td>Top 4 D <span class="pos">Exact</span></td><td>30</td><td></td><td></td><td></td><td></td><td>M-NTC</td><td>-</td><td>$4.500M</td><td>27-28</td><td>UFA</td></tr><tr><td>M. Maccelli</td><td>LW</td><td></td><td>83</td><td>Top 6 F <span class="pos">Low</span></td><td>25</td><td></td><td></td><td></td><td></td><td>-</td><td>-</td><td>$2.250M</td><td>26-27</td><td>RFA</td></tr><tr><td>A. Romanov</td><td>LD</td><td></td><td>83</td><td>Top 4 D <span class="pos">Med</span></td><td>26</td><td></td><td></td><td></td><td></td><td>NTC</td><td>-</td><td>$6.250M</td><td>32-33</td><td>UFA</td></tr><tr><td>E. Heineman</td><td>LW</td><td>51</td><td>82</td><td>Top 6 F <span class="pos">Med</span></td><td>24</td><td>6&#x27;2&quot;</td><td>204</td><td>L</td><td>PWF</td><td>-</td><td>Yes</td><td>$1.100M</td><td>26-27</td><td>RFA</td></tr><tr><td>K. Palmieri</td><td>RW/LW</td><td>21</td><td>82</td><td>Top 6 F <span class="pos">Exact</span></td><td>35</td><td>6&#x27;0&quot;</td><td>192</td><td></td><td>TWF</td><td>M-NTC</td><td>Yes</td><td>$4.750M</td><td>26-27</td><td>UFA</td></tr><tr><td>C. Cizikas</td><td>C</td><td></td><td>81</td><td>Top 9 F <span class="pos">Exact</span></td><td>35</td><td></td><td></td><td></td><td></td><td>-</td><td>Yes</td><td>$2.500M</td><td>26-27</td><td>UFA</td></tr><tr><td>A. Duclair</td><td>LW/RW</td><td></td><td>81</td><td>Top 6 F <span class="pos">Exact</span></td><td>31</td><td></td><td></td><td></td><td></td><td>M-NTC</td><td>-</td><td>$3.500M</td><td>27-28</td><td>UFA</td></tr><tr><td>J. Pageau</td><td>C</td><td>44</td><td>81</td><td>Top 6 F <span class="pos">Exact</span></td><td>33</td><td>5&#x27;11&quot;</td><td>180</td><td></td><td>TWF</td><td>NTC</td><td>-</td><td>$4.850M</td><td>28-29</td><td>UFA</td></tr><tr><td>C. Ritchie <span class="pos">SCR</span></td><td>C</td><td>64</td><td>81</td><td>Top 6 F <span class="pos">Med</span></td><td>21</td><td>6&#x27;2&quot;</td><td>200</td><td></td><td></td><td>-</td><td>-</td><td>$0.950M</td><td>26-27</td><td>RFA</td></tr><tr><td>P. Engvall</td><td>LW/RW</td><td></td><td>80</td><td>Bottom 6 F <span class="pos">Exact</span></td><td>30</td><td></td><td></td><td></td><td></td><td>M-NTC</td><td>-</td><td>$3.000M</td><td>29-30</td><td>UFA</td></tr><tr><td>M. Kessel</td><td>RD/LD</td><td></td><td>79</td><td>Top 6 D <span class="pos">Med</span></td><td>26</td><td></td><td></td><td></td><td></td><td>-</td><td>-</td><td>$0.850M</td><td>26-27</td><td>UFA</td></tr><tr><td>K. MacLean <span class="pos">SCR</span></td><td>LW</td><td></td><td>79</td><td>Bottom 6 F <span class="pos">Exact</span></td><td>27</td><td></td><td></td><td></td><td></td><td>-</td><td>-</td><td>$0.850M</td><td>26-27</td><td>UFA</td></tr></tbody></table></div></div></section><section><div class="sec-head"><h2>Goalies</h2><div class="meta">contracts pending</div></div><div class="tbl-wrap"><div class="tbl-scroll"><table class="num roster"><thead><tr><th>Player</th><th>Pos</th><th>#</th><th>OVR</th><th>POT</th><th>Age</th><th>Ht</th><th>Wt</th><th>Shoots</th><th>Type</th><th>Clause</th><th>Ext</th><th>Salary</th><th>Through</th><th>Then</th></tr></thead><tbody><tr><td>I. Sorokin</td><td>G</td><td></td><td>93</td><td></td><td></td><td></td><td></td><td></td><td></td><td>-</td><td>-</td><td></td><td></td><td></td></tr><tr><td>S. Varlamov</td><td>G</td><td>40</td><td>81</td><td></td><td></td><td>6&#x27;2&quot;</td><td>201</td><td></td><td></td><td>-</td><td>-</td><td></td><td></td><td></td></tr></tbody></table></div></div></section><section><div class="sec-head"><h2>In the System</h2><div class="meta">21 skaters</div></div><div class="tbl-wrap"><div class="tbl-scroll"><table class="num roster"><thead><tr><th>Player</th><th>Pos</th><th>#</th><th>OVR</th><th>POT</th><th>Age</th><th>Ht</th><th>Wt</th><th>Shoots</th><th>Type</th><th>Clause</th><th>Ext</th><th>Salary</th><th>Through</th><th>Then</th></tr></thead><tbody><tr><td>M. Chaffee</td><td>RW</td><td></td><td>77</td><td>Bottom 6 F <span class="pos">Exact</span></td><td>28</td><td></td><td></td><td></td><td></td><td>-</td><td>-</td><td>$0.850M</td><td>26-27</td><td>UFA</td></tr><tr><td>I. George</td><td>LD</td><td></td><td>77</td><td>Top 6 D <span class="pos">Med</span></td><td>22</td><td></td><td></td><td></td><td></td><td>-</td><td>Yes</td><td>$0.915M</td><td>26-27</td><td>RFA</td></tr><tr><td>E. Bear</td><td>RD</td><td></td><td>76</td><td>Top 4 D <span class="pos">Exact</span></td><td>29</td><td></td><td></td><td></td><td></td><td>-</td><td>-</td><td>$0.850M</td><td>26-27</td><td>UFA</td></tr><tr><td>V. Eklund</td><td>LW</td><td></td><td>75</td><td>Elite <span class="pos">Med</span></td><td>19</td><td></td><td></td><td></td><td></td><td>-</td><td>-</td><td>$0.975M</td><td>27-28</td><td>RFA</td></tr><tr><td>L. Foudy</td><td>C/LW</td><td></td><td>75</td><td>Top 6 F <span class="pos">Low</span></td><td>26</td><td></td><td></td><td></td><td></td><td>-</td><td>-</td><td>$0.850M</td><td>26-27</td><td>UFA</td></tr><tr><td>M. Warren</td><td>LD</td><td></td><td>74</td><td>Top 6 D <span class="pos">Med</span></td><td>25</td><td></td><td></td><td></td><td></td><td>-</td><td>-</td><td>$0.850M</td><td>26-27</td><td>RFA</td></tr><tr><td>M. Luff</td><td>RW</td><td></td><td>73</td><td>Bottom 6 F <span class="pos">Exact</span></td><td>29</td><td></td><td></td><td></td><td></td><td>-</td><td>-</td><td>$0.850M</td><td>26-27</td><td>UFA</td></tr><tr><td>K. Aitcheson</td><td>LD/RD</td><td></td><td>72</td><td>Top 4 D <span class="pos">Med</span></td><td>20</td><td></td><td></td><td></td><td></td><td>-</td><td>-</td><td>$1.075M</td><td>28-29</td><td>RFA</td></tr><tr><td>A. Jefferies</td><td>LW</td><td></td><td>71</td><td>Top 9 F <span class="pos">Med</span></td><td>24</td><td></td><td></td><td></td><td></td><td>-</td><td>-</td><td>$0.850M</td><td>26-27</td><td>RFA</td></tr><tr><td>D. Kuefler</td><td>LW</td><td></td><td>70</td><td>Bottom 6 F <span class="pos">Med</span></td><td>24</td><td></td><td></td><td></td><td></td><td>-</td><td>-</td><td>$0.875M</td><td>27-28</td><td>RFA</td></tr><tr><td>M. Gustafsson</td><td>LD</td><td></td><td>69</td><td>Top 4 D <span class="pos">Med</span></td><td>18</td><td></td><td></td><td></td><td></td><td>-</td><td>-</td><td>$1.075M</td><td>28-29</td><td>RFA</td></tr><tr><td>E. Liukas</td><td>RW</td><td></td><td>68</td><td>Bottom 6 F <span class="pos">Med</span></td><td>24</td><td></td><td></td><td></td><td></td><td>-</td><td>-</td><td>$0.850M</td><td>26-27</td><td>RFA</td></tr><tr><td>C. Odelius</td><td>LD/RD</td><td></td><td>68</td><td>Top 6 D <span class="pos">Med</span></td><td>22</td><td></td><td></td><td></td><td></td><td>-</td><td>Yes</td><td>$0.865M</td><td>26-27</td><td>RFA</td></tr><tr><td>J. Larson</td><td>RW/LW</td><td></td><td>67</td><td>Bottom 6 F <span class="pos">Med</span></td><td>25</td><td></td><td></td><td></td><td></td><td>-</td><td>-</td><td>$0.875M</td><td>27-28</td><td>UFA</td></tr><tr><td>J. Pulkkinen</td><td>LD/RD</td><td></td><td>67</td><td>Top 6 D <span class="pos">Med</span></td><td>21</td><td></td><td></td><td></td><td></td><td>-</td><td>-</td><td>$0.880M</td><td>26-27</td><td>RFA</td></tr><tr><td>L. Romano</td><td>RW</td><td></td><td>66</td><td>Bottom 6 F <span class="pos">Med</span></td><td>19</td><td></td><td></td><td></td><td></td><td>-</td><td>-</td><td>UNSIGNED</td><td>26-27</td><td>UFA</td></tr><tr><td>G. Veremyev</td><td>C/LW</td><td></td><td>64</td><td>Bottom 6 F <span class="pos">Med</span></td><td>23</td><td></td><td></td><td></td><td></td><td>-</td><td>-</td><td>$0.885M</td><td>26-27</td><td>RFA</td></tr><tr><td>J. Kvasnicka</td><td>RW</td><td></td><td>62</td><td>Bottom 6 F <span class="pos">Med</span></td><td>19</td><td></td><td></td><td></td><td></td><td>-</td><td>-</td><td>UNSIGNED</td><td>26-27</td><td>UFA</td></tr><tr><td>T. Poletin</td><td>LW</td><td></td><td>61</td><td>Bottom 6 F <span class="pos">Med</span></td><td>19</td><td></td><td></td><td></td><td></td><td>-</td><td>-</td><td>UNSIGNED</td><td>26-27</td><td>UFA</td></tr><tr><td>V. Dravecky</td><td>RD/LD</td><td></td><td>60</td><td>Top 6 D <span class="pos">Low</span></td><td>18</td><td></td><td></td><td></td><td></td><td>-</td><td>-</td><td>UNSIGNED</td><td>27-28</td><td>UFA</td></tr><tr><td>J. Nurmi</td><td>LW</td><td></td><td>58</td><td>Top 9 F <span class="pos">Med</span></td><td>21</td><td></td><td></td><td></td><td></td><td>-</td><td>Yes</td><td>$0.870M</td><td>26-27</td><td>RFA</td></tr></tbody></table></div></div></section><section><div class="sec-head"><h2>Wants Extension</h2></div><div class="tbl-wrap"><div class="tbl-scroll"><table class="num"><thead><tr><th>Player</th><th>Pos</th><th>OVR</th><th>Age</th><th>Salary</th><th>Then</th></tr></thead><tbody><tr><td>E. Heineman</td><td>LW</td><td>82</td><td>24</td><td>$1.100M</td><td>RFA</td></tr><tr><td>K. Palmieri</td><td>RW/LW</td><td>82</td><td>35</td><td>$4.750M</td><td>UFA</td></tr><tr><td>C. Cizikas</td><td>C</td><td>81</td><td>35</td><td>$2.500M</td><td>UFA</td></tr><tr><td>I. George</td><td>LD</td><td>77</td><td>22</td><td>$0.915M</td><td>RFA</td></tr><tr><td>C. Odelius</td><td>LD/RD</td><td>68</td><td>22</td><td>$0.865M</td><td>RFA</td></tr><tr><td>J. Nurmi</td><td>LW</td><td>58</td><td>21</td><td>$0.870M</td><td>RFA</td></tr></tbody></table></div></div></section></div><div class="panel" id="p-lines" role="tabpanel"><section><div class="sec-head"><h2>Even Strength</h2><div class="meta">as of Sep 29, 2026</div></div><div class="line-card"><div class="line-head"><span class="line-k">Line 1</span><span class="chem">0</span></div><div class="lps n3"><div class="lp"><span class="slot">LW</span><span class="nm">B. Horvat</span><span class="ov num">88</span></div><div class="lp"><span class="slot">C</span><span class="nm">M. Barzal</span><span class="ov num">88</span></div><div class="lp"><span class="slot">RW</span><span class="nm">K. Palmieri</span><span class="ov num">82</span></div></div></div><div class="line-card"><div class="line-head"><span class="line-k">Line 2</span><span class="chem up">+2 OVR</span></div><div class="lps n3"><div class="lp"><span class="slot">LW</span><span class="nm">M. Maccelli</span><span class="ov num">83</span></div><div class="lp"><span class="slot">C</span><span class="nm">B. Schenn</span><span class="ov num">84</span></div><div class="lp"><span class="slot">RW</span><span class="nm">P. Engvall</span><span class="ov num">80</span></div></div></div><div class="line-card"><div class="line-head"><span class="line-k">Line 3</span><span class="chem up">+1 OVR</span></div><div class="lps n3"><div class="lp"><span class="slot">LW</span><span class="nm">E. Heineman</span><span class="ov num">82</span></div><div class="lp"><span class="slot">C</span><span class="nm">C. Cizikas</span><span class="ov num">81</span></div><div class="lp"><span class="slot">RW</span><span class="nm">M. Coronato</span><span class="ov num">85</span></div></div></div><div class="line-card"><div class="line-head"><span class="line-k">Line 4</span><span class="chem">0</span></div><div class="lps n3"><div class="lp"><span class="slot">LW</span><span class="nm">A. Duclair</span><span class="ov num">81</span></div><div class="lp"><span class="slot">C</span><span class="nm">J. Pageau</span><span class="ov num">81</span></div><div class="lp"><span class="slot">RW</span><span class="nm">S. Holmstrom</span><span class="ov num">84</span></div></div></div><div class="line-card"><div class="line-head"><span class="line-k">Pair 1</span><span class="chem">0</span></div><div class="lps n2"><div class="lp"><span class="slot">LD</span><span class="nm">M. Schaefer</span><span class="ov num">91</span></div><div class="lp"><span class="slot">RD</span><span class="nm">R. Pulock</span><span class="ov num">88</span></div></div></div><div class="line-card"><div class="line-head"><span class="line-k">Pair 2</span><span class="chem up">+4 OVR</span></div><div class="lps n2"><div class="lp"><span class="slot">LD</span><span class="nm">A. Pelech</span><span class="ov num">87</span></div><div class="lp"><span class="slot">RD</span><span class="nm">M. Weegar</span><span class="ov num">86</span></div></div></div><div class="line-card"><div class="line-head"><span class="line-k">Pair 3</span><span class="chem">0</span></div><div class="lps n2"><div class="lp"><span class="slot">LD</span><span class="nm">A. Romanov</span><span class="ov num">83</span></div><div class="lp"><span class="slot">RD</span><span class="nm">M. Kessel</span><span class="ov num">79</span></div></div></div></section><section><div class="sec-head"><h2>Power Play</h2></div><div class="line-card"><div class="line-head"><span class="line-k">PP1</span><span class="chem up">+5 OVR</span></div><div class="lps n5"><div class="lp"><span class="slot">LW</span><span class="nm">B. Horvat</span><span class="ov num">88</span></div><div class="lp"><span class="slot">C</span><span class="nm">M. Barzal</span><span class="ov num">88</span></div><div class="lp"><span class="slot">RW</span><span class="nm">S. Holmstrom</span><span class="ov num">84</span></div><div class="lp"><span class="slot">LD</span><span class="nm">M. Coronato</span><span class="ov num">85</span></div><div class="lp"><span class="slot">RD</span><span class="nm">M. Schaefer</span><span class="ov num">91</span></div></div></div><div class="line-card"><div class="line-head"><span class="line-k">PP2</span><span class="chem">0</span></div><div class="lps n5"><div class="lp"><span class="slot">LW</span><span class="nm">E. Heineman</span><span class="ov num">82</span></div><div class="lp"><span class="slot">C</span><span class="nm">B. Schenn</span><span class="ov num">84</span></div><div class="lp"><span class="slot">RW</span><span class="nm">M. Maccelli</span><span class="ov num">83</span></div><div class="lp"><span class="slot">LD</span><span class="nm">A. Duclair</span><span class="ov num">81</span></div><div class="lp"><span class="slot">RD</span><span class="nm">R. Pulock</span><span class="ov num">88</span></div></div></div></section><section><div class="sec-head"><h2>Penalty Kill</h2></div><div class="line-card"><div class="line-head"><span class="line-k">PK1</span><span class="chem up">+4 OVR</span></div><div class="lps n4"><div class="lp"><span class="slot">LW</span><span class="nm">J. Pageau</span><span class="ov num">81</span></div><div class="lp"><span class="slot">C</span><span class="nm">C. Cizikas</span><span class="ov num">81</span></div><div class="lp"><span class="slot">LD</span><span class="nm">M. Weegar</span><span class="ov num">86</span></div><div class="lp"><span class="slot">RD</span><span class="nm">A. Pelech</span><span class="ov num">87</span></div></div></div><div class="line-card"><div class="line-head"><span class="line-k">PK2</span><span class="chem up">+1 OVR</span></div><div class="lps n4"><div class="lp"><span class="slot">LW</span><span class="nm">B. Horvat</span><span class="ov num">88</span></div><div class="lp"><span class="slot">C</span><span class="nm">B. Schenn</span><span class="ov num">84</span></div><div class="lp"><span class="slot">LD</span><span class="nm">A. Romanov</span><span class="ov num">83</span></div><div class="lp"><span class="slot">RD</span><span class="nm">R. Pulock</span><span class="ov num">88</span></div></div></div><div class="line-card"><div class="line-head"><span class="line-k">PK3</span><span class="chem up">+1 OVR</span></div><div class="lps n4"><div class="lp"><span class="slot">LW</span><span class="nm">K. Palmieri</span><span class="ov num">82</span></div><div class="lp"><span class="slot">C</span><span class="nm">M. Coronato</span><span class="ov num">85</span></div><div class="lp"><span class="slot">LD</span><span class="nm">M. Schaefer</span><span class="ov num">91</span></div><div class="lp"><span class="slot">RD</span><span class="nm">M. Kessel</span><span class="ov num">79</span></div></div></div></section><section><div class="sec-head"><h2>Goalies</h2></div><div class="line-card"><div class="line-head"><span class="line-k">Goalies</span></div><div class="lps n2"><div class="lp"><span class="slot">1</span><span class="nm">S. Varlamov</span><span class="ov num">81</span></div><div class="lp"><span class="slot">2</span><span class="nm">I. Sorokin</span><span class="ov num">93</span></div></div></div></section><section><div class="sec-head"><h2>Scratched</h2></div><div class="line-card"><div class="line-head"><span class="line-k">Scratched</span></div><div class="lps n3"><div class="lp"><span class="slot"></span><span class="nm">C. Ritchie</span><span class="ov num">81</span></div><div class="lp"><span class="slot"></span><span class="nm">T. DeAngelo</span><span class="ov num">83</span></div><div class="lp"><span class="slot"></span><span class="nm">K. MacLean</span><span class="ov num">79</span></div></div></div></section></div><div class="panel" id="p-front" role="tabpanel"><div class="strip"><div class="stat"><div class="k">Cap Space</div><div class="v num">$4.250M</div></div><div class="stat"><div class="k">Cap Hit</div><div class="v num">$99.750M</div></div><div class="stat"><div class="k">Salary Cap</div><div class="v num">$104.000M</div></div><div class="stat"><div class="k">Playoff Cap</div><div class="v num">$93.450M</div></div><div class="stat"><div class="k">Contracts</div><div class="v num">43/50</div></div><div class="stat"><div class="k">Funds</div><div class="v num">$0.559M</div></div><div class="stat"><div class="k">Salary Target</div><div class="v num">$63.885M</div></div><div class="stat"><div class="k">Retained</div><div class="v num">$0M</div></div></div><section><div class="sec-head"><h2>Owner</h2><div class="meta">as of Sep 29, 2026</div></div><div class="story-card"><div class="story-lead"><div class="story-big">Buyer</div><div class="story-lead-txt">I&#x27;m very pleased with the work you have been doing with this franchise. Keep up the good work!</div></div><ul class="story-list"><li>Owner happiness: <b>High</b></li><li>State of the team: <b>Buyer</b></li></ul></div></section><section><div class="sec-head"><h2>Owner Goals</h2></div><div class="tbl-wrap"><div class="tbl-scroll"><table class=""><thead><tr><th>Tier</th><th>Goal</th><th>Reward</th><th>Evaluated</th><th>Status</th></tr></thead><tbody><tr><td><span class="pos" style="margin-left:0">Primary</span></td><td>Improve the Top 6 forward group</td><td class="num">$50,000</td><td class="num">03/01/2027</td><td>Open</td></tr><tr><td><span class="pos" style="margin-left:0">Secondary</span></td><td>Win the regular season home opener</td><td class="num">$30,000</td><td class="num">10/03/2026</td><td>Open</td></tr><tr><td><span class="pos" style="margin-left:0">Secondary</span></td><td>43 wins this season</td><td class="num">$40,000</td><td class="num">04/11/2027</td><td>Open</td></tr><tr><td><span class="pos" style="margin-left:0">Stretch</span></td><td>Upgrade the parking lot by 1 level</td><td class="num">$30,000</td><td class="num">06/19/2027</td><td>Open</td></tr></tbody></table></div></div></section><section><div class="sec-head"><h2>Operations Budget</h2><div class="meta">salary target $63.885M</div></div><div class="tbl-wrap"><div class="tbl-scroll"><table class="num"><thead><tr><th>Line</th><th>Allocated</th><th>Spent</th><th>Remaining</th></tr></thead><tbody><tr><td>Player Salaries</td><td>$92.685M</td><td>$0.000M</td><td>$92.685M</td></tr><tr><td>Arena Operations</td><td>$2.302M</td><td>$0.000M</td><td>$2.302M</td></tr><tr><td>Promotions</td><td>$0.977M</td><td>$0.000M</td><td>$0.977M</td></tr><tr><td>Advertising</td><td>$1.738M</td><td>$0.003M</td><td>$1.735M</td></tr><tr><td>Scout Salaries</td><td>$3.101M</td><td>$0.000M</td><td>$3.101M</td></tr><tr><td>Scout Travel</td><td>$2.029M</td><td>$0.002M</td><td>$2.027M</td></tr><tr><td>Coach Budget</td><td>$8.915M</td><td>$0.000M</td><td>$8.915M</td></tr></tbody><tfoot><tr class="tot"><td>Total</td><td>$111.747M</td><td>$0.005M</td><td>$111.742M</td></tr></tfoot></table></div></div></section><section><div class="sec-head"><h2>Cap Outlook</h2><div class="meta">skater salaries &middot; goalie deals pending</div></div><div class="tbl-wrap"><div class="tbl-scroll"><table class="num"><thead><tr><th>Season</th><th>Salary Cap</th><th>Main Roster</th><th>System</th><th>Contracts</th></tr></thead><tbody><tr><td>26-27</td><td>$104.000M</td><td>$88.750M</td><td>$15.240M</td><td>43</td></tr><tr><td>27-28</td><td>-</td><td>$71.875M</td><td>$4.875M</td><td>-</td></tr><tr><td>28-29</td><td>-</td><td>$56.400M</td><td>$2.150M</td><td>-</td></tr><tr><td>29-30</td><td>$106.600M</td><td>$45.800M</td><td>$0.000M</td><td>8</td></tr><tr><td>30-31</td><td>$109.600M</td><td>$36.650M</td><td>$0.000M</td><td>6</td></tr><tr><td>31-32</td><td>-</td><td>$12.750M</td><td>$0.000M</td><td>-</td></tr><tr><td>32-33</td><td>$111.100M</td><td>$6.250M</td><td>$0.000M</td><td>1</td></tr><tr><td>33-34</td><td>$112.600M</td><td>$0.000M</td><td>$0.000M</td><td>0</td></tr></tbody></table></div></div></section><section><div class="sec-head"><h2>Trade Offers</h2><div class="meta">2 received</div></div><div class="tbl-wrap"><div class="tbl-scroll"><table class=""><thead><tr><th>Date</th><th>Team</th><th>NYI sends</th><th>NYI gets</th><th>Result</th></tr></thead><tbody><tr><td>09/29/2026</td><td>TBL</td><td>NYI 2027 R3; I. George (D, $0.915M)</td><td>TOR 2027 R4; TBL 2027 R4</td><td>Declined</td></tr><tr><td>09/29/2026</td><td>STL</td><td>COL 2028 R3; J. Nurmi (LW, $0.870M)</td><td>STL 2028 R4; STL 2028 R7</td><td>Declined</td></tr></tbody></table></div></div></section><section><div class="sec-head"><h2>League Cap Rules</h2></div><div class="tbl-wrap"><div class="tbl-scroll"><table class=""><thead><tr><th>Rule</th><th>Value</th></tr></thead><tbody><tr><td>Salary Cap ($M)</td><td>$104.000M</td></tr><tr><td>Salary Cap Floor ($M)</td><td>$76.900M</td></tr><tr><td>Max Player Salary ($M)</td><td>$20.800M</td></tr><tr><td>Min Player Salary ($M)</td><td>$0.850M</td></tr><tr><td>Max Rookie Salary ($M)</td><td>$1.025M</td></tr></tbody></table></div></div></section></div><div class="panel" id="p-schedule" role="tabpanel"><section><div class="sec-head"><h2>Schedule</h2><div class="meta">0 of 82 played</div></div><p class="empty">Regular season schedule not logged yet</p></section></div><div class="panel" id="p-goalies" role="tabpanel"><section><div class="sec-head"><h2>Goalies</h2><div class="meta">2 on the roster</div></div><div class="starter"><div class="starter-head"><div><span class="starter-name">I. Sorokin</span><span class="starter-meta">93 OVR</span></div><div class="starter-tot"><span>0 GP</span></div></div><p class="empty">No starts yet</p></div><div class="starter"><div class="starter-head"><div><span class="starter-name">S. Varlamov</span><span class="starter-meta">81 OVR &middot; #40</span></div><div class="starter-tot"><span>0 GP</span></div></div><p class="empty">No starts yet</p></div></section></div><div class="panel" id="p-divisions" role="tabpanel"><section><div class="sec-head"><h2>vs. Divisions</h2><div class="meta">record vs each club</div></div><div class="div-head"><span class="div-name">Metropolitan</span><span class="div-rec">0&ndash;0&ndash;0</span></div><div class="teams"><div class="teamrow"><span class="tabbr">CAR</span><span class="teamname">Carolina Hurricanes</span><span class="teamrec muted">0&ndash;0&ndash;0</span></div><div class="teamrow"><span class="tabbr">CBJ</span><span class="teamname">Columbus Blue Jackets</span><span class="teamrec muted">0&ndash;0&ndash;0</span></div><div class="teamrow"><span class="tabbr">NJD</span><span class="teamname">New Jersey Devils</span><span class="teamrec muted">0&ndash;0&ndash;0</span></div><div class="teamrow you"><span class="tabbr">NYI</span><span class="teamname">New York Islanders</span><span class="teamrec muted">n/a</span></div><div class="teamrow"><span class="tabbr">NYR</span><span class="teamname">New York Rangers</span><span class="teamrec muted">0&ndash;0&ndash;0</span></div><div class="teamrow"><span class="tabbr">PHI</span><span class="teamname">Philadelphia Flyers</span><span class="teamrec muted">0&ndash;0&ndash;0</span></div><div class="teamrow"><span class="tabbr">PIT</span><span class="teamname">Pittsburgh Penguins</span><span class="teamrec muted">0&ndash;0&ndash;0</span></div><div class="teamrow"><span class="tabbr">WSH</span><span class="teamname">Washington Capitals</span><span class="teamrec muted">0&ndash;0&ndash;0</span></div></div><div class="div-head"><span class="div-name">Atlantic</span><span class="div-rec">0&ndash;0&ndash;0</span></div><div class="teams"><div class="teamrow"><span class="tabbr">BOS</span><span class="teamname">Boston Bruins</span><span class="teamrec muted">0&ndash;0&ndash;0</span></div><div class="teamrow"><span class="tabbr">BUF</span><span class="teamname">Buffalo Sabres</span><span class="teamrec muted">0&ndash;0&ndash;0</span></div><div class="teamrow"><span class="tabbr">DET</span><span class="teamname">Detroit Red Wings</span><span class="teamrec muted">0&ndash;0&ndash;0</span></div><div class="teamrow"><span class="tabbr">FLA</span><span class="teamname">Florida Panthers</span><span class="teamrec muted">0&ndash;0&ndash;0</span></div><div class="teamrow"><span class="tabbr">MTL</span><span class="teamname">Montreal Canadiens</span><span class="teamrec muted">0&ndash;0&ndash;0</span></div><div class="teamrow"><span class="tabbr">OTT</span><span class="teamname">Ottawa Senators</span><span class="teamrec muted">0&ndash;0&ndash;0</span></div><div class="teamrow"><span class="tabbr">TBL</span><span class="teamname">Tampa Bay Lightning</span><span class="teamrec muted">0&ndash;0&ndash;0</span></div><div class="teamrow"><span class="tabbr">TOR</span><span class="teamname">Toronto Maple Leafs</span><span class="teamrec muted">0&ndash;0&ndash;0</span></div></div><div class="div-head"><span class="div-name">Central</span><span class="div-rec">0&ndash;0&ndash;0</span></div><div class="teams"><div class="teamrow"><span class="tabbr">CHI</span><span class="teamname">Chicago Blackhawks</span><span class="teamrec muted">0&ndash;0&ndash;0</span></div><div class="teamrow"><span class="tabbr">COL</span><span class="teamname">Colorado Avalanche</span><span class="teamrec muted">0&ndash;0&ndash;0</span></div><div class="teamrow"><span class="tabbr">DAL</span><span class="teamname">Dallas Stars</span><span class="teamrec muted">0&ndash;0&ndash;0</span></div><div class="teamrow"><span class="tabbr">MIN</span><span class="teamname">Minnesota Wild</span><span class="teamrec muted">0&ndash;0&ndash;0</span></div><div class="teamrow"><span class="tabbr">NSH</span><span class="teamname">Nashville Predators</span><span class="teamrec muted">0&ndash;0&ndash;0</span></div><div class="teamrow"><span class="tabbr">STL</span><span class="teamname">St. Louis Blues</span><span class="teamrec muted">0&ndash;0&ndash;0</span></div><div class="teamrow"><span class="tabbr">UTA</span><span class="teamname">Utah Mammoth</span><span class="teamrec muted">0&ndash;0&ndash;0</span></div><div class="teamrow"><span class="tabbr">WPG</span><span class="teamname">Winnipeg Jets</span><span class="teamrec muted">0&ndash;0&ndash;0</span></div></div><div class="div-head"><span class="div-name">Pacific</span><span class="div-rec">0&ndash;0&ndash;0</span></div><div class="teams"><div class="teamrow"><span class="tabbr">ANA</span><span class="teamname">Anaheim Ducks</span><span class="teamrec muted">0&ndash;0&ndash;0</span></div><div class="teamrow"><span class="tabbr">CGY</span><span class="teamname">Calgary Flames</span><span class="teamrec muted">0&ndash;0&ndash;0</span></div><div class="teamrow"><span class="tabbr">EDM</span><span class="teamname">Edmonton Oilers</span><span class="teamrec muted">0&ndash;0&ndash;0</span></div><div class="teamrow"><span class="tabbr">LAK</span><span class="teamname">Los Angeles Kings</span><span class="teamrec muted">0&ndash;0&ndash;0</span></div><div class="teamrow"><span class="tabbr">SJS</span><span class="teamname">San Jose Sharks</span><span class="teamrec muted">0&ndash;0&ndash;0</span></div><div class="teamrow"><span class="tabbr">SEA</span><span class="teamname">Seattle Kraken</span><span class="teamrec muted">0&ndash;0&ndash;0</span></div><div class="teamrow"><span class="tabbr">VAN</span><span class="teamname">Vancouver Canucks</span><span class="teamrec muted">0&ndash;0&ndash;0</span></div><div class="teamrow"><span class="tabbr">VGK</span><span class="teamname">Vegas Golden Knights</span><span class="teamrec muted">0&ndash;0&ndash;0</span></div></div></section></div>
+  <footer>
+    New York Islanders &middot; Season 1 &middot; <b>0-0-0</b> &middot; Preseason
+  </footer>
+</div>
+
+<script>
+(function () {
+  // Parse a cell into a sort key: W-L record, numeric, or text.
+  function cellKey(td) {
+    var t = (td.textContent || "").trim();
+    var wl = t.match(/^(\d+)[\u2013-](\d+)$/);           // e.g. "3-0" -> rank by wins, fewer losses breaks ties
+    if (wl) return parseInt(wl[1], 10) - parseInt(wl[2], 10) / 100;
+    var money = t.match(/^\$(\d+(?:\.\d+)?)([KM])$/);       // "$60K", "$820K", "$26.3M" -> thousands
+    if (money) return parseFloat(money[1]) * (money[2] === "M" ? 1000 : 1);
+    var n = Number(t.replace(/[+]/g, "").replace(/[\u2013\u2212]/g, "-"));  // ".558", "17.0", "+49"
+    if (t !== "" && !isNaN(n)) return n;
+    return t.toLowerCase();
+  }
+
+  function makeSortable(table) {
+    var ths = table.tHeaders && table.tHeaders.length ? null : null;
+    var headRow = table.querySelector("thead tr");
+    if (!headRow) return;
+    var headers = Array.prototype.slice.call(headRow.children);
+    var tbody = table.querySelector("tbody");
+
+    headers.forEach(function (th, col) {
+      th.classList.add("sortable");
+      th.setAttribute("tabindex", "0");
+      th.setAttribute("role", "columnheader");
+      var caret = document.createElement("span");
+      caret.className = "caret";
+      th.appendChild(caret);
+
+      function sortBy() {
+        // Totals rows are locked to the bottom and never take part in a sort.
+        // They belong in a tfoot; this catches any that sit in the tbody.
+        var all = Array.prototype.slice.call(tbody.rows);
+        var rows = all.filter(function (r) { return !r.classList.contains("tot"); });
+        var tots = all.filter(function (r) { return r.classList.contains("tot"); });
+        if (!rows.length) return;
+        var isText = typeof cellKey(rows[0].cells[col]) === "string";
+        var prev = th.getAttribute("aria-sort");
+        // first click: text ascends A->Z, numbers descend high->low
+        var dir = prev === "ascending" ? "descending"
+                : prev === "descending" ? "ascending"
+                : (isText ? "ascending" : "descending");
+
+        headers.forEach(function (h) { h.removeAttribute("aria-sort"); });
+        th.setAttribute("aria-sort", dir);
+        var sign = dir === "ascending" ? 1 : -1;
+
+        rows.sort(function (a, b) {
+          var ka = cellKey(a.cells[col]), kb = cellKey(b.cells[col]);
+          if (ka < kb) return -1 * sign;
+          if (ka > kb) return 1 * sign;
+          return 0;
+        });
+        rows.concat(tots).forEach(function (r) { tbody.appendChild(r); });
+      }
+
+      th.addEventListener("click", sortBy);
+      th.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); sortBy(); }
+      });
+    });
+  }
+
+  document.querySelectorAll(".tbl-wrap table").forEach(makeSortable);
+})();
+
+(function () {
+  var tabs = Array.prototype.slice.call(document.querySelectorAll(".tab"));
+  var panels = Array.prototype.slice.call(document.querySelectorAll(".panel"));
+  function activate(id) {
+    tabs.forEach(function (t) {
+      var on = t.getAttribute("data-panel") === id;
+      t.classList.toggle("is-active", on);
+      t.setAttribute("aria-selected", on ? "true" : "false");
+    });
+    panels.forEach(function (p) { p.classList.toggle("is-active", p.id === id); });
+    window.scrollTo(0, 0);
+  }
+  tabs.forEach(function (t) {
+    t.addEventListener("click", function () { activate(t.getAttribute("data-panel")); });
+  });
+  document.addEventListener("click", function (e) {
+    var g = e.target.closest ? e.target.closest("[data-goto]") : null;
+    if (g) activate(g.getAttribute("data-goto"));
+  });
+  var home = document.querySelector(".mast-home");
+  if (home) home.addEventListener("click", function () { activate("p-overview"); });
+})();
+
+(function () {
+  /* GitHub Pages serves this page with cache-control: max-age=600 and gives us
+     no way to change that, so a phone can sit on a stale copy. version.txt is
+     fetched with no-store, which bypasses the HTTP cache entirely; when it names
+     a newer build than this document, reload through a ?v= URL the browser has
+     no cache entry for. The ?v= guard means we redirect at most once per build,
+     so a mismatched version.txt can never loop. */
+  var meta = document.querySelector('meta[name="build"]');
+  var BUILD = meta ? meta.getAttribute("content") : "";
+  function currentV() {
+    var m = /[?&]v=([^&]*)/.exec(location.search);
+    return m ? decodeURIComponent(m[1]) : null;
+  }
+  function check() {
+    if (!window.fetch || location.protocol === "file:") return;
+    fetch("version.txt", { cache: "no-store" }).then(function (r) {
+      return r.ok ? r.text() : null;
+    }).then(function (v) {
+      if (!v) return;
+      v = v.trim();
+      if (!v || v === BUILD) {
+        if (currentV()) history.replaceState(null, "", location.pathname);
+        return;
+      }
+      if (currentV() === v) return;   /* already tried this build; do not loop */
+      location.replace(location.pathname + "?v=" + encodeURIComponent(v));
+    }).catch(function () {});
+  }
+  check();
+  document.addEventListener("visibilitychange", function () {
+    if (!document.hidden) check();
+  });
+  window.addEventListener("pageshow", function (e) { if (e.persisted) check(); });
+})();
+
+</script>
+</body>
+</html>
