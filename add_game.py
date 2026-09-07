@@ -28,6 +28,7 @@ GAME = dict(
     pim=("06:00", "04:00"), pp=("0/2", "0/3"), ppm=("02:48", "04:48"), shg=(0, 0),
     goalies=[dict(goalie="I. Sorokin", dec="OTL", sa=43, sv=41, ga=2, toi="65:00", start="Start")],
     opp_goalies=[dict(goalie="M. Stolarz", catches="L", dec="W", sa=32, sv=31, ga=1, toi="65:00")],
+    # scoring: the site adds the scorer's running season total in parens, so do not type it here
     scoring=[
         dict(per="1",  team="NYI", scorer="B. Horvat",  a1=None, a2=None, typ="EV", score="1-0"),
         dict(per="3",  team="TOR", scorer="B. Duhaime", a1=None, a2=None, typ="EV", score="1-1"),

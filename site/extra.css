@@ -208,3 +208,4 @@
   table.fin thead th { white-space: normal; }
   table.fin tbody td:first-child, table.fin thead th:first-child,
   table.fin tfoot td:first-child { text-align: left; }
+  .gtot { color: var(--ink-mute); font-weight: 700; font-variant-numeric: tabular-nums; }

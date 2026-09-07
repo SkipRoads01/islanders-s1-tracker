@@ -287,6 +287,11 @@ deploy after every game**, not just the workbook.
   **The figure carries the number; the sentence must add new information rather than
   restating it.** Derive streaks from the recaps, never by assumption — a game missed
   does not break a streak.
+- **A goal always carries the scorer's season total in parentheses**, hockey box-score style:
+  `Horvat (1)`. It is the running count through that game, not the season-to-date figure, so
+  G1's goal reads `(1)` forever. Applied in the `Scoring` table and in recap prose. Opponent
+  goals get no parenthetical: all we can count is what they have scored against NYI, which is
+  not their season total.
 - **A contrasting clause takes `but`, never `and`.** When the second half of a sentence cuts
   against the first, the conjunction has to carry that turn: "Romanov, Pelech and Barzal each
   took one, **but** Toronto came away with nothing on the power play." `And` flattens the two

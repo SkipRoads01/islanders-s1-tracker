@@ -210,6 +210,19 @@ for k, p in PLAYERS.items():
     sn = str(p["Player"]).split(".")[-1].strip()
     SURNAME.setdefault(pkey(sn), k)
 
+# ---- a goal always shows the scorer's running season total, hockey box-score style
+SCORER_NUM = {}
+_seen = {}
+for _s in sorted(scoring, key=lambda r: int(r["G"])):
+    if _s["Team"] != TAG:
+        continue          # an opponent's true season total is not ours to know
+    _k = pkey(_s["Scorer"])
+    _seen[_k] = _seen.get(_k, 0) + 1
+    SCORER_NUM[id(_s)] = _seen[_k]
+
+def season_goals(name):
+    return sum(1 for r in scoring if r["Team"] == TAG and pkey(r["Scorer"]) == pkey(name))
+
 def photo_uri(key):
     for ext, mime in (("png", "image/png"), ("jpg", "image/jpeg"), ("jpeg", "image/jpeg"), ("webp", "image/webp")):
         f = SITE / "logos" / "players" / ("%s.%s" % (key, ext))
@@ -456,6 +469,9 @@ def scoring_table(g):
     body = []
     for x in rs:
         who = pname(x["Scorer"]) if x["Team"] == TAG else esc(x["Scorer"])
+        num = SCORER_NUM.get(id(x))
+        if num:
+            who += ' <span class="gtot">(%d)</span>' % num
         if x["Type"] and x["Type"] != "EV":
             who += ' <span class="pos">%s</span>' % esc(x["Type"])
         helpers = ", ".join(esc(v) for v in (x["A1"], x["A2"]) if v) or "unassisted"
