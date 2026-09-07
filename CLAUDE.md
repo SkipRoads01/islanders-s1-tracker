@@ -280,6 +280,11 @@ deploy after every game**, not just the workbook.
   **The figure carries the number; the sentence must add new information rather than
   restating it.** Derive streaks from the recaps, never by assumption — a game missed
   does not break a streak.
+- **A contrasting clause takes `but`, never `and`.** When the second half of a sentence cuts
+  against the first, the conjunction has to carry that turn: "Romanov, Pelech and Barzal each
+  took one, **but** Toronto came away with nothing on the power play." `And` flattens the two
+  halves into a list and throws away the point of the sentence. Read every compound sentence
+  and ask whether the clauses agree or contrast before choosing the word.
 - **Passing percentage is never a story.** The user plays every shift; the CPU side does not
   misfire passes the way a human stick does. A gap of 15-20 points in the computer's favour is
   the normal state of this game, not a finding about either team. Never write it as a
