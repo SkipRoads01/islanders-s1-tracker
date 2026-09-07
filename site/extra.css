@@ -140,3 +140,71 @@
   .txres { font-size: 10.5px; font-weight: 800; letter-spacing: .04em; padding: 3px 7px; border-radius: 6px; white-space: nowrap; }
   .txres.no { color: var(--loss); background: var(--loss-bg); }
   .txres.ok { color: var(--win); background: var(--win-bg); }
+  /* ---- General Manager tables: must fit the column with no sideways scroll ---- */
+  table.txn, table.ext { table-layout: fixed; width: 100%; font-size: 12.5px; }
+  table.txn tbody td, table.ext tbody td { white-space: normal; overflow-wrap: anywhere; line-height: 1.35; }
+  table.txn thead th, table.ext thead th { white-space: normal; }
+  table.txn col.c-date { width: 74px; }
+  table.txn tbody td:nth-child(1), table.txn thead th:nth-child(1) { width: 78px; text-align: left; white-space: nowrap; }
+  table.txn tbody td:nth-child(2), table.txn thead th:nth-child(2) { width: 76px; text-align: left; }
+  table.txn tbody td:nth-child(3), table.txn thead th:nth-child(3) { width: 42px; text-align: center; }
+  table.txn tbody td:nth-child(4), table.txn tbody td:nth-child(5) { text-align: left; }
+  table.txn tbody td:nth-child(6), table.txn thead th:nth-child(6) { width: 78px; }
+  table.txn .dash { color: var(--ink-mute); }
+  .tlogo.xs { width: 28px; height: 28px; border-radius: 7px; background-size: 84%; display: inline-block; }
+  table.ext tbody td:nth-child(1), table.ext thead th:nth-child(1) { text-align: left; }
+  table.ext tbody td:nth-child(2), table.ext thead th:nth-child(2) { width: 46px; }
+  table.ext tbody td:nth-child(3), table.ext thead th:nth-child(3) { width: 42px; }
+  table.ext tbody td:nth-child(4), table.ext thead th:nth-child(4) { width: 40px; }
+  table.ext tbody td:nth-child(5), table.ext thead th:nth-child(5) { width: 72px; }
+  table.ext tbody td:nth-child(6), table.ext thead th:nth-child(6) { width: 48px; }
+  table.ext tbody td:nth-child(7), table.ext thead th:nth-child(7) { width: 72px; }
+  table.ext tbody td:nth-child(8), table.ext thead th:nth-child(8) { width: 62px; white-space: nowrap; }
+  .txres.unk { color: var(--ink-mute); background: var(--surface-2); }
+  .gmsec section:first-child { margin-top: 0; }
+  .gmsec section + section { margin-top: 20px; }
+  /* Owner Goals: the goal text is prose, so let it wrap instead of pushing Status off-screen */
+  table.goals { table-layout: fixed; }
+  table.goals tbody td, table.goals thead th { white-space: normal; overflow-wrap: anywhere; }
+  table.goals tbody td:nth-child(2) { text-align: left; }
+  table.goals tbody td:nth-child(1), table.goals thead th:nth-child(1) { width: 82px; text-align: left; }
+  table.goals tbody td:nth-child(3), table.goals thead th:nth-child(3) { width: 72px; }
+  table.goals tbody td:nth-child(4), table.goals thead th:nth-child(4) { width: 86px; }
+  table.goals tbody td:nth-child(5), table.goals thead th:nth-child(5) { width: 64px; }
+  @media (max-width: 560px) {
+    table.txn, table.ext { font-size: 11.5px; }
+    table.txn tbody td, table.ext tbody td, table.txn thead th, table.ext thead th { padding: 7px 5px; }
+    table.txn tbody td:nth-child(1), table.txn thead th:nth-child(1) { width: 64px; }
+    table.txn tbody td:nth-child(2), table.txn thead th:nth-child(2) { width: 58px; }
+    table.txn tbody td:nth-child(3), table.txn thead th:nth-child(3) { width: 34px; }
+    table.txn tbody td:nth-child(6), table.txn thead th:nth-child(6) { width: 62px; }
+    .tlogo.xs { width: 24px; height: 24px; }
+    /* Age and Roster drop out; the phone keeps who, what they earn and whether they want to stay */
+    table.ext tbody td:nth-child(4), table.ext thead th:nth-child(4),
+    table.ext tbody td:nth-child(8), table.ext thead th:nth-child(8) { display: none; }
+    table.ext tbody td:nth-child(2), table.ext thead th:nth-child(2) { width: 38px; }
+    table.ext tbody td:nth-child(3), table.ext thead th:nth-child(3) { width: 36px; }
+    table.ext tbody td:nth-child(5), table.ext thead th:nth-child(5) { width: 62px; }
+    table.ext tbody td:nth-child(6), table.ext thead th:nth-child(6) { width: 44px; }
+    table.ext tbody td:nth-child(7), table.ext thead th:nth-child(7) { width: 64px; }
+    table.goals tbody td:nth-child(1), table.goals thead th:nth-child(1) { width: 62px; }
+    table.goals tbody td:nth-child(3), table.goals thead th:nth-child(3) { width: 56px; }
+    table.goals tbody td:nth-child(4), table.goals thead th:nth-child(4) { width: 68px; }
+    table.goals tbody td:nth-child(5), table.goals thead th:nth-child(5) { width: 52px; }
+    table.txn tbody td:nth-child(2), table.txn thead th:nth-child(2) { width: 50px; }
+    table.txn tbody td:nth-child(6), table.txn thead th:nth-child(6) { width: 58px; }
+    table.ext tbody td:nth-child(5), table.ext thead th:nth-child(5) { width: 58px; }
+    table.ext tbody td:nth-child(6), table.ext thead th:nth-child(6) { width: 40px; }
+    table.ext tbody td:nth-child(7), table.ext thead th:nth-child(7) { width: 60px; }
+    table.fin { font-size: 11.5px; }
+    table.fin tbody td, table.fin thead th, table.fin tfoot td { padding: 7px 5px; }
+    table.fin tbody td:nth-child(n+2), table.fin thead th:nth-child(n+2),
+    table.fin tfoot td:nth-child(n+2) { width: 70px; }
+    /* the result chip is the only thing that will not wrap, so it sets the floor */
+    .txres { font-size: 9.5px; padding: 2px 5px; letter-spacing: 0; }
+  }
+  /* Budget and Cap Outlook: numeric, but Remaining and Contracts must stay on screen */
+  table.fin { table-layout: fixed; width: 100%; }
+  table.fin thead th { white-space: normal; }
+  table.fin tbody td:first-child, table.fin thead th:first-child,
+  table.fin tfoot td:first-child { text-align: left; }

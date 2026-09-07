@@ -137,6 +137,7 @@ goals/shots/hits come from the four cumulative screens differenced into per-peri
 | `Cap` | `Season` `Salary Cap` `Main Roster` `System` `Contracts` |
 | `Front Office` | `Key` `Value` |
 | `Transactions` | `Date` `Type` `Partner` `Direction` `Out` `In` `Result` |
+| `Front Office` tab order | strip, **General Manager** (Transactions, Extension Eligible), Owner, Owner Goals, Operations Budget, Cap Outlook, League Cap Rules |
 | `Schedule` | `G` `Date` `H/A` `Opp` `Time (ET)` |
 | `Teams` | `Team` `Abbr` `Conference` `Division` |
 | `Notes` | `Date` `Note` |
@@ -218,6 +219,12 @@ Carried over from the baseball project because they're habits, not sport rules:
   opening **09/30/2026 at TOR**. An earlier load from a third-party calendar PDF was short
   one game (it omitted the September opener) and was replaced. Preseason is not played.
   **Verify any schedule source against the club's own release before loading it.**
+- **A table must fit its column; horizontal scrolling is a defect.** The chrome's default
+  `tbody td { white-space: nowrap }` is what pushes the last column off-screen, so any table
+  carrying prose or long strings needs `table-layout: fixed`, per-column widths, and
+  `white-space: normal; overflow-wrap: anywhere`. Verify at 390px as well as desktop, and
+  remember a `nowrap` chip inside a cell sets the floor for that column. Drop the least
+  important columns on a phone rather than letting the table scroll.
 - **Every table is sortable; totals rows are locked.** A totals row goes in `<tfoot>` with
   class `tot` and never takes part in a sort. `build_site.py`'s `table()` does this via its
   `tfoot=` argument; never emit a totals row into `<tbody>`.
@@ -317,6 +324,10 @@ deploy after every game**, not just the workbook.
   Pages is switched on.
 - Schedule loaded (84 games, see §7). Hero shows the next game, the NHL shield
   and the Eastern Conference mark.
+- **Extension Eligible** lists every player whose deal ends after the current season, sorted
+  interested-first then by OVR, with `Roster Ref`'s `Ext` column as the `Interest` value
+  (`Yes` / `No` / `-` when the screen did not say). Unsigned prospects are excluded: they need
+  signing, not extending. It replaced the old Wants Extension table on the Roster tab.
 - Pending from the user: goalie contracts (Sorokin, Varlamov); the wordmark image file
   (`site/logos/wordmark.png`; the crest stands in until then); player photos
   (`site/logos/players/`); and **the skater box score for G1** - the play-by-play supports

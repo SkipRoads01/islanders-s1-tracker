@@ -542,10 +542,6 @@ roster_html = sec("Main Roster", roster_table(main_sk),
                   meta="%d skaters &middot; %d dressed &middot; %d scratched" % (len(main_sk), len(dressed), len(scratched)))
 roster_html += sec("Goalies", roster_table(main_g, goalie=True), meta="contracts pending")
 roster_html += sec("In the System", roster_table(system), meta="%d skaters" % len(system))
-roster_html += sec("Wants Extension", table(["Player", "Pos", "OVR", "Age", "Salary", "Then"],
-    [("", [td(pname(p["Player"])), td(esc(p["Pos"])), td(esc(p["OVR"])), td(esc(p["Age"])),
-           td(esc(money(p.get("26-27")))), td(esc(p.get("Then") or ""))])
-     for p in roster if p.get("Ext") == "Yes"]))
 
 # ---- lines
 by_unit = defaultdict(list)
@@ -588,6 +584,53 @@ lines_html += sec("Scratched", unit_card("Scratched", "SCR"))
 def num(v, fmt="%.3f"):
     return (fmt % v) if isinstance(v, (int, float)) else esc(v)
 
+def pieces(v):
+    """'A; B' -> two stacked lines so a long return never widens the table."""
+    v = str(v or "-")
+    return "<br>".join(esc(x.strip()) for x in v.split(";") if x.strip()) or "-"
+
+def txn_row(t):
+    res = str(t["Result"])
+    partner = str(t["Partner"] or "-")
+    tm = tlogo(partner, "xs") if partner in team_name else '<span class="dash">-</span>'
+    return ("", [td(esc(t["Date"])), td(esc(t.get("Type") or "-")), td(tm),
+                 td(pieces(t["Out"])), td(pieces(t["In"])),
+                 td('<span class="txres %s">%s</span>' % ("ok" if res == "Accepted" else "no", esc(res)))])
+
+declined = sum(1 for t in trades if str(t["Result"]) == "Declined")
+gm = sec("Transactions", table(["Date", "Type", "Team", "NYI sends", "NYI gets", "Result"],
+    [txn_row(t) for t in trades], cls="txn"),
+    meta="%d logged &middot; %d declined" % (len(trades), declined))
+
+# players whose deal runs out after this season - the ones an extension can be offered to
+CURRENT_SEASON = "26-27"
+
+def ext_rows():
+    out = []
+    for p in roster:
+        thr, then = salary_through(p)
+        if thr != CURRENT_SEASON or p.get(CURRENT_SEASON) == "UNSIGNED":
+            continue
+        interest = str(p.get("Ext") or "-")
+        out.append((p, then, interest))
+    order = {"Yes": 0, "-": 1, "No": 2}
+    return sorted(out, key=lambda x: (order.get(x[2], 1), -int(x[0]["OVR"] or 0)))
+
+erows = ext_rows()
+if erows:
+    body = []
+    for p, then, interest in erows:
+        cls = {"Yes": "ok", "No": "no"}.get(interest, "unk")
+        label = {"Yes": "Yes", "No": "No"}.get(interest, "-")
+        body.append(("", [td(pname(p["Player"])), td(esc(p["Pos"])), td(esc(p["OVR"])), td(esc(p["Age"])),
+                          td(esc(money(p.get(CURRENT_SEASON)))), td(esc(then or "-")),
+                          td('<span class="txres %s">%s</span>' % (cls, esc(label))),
+                          td(esc("Main" if p["Group"] == "Main Roster" else "System"))]))
+    yes = sum(1 for _, _, i in erows if i == "Yes")
+    gm += sec("Extension Eligible",
+              table(["Player", "Pos", "OVR", "Age", "Salary", "Then", "Interest", "Roster"], body, cls="ext"),
+              meta="%d expiring &middot; %d interested" % (len(erows), yes))
+
 fo_strip = "".join([
     tile("Cap Space", "$%sM" % num(front.get("Cap Space ($M)"))),
     tile("Cap Hit", "$%sM" % num(front.get("Team Cap Hit ($M)"))),
@@ -606,27 +649,19 @@ owner = ('<div class="story-card"><div class="story-lead"><div class="story-big"
          '<ul class="story-list"><li>Owner happiness: <b>%s</b></li><li>State of the team: <b>%s</b></li></ul></div>') % (
     esc(front.get("State of the Team")), esc(front.get("Owner Message")), esc(front.get("Owner Happiness")), esc(front.get("State of the Team")))
 fo = '<div class="strip">%s</div>' % fo_strip
+fo += sec("General Manager", gm, cls="gmsec")
 fo += sec("Owner", owner, meta="as of %s" % esc(as_of_txt))
-fo += sec("Owner Goals", table(["Tier", "Goal", "Reward", "Evaluated", "Status"], goal_rows, cls=""))
+fo += sec("Owner Goals", table(["Tier", "Goal", "Reward", "Evaluated", "Status"], goal_rows, cls="goals"))
 fo += sec("Operations Budget", table(["Line", "Allocated", "Spent", "Remaining"],
     [("", [td(esc(b["Line"])), td("$%.3fM" % b["Allocated"]), td("$%.3fM" % b["Spent"]), td("$%.3fM" % b["Remaining"])]) for b in budget],
     tfoot=[td("Total"), td("$%.3fM" % sum(b["Allocated"] for b in budget)), td("$%.3fM" % sum(b["Spent"] for b in budget)),
-           td("$%.3fM" % sum(b["Remaining"] for b in budget))]),
+           td("$%.3fM" % sum(b["Remaining"] for b in budget))], cls="fin"),
     meta="salary target $%sM" % num(front.get("Salary Target ($M)")))
 fo += sec("Cap Outlook", table(["Season", "Salary Cap", "Main Roster", "System", "Contracts"],
     [("", [td(esc(c["Season"])), td(("$%.3fM" % c["Salary Cap"]) if c["Salary Cap"] else "-"),
            td("$%.3fM" % c["Main Roster"]), td("$%.3fM" % c["System"]),
-           td(esc(c["Contracts"]) if c["Contracts"] is not None else "-")]) for c in cap]),
+           td(esc(c["Contracts"]) if c["Contracts"] is not None else "-")]) for c in cap], cls="fin"),
     meta="skater salaries &middot; goalie deals pending")
-def txn_row(t):
-    res = str(t["Result"])
-    return ("", [td(esc(t["Date"])), td(esc(t.get("Type") or "-")), td(esc(t["Partner"])),
-                 td(esc(t["Out"])), td(esc(t["In"])),
-                 td('<span class="txres %s">%s</span>' % ("ok" if res == "Accepted" else "no", esc(res)))])
-declined = sum(1 for t in trades if str(t["Result"]) == "Declined")
-fo += sec("Transactions", table(["Date", "Type", "Team", "NYI sends", "NYI gets", "Result"],
-    [txn_row(t) for t in trades], cls=""),
-    meta="%d logged &middot; %d declined" % (len(trades), declined))
 fo += sec("League Cap Rules", table(["Rule", "Value"],
     [("", [td(esc(k)), td("$%.3fM" % front[k])]) for k in ("Salary Cap ($M)", "Salary Cap Floor ($M)", "Max Player Salary ($M)",
                                                             "Min Player Salary ($M)", "Max Rookie Salary ($M)")], cls=""))
