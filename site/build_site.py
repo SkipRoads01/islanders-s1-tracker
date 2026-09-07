@@ -283,10 +283,13 @@ def player_card(key):
             ('<div class="pm-photo empty-photo"><span class="tlogo lg-NYI" aria-hidden="true"></span></div>')
     meta = " &middot; ".join(esc(str(v)) for v in [p["Pos"], ("#%s" % p["#"]) if p["#"] else None,
                                                    ("%s OVR" % p["OVR"]) if p["OVR"] else None,
-                                                   ("Age %s" % p["Age"]) if p["Age"] else None] if v)
+                                                   ("Age %s" % p["Age"]) if p["Age"] else None,
+                                                   "In the System" if p.get("Group") == "In the System" else None] if v)
     bits = []
     for lab, k in (("Height", "Ht"), ("Weight", "Wt"), ("Shoots", "Shoots"), ("Type", "Type"),
-                   ("Potential", "POT"), ("Clause", "Clause"), ("Group", "Group"), ("Status", "Status")):
+                   ("Potential", "POT"), ("Clause", "Clause"), ("Status", "Status")):
+        # Group is dropped: "Main Roster" on a main-roster card says nothing. In the System
+        # is real information, so it rides in the meta line under the name instead.
         if p.get(k):
             bits.append('<div class="pstat"><span class="k">%s</span><span class="v">%s</span></div>' % (esc(lab), esc(p[k])))
     thr, then = salary_through(p)
