@@ -368,6 +368,9 @@ page = """<!doctype html>
 <meta name="color-scheme" content="light dark">
 <meta name="build" content="%(build)s">
 <meta name="theme-color" content="#00539b">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <title>Islanders S%(season)d Tracker</title>
 <style>
 %(chrome)s

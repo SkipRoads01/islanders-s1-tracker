@@ -118,5 +118,12 @@
   document.addEventListener("visibilitychange", function () {
     if (!document.hidden) check();
   });
+  /* Offline shell. Registered after the version check so it never delays it. */
+  if ("serviceWorker" in navigator &&
+      (location.protocol === "https:" || location.hostname === "127.0.0.1" || location.hostname === "localhost")) {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("sw.js").catch(function () {});
+    });
+  }
   window.addEventListener("pageshow", function (e) { if (e.persisted) check(); });
 })();

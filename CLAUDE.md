@@ -30,6 +30,8 @@ islanders-s1-tracker/          # data repo AND the GitHub Pages repo (one repo, 
 ├── S1 NY Islanders.xlsx       # THE workbook — exact filename, set once and never renamed
 ├── index.html                 # generated — never hand-edit
 ├── version.txt                # generated build id; must match <meta name="build">
+├── sw.js                      # offline shell: network-first page cache, version.txt never intercepted
+├── manifest.webmanifest       # add-to-home-screen; icon-192/512.png + apple-touch-icon.png from the crest
 ├── CLAUDE.md                  # this file
 ├── add_game.py                # injection engine — edit the GAME block, run it (not yet ported)
 ├── scripts/seed_workbook.py   # one-time seed from the 09/29/2026 franchise screens; record only
@@ -248,8 +250,11 @@ deploy after every game**, not just the workbook.
 - **New York Islanders, Season 1, preseason.** In-game date 09/29/2026. Record 0-0-0.
 - Workbook seeded with the front-office and roster sheets in §4; **no game-log sheets yet**
   because their columns are still the user's to give (§4). Do not invent them.
-- Site built and published from this repo: tabs Overview, Roster, Lines, Front Office,
-  Schedule, Goalies, vs. Divisions. Game-driven sections render `.empty` placeholders.
+- Site built from this repo: tabs Overview, Roster, Lines, Front Office, Schedule, Goalies,
+  vs. Divisions. Game-driven sections render `.empty` placeholders. Works offline once loaded
+  (service worker, verified with the network cut). GitHub Pages serves `main` at the repo
+  root: https://skiproads01.github.io/islanders-s1-tracker/ once the branch is merged and
+  Pages is switched on.
 - Schedule loaded (83 games as supplied, see §7). Hero shows the next game, the NHL shield
   and the Eastern Conference mark.
 - Pending from the user: goalie contracts (Sorokin, Varlamov), the wordmark image file for

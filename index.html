@@ -4,8 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
-<meta name="build" content="20260907-020744">
+<meta name="build" content="20260907-021445">
 <meta name="theme-color" content="#00539b">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <title>Islanders S1 Tracker</title>
 <style>
 
@@ -1087,6 +1090,13 @@
   document.addEventListener("visibilitychange", function () {
     if (!document.hidden) check();
   });
+  /* Offline shell. Registered after the version check so it never delays it. */
+  if ("serviceWorker" in navigator &&
+      (location.protocol === "https:" || location.hostname === "127.0.0.1" || location.hostname === "localhost")) {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("sw.js").catch(function () {});
+    });
+  }
   window.addEventListener("pageshow", function (e) { if (e.persisted) check(); });
 })();
 
