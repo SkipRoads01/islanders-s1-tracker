@@ -287,6 +287,13 @@ deploy after every game**, not just the workbook.
   **The figure carries the number; the sentence must add new information rather than
   restating it.** Derive streaks from the recaps, never by assumption — a game missed
   does not break a streak.
+- **A phrase that implies a sequence needs the sequence to have happened.** "Opened the
+  scoring" promises more scoring after it; on a night the goal was the team's only one, it is
+  simply wrong. Read every idiom for what it commits you to: "started a run", "got them going",
+  "the first of many". When the goal stood alone, say so.
+- **Name the game and the opponent in every editorial line**: `in G1 at TOR`. The preposition
+  carries the venue - `at` for a road game, `vs.` for a home one. A bare "to open the scoring"
+  tells the reader neither when nor against whom.
 - **A goal always carries the scorer's season total in parentheses**, hockey box-score style:
   `Horvat (1)`. It is the running count through that game, not the season-to-date figure, so
   G1's goal reads `(1)` forever. Applied in the `Scoring` table and in recap prose. Opponent
