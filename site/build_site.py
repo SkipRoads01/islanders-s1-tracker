@@ -81,7 +81,7 @@ goals = rows(wb["Owner Goals"])
 budget = rows(wb["Budget"])
 cap = rows(wb["Cap"])
 front = {r["Key"]: r["Value"] for r in rows(wb["Front Office"])}
-trades = rows(wb["Trades"])
+trades = rows(wb["Transactions"]) if "Transactions" in wb.sheetnames else rows(wb["Trades"])
 teams = rows(wb["Teams"])
 schedule = rows(wb["Schedule"])
 team_name = {t["Abbr"]: t["Team"] for t in teams}
@@ -615,9 +615,15 @@ fo += sec("Cap Outlook", table(["Season", "Salary Cap", "Main Roster", "System",
            td("$%.3fM" % c["Main Roster"]), td("$%.3fM" % c["System"]),
            td(esc(c["Contracts"]) if c["Contracts"] is not None else "-")]) for c in cap]),
     meta="skater salaries &middot; goalie deals pending")
-fo += sec("Trade Offers", table(["Date", "Team", "NYI sends", "NYI gets", "Result"],
-    [("", [td(esc(t["Date"])), td(esc(t["Partner"])), td(esc(t["Out"])), td(esc(t["In"])), td(esc(t["Result"]))]) for t in trades], cls=""),
-    meta="%d received" % len(trades))
+def txn_row(t):
+    res = str(t["Result"])
+    return ("", [td(esc(t["Date"])), td(esc(t.get("Type") or "-")), td(esc(t["Partner"])),
+                 td(esc(t["Out"])), td(esc(t["In"])),
+                 td('<span class="txres %s">%s</span>' % ("ok" if res == "Accepted" else "no", esc(res)))])
+declined = sum(1 for t in trades if str(t["Result"]) == "Declined")
+fo += sec("Transactions", table(["Date", "Type", "Team", "NYI sends", "NYI gets", "Result"],
+    [txn_row(t) for t in trades], cls=""),
+    meta="%d logged &middot; %d declined" % (len(trades), declined))
 fo += sec("League Cap Rules", table(["Rule", "Value"],
     [("", [td(esc(k)), td("$%.3fM" % front[k])]) for k in ("Salary Cap ($M)", "Salary Cap Floor ($M)", "Max Player Salary ($M)",
                                                             "Min Player Salary ($M)", "Max Rookie Salary ($M)")], cls=""))

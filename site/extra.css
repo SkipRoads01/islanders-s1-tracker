@@ -137,3 +137,6 @@
     .tlogo.mid { width: 38px; height: 38px; border-radius: 9px; }
     .pm-photo { width: 62px; height: 62px; }
   }
+  .txres { font-size: 10.5px; font-weight: 800; letter-spacing: .04em; padding: 3px 7px; border-radius: 6px; white-space: nowrap; }
+  .txres.no { color: var(--loss); background: var(--loss-bg); }
+  .txres.ok { color: var(--win); background: var(--win-bg); }

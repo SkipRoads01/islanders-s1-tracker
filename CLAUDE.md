@@ -136,10 +136,14 @@ goals/shots/hits come from the four cumulative screens differenced into per-peri
 | `Budget` | `Line` `Allocated` `Spent` `Remaining` |
 | `Cap` | `Season` `Salary Cap` `Main Roster` `System` `Contracts` |
 | `Front Office` | `Key` `Value` |
-| `Trades` | `Date` `Partner` `Direction` `Out` `In` `Result` |
+| `Transactions` | `Date` `Type` `Partner` `Direction` `Out` `In` `Result` |
 | `Schedule` | `G` `Date` `H/A` `Opp` `Time (ET)` |
 | `Teams` | `Team` `Abbr` `Conference` `Division` |
 | `Notes` | `Date` `Note` |
+
+`Transactions` covers everything the front office is offered or does, not just trades: `Type`
+is `Trade offer`, `Signing`, `Waivers` or the like, and `Result` is `Accepted` or `Declined`.
+A field the screen did not capture is a `-`, never a guess.
 
 `Roster Ref` conventions, taken from the game's List All Contracts screen: `Group` is
 `Main Roster` or `In the System`; `Status` is `Dressed` / `Scratched` for the main roster;
