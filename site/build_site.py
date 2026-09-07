@@ -513,8 +513,14 @@ else:
     overview += sec("Team Goaltending", empty("No games played"))
 
 # ---- roster
+def interest_chip(p):
+    """Does this player want an extension? Same chip the Extension Eligible table uses."""
+    v = str(p.get("Ext") or "-")
+    cls = {"Yes": "ok", "No": "no"}.get(v, "unk")
+    return '<span class="txres %s">%s</span>' % (cls, esc(v if v in ("Yes", "No") else "-"))
+
 def roster_table(players, goalie=False):
-    hdr = ["Player", "Pos", "#", "OVR", "POT", "Age", "Ht", "Wt", "Shoots", "Type", "Clause", "Ext", "Salary", "Through", "Then"]
+    hdr = ["Player", "Pos", "#", "OVR", "POT", "Age", "Ht", "Wt", "Shoots", "Type", "Clause", "Interest", "Salary", "Through", "Then"]
     body = []
     for p in players:
         thr, then = salary_through(p)
@@ -529,7 +535,7 @@ def roster_table(players, goalie=False):
             td(name), td(esc(p["Pos"])), td(esc(p.get("#") or "")), td(esc(p["OVR"])), td(pot),
             td(esc(p.get("Age") or "")), td(esc(p.get("Ht") or "")), td(esc(p.get("Wt") or "")),
             td(esc(p.get("Shoots") or "")), td(esc(p.get("Type") or "")), td(esc(cl)),
-            td(esc(p.get("Ext") or "-")), td(esc(money(p.get("26-27")))), td(esc(thr or "")), td(esc(then or "")),
+            td(interest_chip(p)), td(esc(money(p.get("26-27")))), td(esc(thr or "")), td(esc(then or "")),
         ]))
     return table(hdr, body, cls="num roster")
 
@@ -620,11 +626,9 @@ erows = ext_rows()
 if erows:
     body = []
     for p, then, interest in erows:
-        cls = {"Yes": "ok", "No": "no"}.get(interest, "unk")
-        label = {"Yes": "Yes", "No": "No"}.get(interest, "-")
         body.append(("", [td(pname(p["Player"])), td(esc(p["Pos"])), td(esc(p["OVR"])), td(esc(p["Age"])),
                           td(esc(money(p.get(CURRENT_SEASON)))), td(esc(then or "-")),
-                          td('<span class="txres %s">%s</span>' % (cls, esc(label))),
+                          td(interest_chip(p)),
                           td(esc("Main" if p["Group"] == "Main Roster" else "System"))]))
     yes = sum(1 for _, _, i in erows if i == "Yes")
     gm += sec("Extension Eligible",
