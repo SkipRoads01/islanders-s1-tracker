@@ -363,7 +363,8 @@ deploy after every game**, not just the workbook.
   scores are still **held for the screens** (§7). PP 1/5 with the only goal in the 3rd is what
   confirmed Cizikas' goal was even strength.
 - **Team Ratings** table on the Teams tab: every club, 72px crest, offense / defense /
-  goaltending, sortable, unknowns at the bottom. Only NJD (91/88/80) is filled in.
+  goaltending, sortable, unknowns at the bottom. **All 32 clubs are rated.** NYI reads
+  87/89/93; the league's best goaltending is NYI's 93, then WPG 92 and TBL 90.
 - Site built from this repo: tabs Overview, Roster, Lines, Front Office, Schedule, Goalies,
   Teams (Team Ratings + vs. Divisions; the tab was `vs. Divisions` before the ratings table
   joined it). Game-driven sections render `.empty` placeholders. Works offline once loaded
@@ -384,6 +385,6 @@ deploy after every game**, not just the workbook.
   only Horvat's goal and the three NYI minors, so `Skater Game Log` is deliberately empty and
   Skating Leaders / Team Skating render placeholders rather than partial totals; **G2's skater box
   score** (Sorokin's 42 SA / 41 SV / 1 GA win and Rittich's 35 SA / 29 SV are both logged;
-  Rittich carries no first initial, which the screen would supply); **TOR's team ratings**; and the franchise screen for the `Win the regular season home opener` owner goal,
+  Rittich carries no first initial, which the screen would supply); and the franchise screen for the `Win the regular season home opener` owner goal,
   which evaluated 10/03/2026 and stays `Open` until the game says otherwise.
 - `add_game.py` is the injection engine: edit its `GAME` block, run it, then `site/deploy.sh`.
