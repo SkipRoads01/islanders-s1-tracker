@@ -253,6 +253,9 @@ Carried over from the baseball project because they're habits, not sport rules:
   any `Headlines` row that names the player. Photos live at `site/logos/players/<key>.png`
   where `<key>` is the name lowercased with punctuation stripped (`bhorvat`, `isorokin`); the
   crest stands in until a photo exists.
+- **Sorokin starts every game** and is logged as the starting goalie without asking. The
+  user's own ruling: the only exception is a game where he names Varlamov. The lineup screen
+  showing Varlamov in slot 1 does not override it.
 - **A game logged before its screens still publishes.** Tier 3 (the play-by-play) carries the
   `Games` row, the scoring, the recaps and the editorial; the team-stat columns stay empty, the
   box score's SOG line prints `-`, and the game card's Team Stats section says
@@ -375,9 +378,8 @@ deploy after every game**, not just the workbook.
   (`site/logos/wordmark.png`; the crest stands in until then); player photos
   (`site/logos/players/`); **the skater box score for G1** - the play-by-play supports
   only Horvat's goal and the three NYI minors, so `Skater Game Log` is deliberately empty and
-  Skating Leaders / Team Skating render placeholders rather than partial totals; **G2's box
-  scores** - the team screens give the NYI starter 42 SA, 41 SV, 1 GA and the win, but not
-  his name, so `Goalie Game Log` has no G2 row (Rittich's 35 SA / 29 SV is logged, without a
-  first initial, which the screen would supply); **TOR's team ratings**; and the franchise screen for the `Win the regular season home opener` owner goal,
+  Skating Leaders / Team Skating render placeholders rather than partial totals; **G2's skater box
+  score** (Sorokin's 42 SA / 41 SV / 1 GA win and Rittich's 35 SA / 29 SV are both logged;
+  Rittich carries no first initial, which the screen would supply); **TOR's team ratings**; and the franchise screen for the `Win the regular season home opener` owner goal,
   which evaluated 10/03/2026 and stays `Open` until the game says otherwise.
 - `add_game.py` is the injection engine: edit its `GAME` block, run it, then `site/deploy.sh`.

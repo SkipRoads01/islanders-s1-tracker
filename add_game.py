@@ -39,7 +39,7 @@ GAME = dict(
     # final team stats, exactly as the game's screen shows them
     toa=("07:31", "05:44"), passing=(74.4, 89.2), fow=(14, 32),
     pim=("06:00", "10:00"), pp=("1/5", "0/3"), ppm=("07:05", "05:32"), shg=(1, 0),
-    goalies=[],
+    goalies=[dict(goalie="I. Sorokin", dec="W", sa=42, sv=41, ga=1, toi="60:00", start="Start")],
     opp_goalies=[dict(goalie="Rittich", catches="R", dec="L", sa=35, sv=29, ga=6, toi="60:00")],
     skaters=[],
     # scoring: the site adds the scorer's running season total in parens, so do not type it here
@@ -78,6 +78,8 @@ GAME = dict(
         # directly when the screens arrived.
     ],
     headlines=[
+        (41, "Saves", "<b>Sorokin</b> was beaten only when Bratt got to his own rebound in the 2nd of G2 vs. NJD, "
+                      "and has allowed three goals in two starts.", "active"),
         (3, "Points", "<b>Schaefer</b> set up the opening goal, fed Schenn on the power play and scored "
                       "shorthanded himself in G2 vs. NJD, a three-point night from a 19-year-old defenseman.", "active"),
         (2, "Points", "<b>Schenn</b> found Duclair at the right post in the 1st and finished Coronato's pass "
@@ -88,8 +90,6 @@ GAME = dict(
                      "primary assist on Palmieri's opener in G2 vs. NJD.", "active"),
         (1, "Goals", "<b>Maccelli</b> outran two defensemen down the slot and beat Rittich for the last of the "
                      "six in G2 vs. NJD.", "active"),
-        (1, "Goals", "<b>Cizikas</b> was credited in the 3rd of G2 vs. NJD after he lost the puck at the side "
-                     "of the net and Bratt knocked it in himself.", "active"),
     ],
     summary="Six goals from six different scorers in the home opener, three of them in the first period. "
             "New Jersey's only reply came off its own rebound.",
