@@ -253,6 +253,10 @@ Carried over from the baseball project because they're habits, not sport rules:
   any `Headlines` row that names the player. Photos live at `site/logos/players/<key>.png`
   where `<key>` is the name lowercased with punctuation stripped (`bhorvat`, `isorokin`); the
   crest stands in until a photo exists.
+- **Publish straight to `main`, every time.** The user's ruling: never park finished work on
+  the feature branch waiting to be asked. Develop on the assigned branch, then fast-forward
+  `main` and push it in the same pass - GitHub Pages serves `main`, so an unmerged branch
+  means his phone is reading a stale page.
 - **Sorokin starts every game** and is logged as the starting goalie without asking. The
   user's own ruling: the only exception is a game where he names Varlamov. The lineup screen
   showing Varlamov in slot 1 does not override it.
