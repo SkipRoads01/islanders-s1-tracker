@@ -351,7 +351,10 @@ deploy after every game**, not just the workbook.
 - **New York Islanders, Season 1, regular season.** Record **1-0-1** through G2.
 - **G1 logged**: 09/30/2026 at TOR, 1-2 OTL. Kessel has the assist on Horvat's goal.
 - **G2 logged**: 10/03/2026 vs NJD, 6-1 W, the home opener. Six goals, six scorers, Schaefer
-  shorthanded. Team stats and both box scores are **held for the screens** (§7).
+  shorthanded. Team stats came in on a second pass (`topup=True`) from the 1st, 2nd and final
+  screens; per-period shots and hits were differenced from the cumulative ones. Both box
+  scores are still **held for the screens** (§7). PP 1/5 with the only goal in the 3rd is what
+  confirmed Cizikas' goal was even strength.
 - **Team Ratings** table on the Teams tab: every club, 72px crest, offense / defense /
   goaltending, sortable, unknowns at the bottom. Only NJD (91/88/80) is filled in.
 - Site built from this repo: tabs Overview, Roster, Lines, Front Office, Schedule, Goalies,
@@ -372,8 +375,9 @@ deploy after every game**, not just the workbook.
   (`site/logos/wordmark.png`; the crest stands in until then); player photos
   (`site/logos/players/`); **the skater box score for G1** - the play-by-play supports
   only Horvat's goal and the three NYI minors, so `Skater Game Log` is deliberately empty and
-  Skating Leaders / Team Skating render placeholders rather than partial totals; **G2's four
-  team-stat screens and both box scores**, including which goalie started; **TOR's team
-  ratings**; and the franchise screen for the `Win the regular season home opener` owner goal,
+  Skating Leaders / Team Skating render placeholders rather than partial totals; **G2's box
+  scores** - the team screens give the NYI starter 42 SA, 41 SV, 1 GA and the win, but not
+  his name, so `Goalie Game Log` has no G2 row (Rittich's 35 SA / 29 SV is logged, without a
+  first initial, which the screen would supply); **TOR's team ratings**; and the franchise screen for the `Win the regular season home opener` owner goal,
   which evaluated 10/03/2026 and stays `Open` until the game says otherwise.
 - `add_game.py` is the injection engine: edit its `GAME` block, run it, then `site/deploy.sh`.

@@ -31,16 +31,16 @@ WB = ROOT / "S1 NY Islanders.xlsx"
 GAME = dict(
     g=2, date="10/03/2026", opp="NJD", ha="H",
     result="W",                        # W / L / OTL / SOL
-    topup=False,
+    topup=True,
     # period lines: (NYI, OPP) goals and shots and hits, in order 1,2,3,OT,SO
     goals=[(3, 0), (0, 1), (3, 0)],
-    shots=None,
-    hits=None,
+    shots=[(12, 19), (4, 14), (19, 9)],
+    hits=[(12, 14), (9, 6), (19, 14)],
     # final team stats, exactly as the game's screen shows them
-    toa=None, passing=None, fow=None,
-    pim=None, pp=None, ppm=None, shg=None,
+    toa=("07:31", "05:44"), passing=(74.4, 89.2), fow=(14, 32),
+    pim=("06:00", "10:00"), pp=("1/5", "0/3"), ppm=("07:05", "05:32"), shg=(1, 0),
     goalies=[],
-    opp_goalies=[],
+    opp_goalies=[dict(goalie="Rittich", catches="R", dec="L", sa=35, sv=29, ga=6, toi="60:00")],
     skaters=[],
     # scoring: the site adds the scorer's running season total in parens, so do not type it here
     scoring=[
@@ -71,6 +71,11 @@ GAME = dict(
         "NYI took the 1st and the 3rd <b>3-0</b> in G2 vs. NJD and lost the 2nd <b>1-0</b>.",
         "Three straight NYI minors in the 1st of G2 vs. NJD put New Jersey two men up twice, and the only goal "
         "of that stretch went the other way.",
+        "NYI won G2 vs. NJD by five while being outshot <b>42-35</b> and winning <b>14 of 46 faceoffs (30%)</b>.",
+        "The Isles have killed all <b>6</b> power plays they have faced this season and are <b>1 for 7</b> on their "
+        "own, the goal coming in the 3rd of G2 vs. NJD.",
+        # topup passes ignore the editorial lists; these two were appended to the Inside sheet
+        # directly when the screens arrived.
     ],
     headlines=[
         (3, "Points", "<b>Schaefer</b> set up the opening goal, fed Schenn on the power play and scored "
