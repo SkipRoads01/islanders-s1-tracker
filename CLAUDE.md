@@ -227,6 +227,10 @@ Carried over from the baseball project because they're habits, not sport rules:
   opening **09/30/2026 at TOR**. An earlier load from a third-party calendar PDF was short
   one game (it omitted the September opener) and was replaced. Preseason is not played.
   **Verify any schedule source against the club's own release before loading it.**
+- **Only prose gets `table-layout: fixed`.** A table of names, positions and money (Extension
+  Eligible) sizes to its content with `white-space: nowrap`; fixed widths dumped the slack into
+  the Player column and broke `LD/RD` and the `M` of `$0.975M` onto second lines. Owner Goals
+  and Transactions keep fixed layout because they carry sentences.
 - **A table must fit its column; horizontal scrolling is a defect.** The chrome's default
   `tbody td { white-space: nowrap }` is what pushes the last column off-screen, so any table
   carrying prose or long strings needs `table-layout: fixed`, per-column widths, and
@@ -253,6 +257,19 @@ Carried over from the baseball project because they're habits, not sport rules:
   any `Headlines` row that names the player. Photos live at `site/logos/players/<key>.png`
   where `<key>` is the name lowercased with punctuation stripped (`bhorvat`, `isorokin`); the
   crest stands in until a photo exists.
+- **Money never carries trailing zeros.** `$104M`, `$9.15M`, `$0.975M` - the game shows a
+  $104M cap, not `$104.000M`. One helper (`mnum`) formats every figure on the page, and the
+  `($M)` suffix comes off a label whose value already ends in `M`.
+- **`Inside the Numbers` never restates the record.** The story lead prints `1-0-1` beside the
+  bullets, so a bullet saying it again is dead copy.
+- **A quantifier is not a fact.** "Put New Jersey two men up twice" tells the reader nothing;
+  "handed New Jersey two 5-on-3 power plays, the second of them 6 seconds long" does. Name the
+  situation, its count and its length.
+- **"Only" is scoped to the sentence it sits in.** "Beaten only by X" next to "three goals in
+  two starts" reads as a contradiction. Bind the superlative to the game, then give the season
+  figure after the semicolon.
+- **Removing a workbook row means `delete_rows`,** then re-read the saved file and count. A
+  clear-and-rewrite pass silently left a duplicate `Inside` bullet behind twice.
 - **Publish straight to `main`, every time.** The user's ruling: never park finished work on
   the feature branch waiting to be asked. Develop on the assigned branch, then fast-forward
   `main` and push it in the same pass - GitHub Pages serves `main`, so an unmerged branch

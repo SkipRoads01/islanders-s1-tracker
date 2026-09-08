@@ -32,12 +32,22 @@ GAMES_IN_SEASON = 84   # 2026-27 CBA expands the regular season from 82 to 84
 def esc(s):
     return html.escape("" if s is None else str(s), quote=True)
 
+def mnum(v):
+    """104.0 -> '104' ; 9.15 -> '9.15' ; 0.975 -> '0.975'. Trailing zeros are noise:
+    the game shows a cap of $104M, not $104.000M."""
+    if v is None or v == "":
+        return ""
+    if not isinstance(v, (int, float)):
+        return str(v)
+    t = ("%.3f" % v).rstrip("0").rstrip(".")
+    return t or "0"
+
 def money(v):
     """0.975 -> $0.975M ; strings pass through (RFA/UFA/UNSIGNED)."""
     if v is None or v == "":
         return ""
     if isinstance(v, (int, float)):
-        return "$%.3fM" % v
+        return "$%sM" % mnum(v)
     return str(v)
 
 def rows(ws):
@@ -616,19 +626,29 @@ lines_html += sec("Goalies", unit_card("Goalies", "G", ["1", "2"]))
 lines_html += sec("Scratched", unit_card("Scratched", "SCR"))
 
 # ---- front office
-def num(v, fmt="%.3f"):
-    return (fmt % v) if isinstance(v, (int, float)) else esc(v)
+def num(v, fmt=None):
+    """Front-office figures are money: same no-trailing-zero rule as money()."""
+    if not isinstance(v, (int, float)):
+        return esc(v)
+    return (fmt % v) if fmt else mnum(v)
 
 def pieces(v):
     """'A; B' -> two stacked lines so a long return never widens the table."""
     v = str(v or "-")
     return "<br>".join(esc(x.strip()) for x in v.split(";") if x.strip()) or "-"
 
+def txn_date(v):
+    """09/29/2026 -> 09/29/26. The four-digit year ran into the Type column."""
+    try:
+        return dt.datetime.strptime(str(v), "%m/%d/%Y").strftime("%m/%d/%y")
+    except ValueError:
+        return str(v)
+
 def txn_row(t):
     res = str(t["Result"])
     partner = str(t["Partner"] or "-")
     tm = tlogo(partner, "xs") if partner in team_name else '<span class="dash">-</span>'
-    return ("", [td(esc(t["Date"])), td(esc(t.get("Type") or "-")), td(tm),
+    return ("", [td(esc(txn_date(t["Date"]))), td(esc(t.get("Type") or "-")), td(tm),
                  td(pieces(t["Out"])), td(pieces(t["In"])),
                  td('<span class="txres %s">%s</span>' % ("ok" if res == "Accepted" else "no", esc(res)))])
 
@@ -672,7 +692,7 @@ fo_strip = "".join([
     tile("Contracts", front.get("Contracts")),
     tile("Funds", "$%sM" % num(front.get("Funds Remaining ($M)"))),
     tile("Salary Target", "$%sM" % num(front.get("Salary Target ($M)"))),
-    tile("Retained", "$%sM" % num(front.get("Retained Salary ($M)"), "%.0f")),
+    tile("Retained", "$%sM" % num(front.get("Retained Salary ($M)"))),
 ])
 goal_rows = []
 for g in goals:
@@ -686,18 +706,20 @@ fo += sec("General Manager", gm, cls="gmsec")
 fo += sec("Owner", owner, meta="as of %s" % esc(as_of_txt))
 fo += sec("Owner Goals", table(["Tier", "Goal", "Reward", "Evaluated", "Status"], goal_rows, cls="goals"))
 fo += sec("Operations Budget", table(["Line", "Allocated", "Spent", "Remaining"],
-    [("", [td(esc(b["Line"])), td("$%.3fM" % b["Allocated"]), td("$%.3fM" % b["Spent"]), td("$%.3fM" % b["Remaining"])]) for b in budget],
-    tfoot=[td("Total"), td("$%.3fM" % sum(b["Allocated"] for b in budget)), td("$%.3fM" % sum(b["Spent"] for b in budget)),
-           td("$%.3fM" % sum(b["Remaining"] for b in budget))], cls="fin"),
+    [("", [td(esc(b["Line"])), td("$%sM" % mnum(b["Allocated"])), td("$%sM" % mnum(b["Spent"])), td("$%sM" % mnum(b["Remaining"]))]) for b in budget],
+    tfoot=[td("Total"), td("$%sM" % mnum(sum(b["Allocated"] for b in budget))),
+           td("$%sM" % mnum(sum(b["Spent"] for b in budget))),
+           td("$%sM" % mnum(sum(b["Remaining"] for b in budget)))], cls="fin"),
     meta="salary target $%sM" % num(front.get("Salary Target ($M)")))
 fo += sec("Cap Outlook", table(["Season", "Salary Cap", "Main Roster", "System", "Contracts"],
-    [("", [td(esc(c["Season"])), td(("$%.3fM" % c["Salary Cap"]) if c["Salary Cap"] else "-"),
-           td("$%.3fM" % c["Main Roster"]), td("$%.3fM" % c["System"]),
+    [("", [td(esc(c["Season"])), td(("$%sM" % mnum(c["Salary Cap"])) if c["Salary Cap"] else "-"),
+           td("$%sM" % mnum(c["Main Roster"])), td("$%sM" % mnum(c["System"])),
            td(esc(c["Contracts"]) if c["Contracts"] is not None else "-")]) for c in cap], cls="fin"),
     meta="skater salaries &middot; goalie deals pending")
 fo += sec("League Cap Rules", table(["Rule", "Value"],
-    [("", [td(esc(k)), td("$%.3fM" % front[k])]) for k in ("Salary Cap ($M)", "Salary Cap Floor ($M)", "Max Player Salary ($M)",
-                                                            "Min Player Salary ($M)", "Max Rookie Salary ($M)")], cls=""))
+    [("", [td(esc(k.replace(" ($M)", ""))), td("$%sM" % mnum(front[k]))])
+     for k in ("Salary Cap ($M)", "Salary Cap Floor ($M)", "Max Player Salary ($M)",
+               "Min Player Salary ($M)", "Max Rookie Salary ($M)")], cls=""))
 
 # ---- schedule / goalies / divisions
 def schedule_panel():

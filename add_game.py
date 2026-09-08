@@ -66,11 +66,11 @@ GAME = dict(
               "Rittich (6-1)."),
     ],
     inside=[
-        "NYI is <b>1-0-1</b> through two games, worth <b>3</b> of a possible 4 points.",
+        # the story lead already prints the record, so a bullet restating it is dead copy
         "<b>Six</b> different Islanders scored in G2 vs. NJD; the team had one goal in G1 at TOR.",
         "NYI took the 1st and the 3rd <b>3-0</b> in G2 vs. NJD and lost the 2nd <b>1-0</b>.",
-        "Three straight NYI minors in the 1st of G2 vs. NJD put New Jersey two men up twice, and the only goal "
-        "of that stretch went the other way.",
+        "Three NYI minors in the 1st of G2 vs. NJD handed New Jersey two 5-on-3 power plays, the second of them "
+        "6 seconds long, and the only goal scored during either went the other way.",
         "NYI won G2 vs. NJD by five while being outshot <b>42-35</b> and winning <b>14 of 46 faceoffs (30%)</b>.",
         "The Isles have killed all <b>6</b> power plays they have faced this season and are <b>1 for 7</b> on their "
         "own, the goal coming in the 3rd of G2 vs. NJD.",
@@ -78,8 +78,8 @@ GAME = dict(
         # directly when the screens arrived.
     ],
     headlines=[
-        (41, "Saves", "<b>Sorokin</b> was beaten only when Bratt got to his own rebound in the 2nd of G2 vs. NJD, "
-                      "and has allowed three goals in two starts.", "active"),
+        (41, "Saves", "The only puck past <b>Sorokin</b> in G2 vs. NJD was Bratt's own rebound in the 2nd; he is "
+                      "at three goals allowed through two starts.", "active"),
         (3, "Points", "<b>Schaefer</b> set up the opening goal, fed Schenn on the power play and scored "
                       "shorthanded himself in G2 vs. NJD, a three-point night from a 19-year-old defenseman.", "active"),
         (2, "Points", "<b>Schenn</b> found Duclair at the right post in the 1st and finished Coronato's pass "
