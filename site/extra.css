@@ -48,6 +48,11 @@
   .sgame .sdate { font-size: 12.5px; font-weight: 700; color: var(--ink-soft); font-variant-numeric: tabular-nums; white-space: nowrap; }
   .sgame .stime { font-size: 11px; color: var(--ink-mute); font-variant-numeric: tabular-nums; }
   .sgame.next .g { color: var(--orange); }
+  /* a played row carries its result where an upcoming one carries the puck drop */
+  .sgame .sfin { font-size: 12.5px; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .sgame .sfin.w { color: var(--win); }
+  .sgame .sfin.l { color: var(--loss); }
+  .sgame .sfin.ot { color: var(--orange); }
   @media (max-width: 560px) {
     .hero-right { gap: 10px; }
     .lm-nhl { height: 45px; }
@@ -209,3 +214,37 @@
   table.fin tbody td:first-child, table.fin thead th:first-child,
   table.fin tfoot td:first-child { text-align: left; }
   .gtot { color: var(--ink-mute); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+  /* ---- Team Ratings: the matchup screen's offense / defense / goaltending, club by club ---- */
+  table.ratings { table-layout: fixed; width: 100%; }
+  table.ratings thead th { white-space: normal; }
+  table.ratings tbody td { padding: 6px 8px; }
+  table.ratings td.rlogo, table.ratings thead th:first-child { width: 92px; text-align: center; }
+  /* .tlogo is an inline span everywhere else it is a flex item; in a table cell it has to
+     be blockified or the width and height do nothing and the crest never paints. */
+  table.ratings td.rlogo .tlogo { display: block; margin: 0 auto; }
+  table.ratings td.rname, table.ratings thead th:nth-child(2) { text-align: left; }
+  table.ratings td.rname { white-space: normal; overflow-wrap: anywhere; }
+  table.ratings .rteam { display: block; font-size: 14.5px; font-weight: 750; letter-spacing: -.01em; }
+  table.ratings .rabbr { display: block; margin-top: 1px; font-size: 10px; font-weight: 800;
+    letter-spacing: .1em; color: var(--ink-mute); }
+  table.ratings td.rdiv, table.ratings thead th:nth-child(3) { width: 118px; }
+  table.ratings td.rdiv { font-size: 12px; font-weight: 600; color: var(--ink-soft); }
+  table.ratings tbody td:nth-child(n+4), table.ratings thead th:nth-child(n+4) { width: 68px; }
+  table.ratings .rv { font-size: 17px; font-weight: 850; color: var(--isles-bright); }
+  table.ratings .dash { color: var(--ink-mute); }
+  table.ratings tbody tr.you td { background: color-mix(in srgb, var(--isles) 9%, transparent); }
+  table.ratings tbody tr.you .rteam { color: var(--isles-bright); }
+  @media (max-width: 560px) {
+    /* the division drops out; the logo, the club and the three numbers stay */
+    table.ratings td.rdiv, table.ratings thead th:nth-child(3) { display: none; }
+    table.ratings td.rlogo, table.ratings thead th:first-child { width: 66px; }
+    table.ratings td.rlogo .tlogo.big { width: 54px; height: 54px; border-radius: 12px; }
+    table.ratings .rteam { font-size: 12.5px; }
+    table.ratings tbody td:nth-child(n+4), table.ratings thead th:nth-child(n+4) { width: 52px; }
+    /* 'Goalie' at the chrome's letter-spacing is wider than its own column, and a header
+       cannot shrink below its word, so the table would scroll by those few pixels. */
+    table.ratings thead th:nth-child(n+4) { font-size: 9px; letter-spacing: 0; padding: 7px 3px; }
+    table.ratings .rv { font-size: 15px; }
+    table.ratings tbody td { padding: 5px 4px; }
+  }

@@ -56,7 +56,10 @@ islanders-s1-tracker/          # data repo AND the GitHub Pages repo (one repo, 
   libreoffice --headless --calc --convert-to xlsx --outdir /tmp "<workbook>.xlsx"
   cp "/tmp/<workbook>.xlsx" "<workbook>.xlsx"
   ```
-  Skipping it yields blank previews and a site built from empty cells.
+  Skipping it yields blank previews and a site built from empty cells. Nothing in the workbook
+  stores a formula today (every game-log cell is typed), so the pass is currently a no-op -
+  check with a scan for cells whose value starts with `=` before deciding it was needed. The
+  remote container's LibreOffice cannot load a file at all, so the pass has to run locally.
 
 ---
 
@@ -139,7 +142,7 @@ goals/shots/hits come from the four cumulative screens differenced into per-peri
 | `Transactions` | `Date` `Type` `Partner` `Direction` `Out` `In` `Result` |
 | `Front Office` tab order | strip, **General Manager** (Transactions, Extension Eligible), Owner, Owner Goals, Operations Budget, Cap Outlook, League Cap Rules |
 | `Schedule` | `G` `Date` `H/A` `Opp` `Time (ET)` |
-| `Teams` | `Team` `Abbr` `Conference` `Division` |
+| `Teams` | `Team` `Abbr` `Conference` `Division` `Off` `Def` `Goalie` |
 | `Notes` | `Date` `Note` |
 
 `Transactions` covers everything the front office is offered or does, not just trades: `Type`
@@ -154,6 +157,11 @@ year columns hold the salary in $M as a number, or the tag the game shows in tha
 `Lines` units: `F1`-`F4`, `D1`-`D3`, `PP1`-`PP2`, `PK1`-`PK3`, `G` (slot 1/2 as the lineup
 screen orders them), `SCR`. `Chem` is the unit's line-chemistry OVR impact, repeated on
 each row of the unit.
+
+`Teams`' `Off` / `Def` / `Goalie` are the club's **team ratings off the matchup screen** -
+offense, defense, goaltending - entered club by club as the user reports them and blank until
+then. His shorthand for them is the parenthesised triple after the opponent in the game notes:
+`G2 vs NJD (91 88 80)` is offense 91, defense 88, goaltending 80. Never estimate one.
 
 ---
 
@@ -245,6 +253,21 @@ Carried over from the baseball project because they're habits, not sport rules:
   any `Headlines` row that names the player. Photos live at `site/logos/players/<key>.png`
   where `<key>` is the name lowercased with punctuation stripped (`bhorvat`, `isorokin`); the
   crest stands in until a photo exists.
+- **A game logged before its screens still publishes.** Tier 3 (the play-by-play) carries the
+  `Games` row, the scoring, the recaps and the editorial; the team-stat columns stay empty, the
+  box score's SOG line prints `-`, and the game card's Team Stats section says
+  `End-of-period screens pending`. When the photos arrive, fill the same `GAME` block in
+  `add_game.py`, set `topup=True` and run it again: the row is topped up in place and the
+  goalie / skater rows are appended. A blank never overwrites something already logged.
+- **`Type` on a `Scoring` row carries the one thing worth flagging**, in the order
+  `SHG` > `PPG` > `GWG` > `EN` > `EV`, because the column holds a single label and the chip is
+  what the reader scans for. G1's overtime winner reads `GWG`; G2's opening goal reads `GWG`
+  even though it was even strength.
+- **The `Team Goaltending` totals row counts only the games the goalie log covers**, not every
+  game played, and the section says so (`1 of 2 games logged`). Season-to-date totals must
+  never imply coverage they do not have.
+- **Unknowns sort to the bottom of every table**, in both directions - a club with no rating,
+  a contract with no clause. `site.js` treats an empty cell and a `-` cell as unknown.
 - Still open, ask when they first arise: shootout goals in the skater log, empty-net goals
   against, TOI format, Three Stars vs. one Player of the Game.
 
@@ -325,12 +348,15 @@ deploy after every game**, not just the workbook.
 
 ## 10. Current state
 
-- **New York Islanders, Season 1, preseason.** In-game date 09/29/2026. Record 0-0-0.
-- Workbook seeded with the front-office and roster sheets in §4; **no game-log sheets yet**
-  because their columns are still the user's to give (§4). Do not invent them.
-- **G1 logged**: 09/30/2026 at TOR, 1-2 OTL. Record 0-0-1.
+- **New York Islanders, Season 1, regular season.** Record **1-0-1** through G2.
+- **G1 logged**: 09/30/2026 at TOR, 1-2 OTL. Kessel has the assist on Horvat's goal.
+- **G2 logged**: 10/03/2026 vs NJD, 6-1 W, the home opener. Six goals, six scorers, Schaefer
+  shorthanded. Team stats and both box scores are **held for the screens** (§7).
+- **Team Ratings** table on the Teams tab: every club, 72px crest, offense / defense /
+  goaltending, sortable, unknowns at the bottom. Only NJD (91/88/80) is filled in.
 - Site built from this repo: tabs Overview, Roster, Lines, Front Office, Schedule, Goalies,
-  vs. Divisions. Game-driven sections render `.empty` placeholders. Works offline once loaded
+  Teams (Team Ratings + vs. Divisions; the tab was `vs. Divisions` before the ratings table
+  joined it). Game-driven sections render `.empty` placeholders. Works offline once loaded
   (service worker, verified with the network cut). GitHub Pages serves `main` at the repo
   root: https://skiproads01.github.io/islanders-s1-tracker/ once the branch is merged and
   Pages is switched on.
@@ -340,9 +366,14 @@ deploy after every game**, not just the workbook.
   interested-first then by OVR, with `Roster Ref`'s `Ext` column as the `Interest` value
   (`Yes` / `No` / `-` when the screen did not say). Unsigned prospects are excluded: they need
   signing, not extending. It replaced the old Wants Extension table on the Roster tab.
+- A played schedule row now carries its result (`OTL 1-2`, `W 6-1`) where an upcoming row
+  carries the puck drop; only unplayed rows keep the `upcoming` styling.
 - Pending from the user: goalie contracts (Sorokin, Varlamov); the wordmark image file
   (`site/logos/wordmark.png`; the crest stands in until then); player photos
-  (`site/logos/players/`); and **the skater box score for G1** - the play-by-play supports
+  (`site/logos/players/`); **the skater box score for G1** - the play-by-play supports
   only Horvat's goal and the three NYI minors, so `Skater Game Log` is deliberately empty and
-  Skating Leaders / Team Skating render placeholders rather than partial totals.
+  Skating Leaders / Team Skating render placeholders rather than partial totals; **G2's four
+  team-stat screens and both box scores**, including which goalie started; **TOR's team
+  ratings**; and the franchise screen for the `Win the regular season home opener` owner goal,
+  which evaluated 10/03/2026 and stays `Open` until the game says otherwise.
 - `add_game.py` is the injection engine: edit its `GAME` block, run it, then `site/deploy.sh`.

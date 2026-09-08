@@ -11,6 +11,13 @@
     return t.toLowerCase();
   }
 
+  // A club with no rating yet, a contract with no clause: unknowns sort to the bottom
+  // in both directions rather than jumbling with real values.
+  function isBlank(td) {
+    var t = (td.textContent || "").trim();
+    return t === "" || t === "-" || t === "\u2013";
+  }
+
   function makeSortable(table) {
     var ths = table.tHeaders && table.tHeaders.length ? null : null;
     var headRow = table.querySelector("thead tr");
@@ -33,7 +40,8 @@
         var rows = all.filter(function (r) { return !r.classList.contains("tot"); });
         var tots = all.filter(function (r) { return r.classList.contains("tot"); });
         if (!rows.length) return;
-        var isText = typeof cellKey(rows[0].cells[col]) === "string";
+        var first = rows.filter(function (r) { return !isBlank(r.cells[col]); })[0] || rows[0];
+        var isText = typeof cellKey(first.cells[col]) === "string";
         var prev = th.getAttribute("aria-sort");
         // first click: text ascends A->Z, numbers descend high->low
         var dir = prev === "ascending" ? "descending"
@@ -45,6 +53,9 @@
         var sign = dir === "ascending" ? 1 : -1;
 
         rows.sort(function (a, b) {
+          var ba = isBlank(a.cells[col]), bb = isBlank(b.cells[col]);
+          if (ba !== bb) return ba ? 1 : -1;
+          if (ba) return 0;
           var ka = cellKey(a.cells[col]), kb = cellKey(b.cells[col]);
           if (ka < kb) return -1 * sign;
           if (ka > kb) return 1 * sign;

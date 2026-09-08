@@ -107,6 +107,10 @@ PTS = 2 * W + OTL
 def n(v):
     return 0 if v is None else v
 
+def dash(v):
+    """A figure that only the game's own screens can supply, before they arrive."""
+    return "-" if v is None else v
+
 GF = sum(n(g["GF"]) for g in games)
 GA = sum(n(g["GA"]) for g in games)
 SHOTS_F = sum(n(g["Shots F"]) for g in games)
@@ -438,7 +442,7 @@ def box_table(g):
         labels.append("OT"); fcells.append(n(g["OT F"])); acells.append(n(g["OT A"]))
     if n(g["SO F"]) + n(g["SO A"]):
         labels.append("SO"); fcells.append(n(g["SO F"])); acells.append(n(g["SO A"]))
-    labels += ["F", "SOG"]; fcells += [n(g["GF"]), n(g["Shots F"])]; acells += [n(g["GA"]), n(g["Shots A"])]
+    labels += ["F", "SOG"]; fcells += [n(g["GF"]), dash(g["Shots F"])]; acells += [n(g["GA"]), dash(g["Shots A"])]
     head = "<th></th>" + "".join("<th>%s</th>" % esc(x) for x in labels)
     def row(abbr, cells, win):
         tds = "".join('<td%s>%s</td>' % (' class="fin"' if i >= len(cells) - 2 else "", c) for i, c in enumerate(cells))
@@ -453,12 +457,16 @@ TEAMSTATS = [("Shots", "Shots F", "Shots A", None), ("Hits", "Hits F", "Hits A",
              ("Power Plays", "PP F", "PP A", None), ("Power Play Minutes", "PPM F", "PPM A", None),
              ("Shorthanded Goals", "SHG F", "SHG A", None)]
 
+def teamstat_pending(g):
+    """True when none of the end-of-period screens have been logged for this game."""
+    return all(g[kf] is None and g[ka] is None for _, kf, ka, _ in TEAMSTATS)
+
 def teamstat_table(g):
     body = []
     for label, kf, ka, suf in TEAMSTATS:
         vf, va = g[kf], g[ka]
-        sf = ("%s%s" % (vf, suf)) if suf else str(vf)
-        sa = ("%s%s" % (va, suf)) if suf else str(va)
+        sf = ("%s%s" % (vf, suf)) if (suf and vf is not None) else str(dash(vf))
+        sa = ("%s%s" % (va, suf)) if (suf and va is not None) else str(dash(va))
         body.append(("", [td(esc(sf), "tsv"), td(esc(label), "tsk"), td(esc(sa), "tsv")]))
     return table([TAG, "", g["Opp"]], body, cls="num tstat")
 
@@ -474,7 +482,8 @@ def scoring_table(g):
             who += ' <span class="gtot">(%d)</span>' % num
         if x["Type"] and x["Type"] != "EV":
             who += ' <span class="pos">%s</span>' % esc(x["Type"])
-        helpers = ", ".join(esc(v) for v in (x["A1"], x["A2"]) if v) or "unassisted"
+        helpers = ", ".join((pname(v) if x["Team"] == TAG else esc(v))
+                            for v in (x["A1"], x["A2"]) if v) or "unassisted"
         body.append(("", [td(esc(x["Period"])), td('<span class="tabbr sm">%s</span>' % esc(x["Team"])),
                           td(who), td(helpers), td(esc(x["Score"]), "num")]))
     return sec("Scoring", table(["Per", "", "Goal", "Assists", "Score"], body, cls=""))
@@ -497,7 +506,8 @@ def game_card(g, open_first=False):
             '<span class="gscore num">%s%s</span><span class="chev">&rsaquo;</span></summary>') % (
         int(g["G"]), rcls, esc(res if res in ("W", "L") else res), tlogo(g["Opp"], "mid"),
         "vs" if home else "@", esc(g["Opp"]), score, esc(tail))
-    body = box_table(g) + scoring_table(g) + sec("Team Stats", teamstat_table(g)) + sec("Recap", recap_html(g))
+    stats = empty("End-of-period screens pending") if teamstat_pending(g) else teamstat_table(g)
+    body = box_table(g) + scoring_table(g) + sec("Team Stats", stats) + sec("Recap", recap_html(g))
     if g["Summary"]:
         body += '<p class="gsum">%s</p>' % esc(g["Summary"])
     return '<details class="gamed %s"%s>%s<div class="gbody">%s</div></details>' % (
@@ -521,10 +531,13 @@ if goalie_log:
                           td(gs["svpct"]), td(gs["sa"]), td(gs["sv"]), td(gs["ga"]), td(gs["so"])]))
     tot_sa = sum(n(r["SA"]) for r in goalie_log); tot_sv = sum(n(r["SV"]) for r in goalie_log)
     tot_ga = sum(n(r["GA"]) for r in goalie_log)
-    foot = [td("Team"), td("%d-%d-%d" % (W, L, OTL)), td(GP),
+    logged = {r["G"] for r in goalie_log}
+    covered = [g for g in games if g["G"] in logged]
+    foot = [td("Team"), td(rec_of(covered)), td(len(covered)),
             td(("%.3f" % (tot_sv / tot_sa)).lstrip("0") if tot_sa else "-"), td(tot_sa), td(tot_sv), td(tot_ga),
             td(sum(n(r["SO"]) for r in goalie_log))]
-    overview += sec("Team Goaltending", table(["Goalie", "Record", "GP", "SV%", "SA", "SV", "GA", "SO"], body, tfoot=foot))
+    overview += sec("Team Goaltending", table(["Goalie", "Record", "GP", "SV%", "SA", "SV", "GA", "SO"], body, tfoot=foot),
+                    meta=None if len(covered) == GP else "%d of %d games logged" % (len(covered), GP))
 else:
     overview += sec("Team Goaltending", empty("No games played"))
 
@@ -702,13 +715,20 @@ def schedule_panel():
             month = mlabel
         home = g["H/A"] == "H"
         gn = int(g["G"])
-        cls = "home" if home else "away"
+        played = by_num.get(gn)
+        cls = ("home" if home else "away") + ("" if played else " upcoming")
         is_next = next_game is not None and gn == int(next_game["G"])
-        out += ('<div class="sgame upcoming %s%s"><span class="g">G%d</span>%s'
+        if played:
+            res = str(played["Result"])
+            rcls = {"W": "w", "L": "l"}.get(res, "ot")
+            tail = '<span class="sfin %s">%s %d&ndash;%d</span>' % (rcls, esc(res), n(played["GF"]), n(played["GA"]))
+        else:
+            tail = '<span class="stime">%s</span>' % esc(g["Time (ET)"])
+        out += ('<div class="sgame %s%s"><span class="g">G%d</span>%s'
                 '<div class="mu"><span class="opp"><span class="loc">%s</span> %s</span><span class="club">%s</span></div>'
-                '<div class="out"><span class="sdate">%s</span><span class="stime">%s</span></div></div>') % (
+                '<div class="out"><span class="sdate">%s</span>%s</div></div>') % (
             cls, " next" if is_next else "", gn, tlogo(g["Opp"], "big"), "vs" if home else "@", esc(g["Opp"]),
-            esc(team_name.get(g["Opp"], "")), esc(d.strftime("%a %b %-d")), esc(g["Time (ET)"]))
+            esc(team_name.get(g["Opp"], "")), esc(d.strftime("%a %b %-d")), tail)
     out += "</div>"
     n_home = sum(1 for g in schedule if g["H/A"] == "H")
     return sec("Schedule", out, meta="%d of %d played &middot; %d home &middot; %d away" % (GP, len(schedule), n_home, len(schedule) - n_home))
@@ -750,6 +770,25 @@ if opp_goalies:
     goalies_html += sec("Goalies Faced", table(["Goalie", "Team", "G", "Dec", "SA", "SV", "GA", "SV%"], body),
                         meta="%d faced" % len({pkey(r["Goalie"]) for r in opp_goalies}))
 
+RATINGS = ["Off", "Def", "Goalie"]   # the matchup screen's team ratings, entered club by club
+
+def ratings_table():
+    body = []
+    for t in sorted(teams, key=lambda t: t["Team"]):
+        cells = [td(tlogo(t["Abbr"], "big"), "rlogo"),
+                 td('<span class="rteam">%s</span><span class="rabbr">%s</span>'
+                    % (esc(t["Team"]), esc(t["Abbr"])), "rname"),
+                 td(esc(t["Division"]), "rdiv")]
+        for k in RATINGS:
+            v = t.get(k)
+            cells.append(td('<span class="rv">%s</span>' % esc(v) if v is not None
+                            else '<span class="dash">-</span>'))
+        body.append((' class="you"' if t["Abbr"] == TAG else "", cells))
+    return table(["", "Team", "Div", "Off", "Def", "Goalie"], body, cls="num ratings")
+
+rated = sum(1 for t in teams if any(t.get(k) is not None for k in RATINGS))
+teams_html = sec("Team Ratings", ratings_table(), meta="%d of %d clubs rated" % (rated, len(teams)))
+
 DIV_ORDER = ["Metropolitan", "Atlantic", "Central", "Pacific"]   # own division first
 divs = OrderedDict()
 for t in sorted(teams, key=lambda t: (DIV_ORDER.index(t["Division"]), t["Team"])):
@@ -771,12 +810,12 @@ for (conf, div), ts in divs.items():
     trs = "".join(cells)
     drec = rec_of([g for g in games if g["Opp"] in {t["Abbr"] for t in ts}]).replace("-", "&ndash;")
     div_html += '<div class="div-head"><span class="div-name">%s</span><span class="div-rec">%s</span></div><div class="teams">%s</div>' % (esc(div), drec, trs)
-divisions_html = sec("vs. Divisions", div_html, meta="record vs each club")
+teams_html += sec("vs. Divisions", div_html, meta="record vs each club")
 
 # ------------------------------------------------------------------ page
 TABS = [("p-overview", "Overview", overview), ("p-roster", "Roster", roster_html), ("p-lines", "Lines", lines_html),
         ("p-front", "Front Office", fo), ("p-schedule", "Schedule", schedule_html), ("p-goalies", "Goalies", goalies_html),
-        ("p-divisions", "vs. Divisions", divisions_html)]
+        ("p-teams", "Teams", teams_html)]
 tabs = "".join('<button class="tab%s" role="tab" aria-selected="%s" data-panel="%s">%s</button>' % (
     " is-active" if i == 0 else "", "true" if i == 0 else "false", pid, esc(label)) for i, (pid, label, _) in enumerate(TABS))
 panels = "".join('<div class="panel%s" id="%s" role="tabpanel">%s</div>' % (" is-active" if i == 0 else "", pid, body)
