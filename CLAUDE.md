@@ -407,13 +407,21 @@ deploy after every game**, not just the workbook.
 
 ## 10. Current state
 
-- **New York Islanders, Season 1, regular season.** Record **1-0-1** through G2.
+- **New York Islanders, Season 1, regular season.** Record **1-1-1** through G3.
 - **G1 logged**: 09/30/2026 at TOR, 1-2 OTL. Kessel has the assist on Horvat's goal.
 - **G2 logged**: 10/03/2026 vs NJD, 6-1 W, the home opener. Six goals, six scorers, Schaefer
   shorthanded. Team stats came in on a second pass (`topup=True`) from the 1st, 2nd and final
   screens; per-period shots and hits were differenced from the cumulative ones. Both box
   scores are still **held for the screens** (§7). PP 1/5 with the only goal in the 3rd is what
   confirmed Cizikas' goal was even strength.
+- **G3 logged**: 10/06/2026 at NYR, 2-4 L. New York scored **three shorthanded goals** while NYI
+  went 1 for 8 on the power play and out-shot them 47-31. All three team-stat screens (1st, 2nd,
+  final) were photographed; per-period shots and hits were differenced from the cumulative ones.
+  The **third shorthanded goal is assigned to Dorofeyev** rather than Lafreniere: `SHG A` reads 2
+  after the 2nd and 3 at the final, NYR scored twice in the 3rd and took no power play in it, and
+  Dorofeyev's came straight off Heineman's power-play goal with penalties still being served.
+  **No `Opp Goaltending` row** - the Rangers goalie is not named in the notes and there is no box
+  score screen. Sorokin is logged 31 SA / 27 SV / 4 GA, L.
 - **Team Ratings** table on the Teams tab: every club, 72px crest, offense / defense /
   goaltending, sortable, unknowns at the bottom. **All 32 clubs are rated.** NYI reads
   **88/89/93** (offense rose from 87 on 10/03/2026); the league's best goaltending is NYI's
@@ -454,6 +462,7 @@ deploy after every game**, not just the workbook.
   only Horvat's goal and the three NYI minors, so `Skater Game Log` is deliberately empty and
   Skating Leaders / Team Skating render placeholders rather than partial totals; **G2's skater box
   score** (Sorokin's 42 SA / 41 SV / 1 GA win and Rittich's 35 SA / 29 SV are both logged;
-  Rittich carries no first initial, which the screen would supply); and the franchise screen for the `Win the regular season home opener` owner goal,
+  Rittich carries no first initial, which the screen would supply); **G3's skater box score and
+  the name of the Rangers goalie**; and the franchise screen for the `Win the regular season home opener` owner goal,
   which evaluated 10/03/2026 and stays `Open` until the game says otherwise.
 - `add_game.py` is the injection engine: edit its `GAME` block, run it, then `site/deploy.sh`.

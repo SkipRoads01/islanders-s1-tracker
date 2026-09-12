@@ -29,72 +29,75 @@ WB = ROOT / "S1 NY Islanders.xlsx"
 # arrive, fill the same block in, set topup=True, and run again: the Games row is
 # topped up in place and the goalie / skater rows are appended.
 GAME = dict(
-    g=2, date="10/03/2026", opp="NJD", ha="H",
-    result="W",                        # W / L / OTL / SOL
-    topup=True,
+    g=3, date="10/06/2026", opp="NYR", ha="A",
+    result="L",                        # W / L / OTL / SOL
+    topup=False,
     # period lines: (NYI, OPP) goals and shots and hits, in order 1,2,3,OT,SO
-    goals=[(3, 0), (0, 1), (3, 0)],
-    shots=[(12, 19), (4, 14), (19, 9)],
-    hits=[(12, 14), (9, 6), (19, 14)],
+    # 1st and 2nd intermission screens plus the final, differenced into per-period lines
+    goals=[(1, 2), (0, 0), (1, 2)],
+    shots=[(12, 8), (10, 12), (25, 11)],
+    hits=[(14, 10), (18, 14), (12, 13)],
     # final team stats, exactly as the game's screen shows them
-    toa=("07:31", "05:44"), passing=(74.4, 89.2), fow=(14, 32),
-    pim=("06:00", "10:00"), pp=("1/5", "0/3"), ppm=("07:05", "05:32"), shg=(1, 0),
-    goalies=[dict(goalie="I. Sorokin", dec="W", sa=42, sv=41, ga=1, toi="60:00", start="Start")],
-    opp_goalies=[dict(goalie="Rittich", catches="R", dec="L", sa=35, sv=29, ga=6, toi="60:00")],
+    toa=("11:53", "03:12"), passing=(78.9, 91.7), fow=(13, 27),
+    pim=("08:00", "16:00"), pp=("1/8", "0/4"), ppm=("08:09", "03:07"), shg=(0, 3),
+    goalies=[dict(goalie="I. Sorokin", dec="L", sa=31, sv=27, ga=4, toi="60:00", start="Start")],
+    # the Rangers goalie is not named in the notes and there is no box score screen
+    opp_goalies=[],
     skaters=[],
-    # scoring: the site adds the scorer's running season total in parens, so do not type it here
+    # scoring: the site adds the scorer's running season total in parens, so do not type it here.
+    # Score is NYI-first here; recap prose is leader-first, per the user's own shorthand.
     scoring=[
-        dict(per="1", team="NYI", scorer="K. Palmieri", a1="B. Horvat",   a2="M. Schaefer", typ="GWG", score="1-0"),
-        dict(per="1", team="NYI", scorer="A. Duclair",  a1="B. Schenn",   a2="A. Pelech",   typ="EV",  score="2-0"),
-        dict(per="1", team="NYI", scorer="M. Schaefer", a1="C. Cizikas",  a2="M. Kessel",   typ="SHG", score="3-0"),
-        dict(per="2", team="NJD", scorer="J. Bratt",    a1=None,          a2=None,          typ="EV",  score="3-1"),
-        dict(per="3", team="NYI", scorer="B. Schenn",   a1="M. Coronato", a2="M. Schaefer", typ="PPG", score="4-1"),
-        dict(per="3", team="NYI", scorer="C. Cizikas",  a1=None,          a2=None,          typ="EV",  score="5-1"),
-        dict(per="3", team="NYI", scorer="M. Maccelli", a1=None,          a2=None,          typ="EV",  score="6-1"),
+        dict(per="1", team="NYR", scorer="M. Rempe",      a1=None,        a2=None, typ="SHG", score="0-1"),
+        dict(per="1", team="NYR", scorer="J. Veleno",     a1=None,        a2=None, typ="SHG", score="0-2"),
+        dict(per="1", team="NYI", scorer="A. Romanov",    a1="M. Maccelli", a2=None, typ="EV",  score="1-2"),
+        dict(per="3", team="NYI", scorer="E. Heineman",   a1="M. Barzal", a2=None, typ="PPG", score="2-2"),
+        dict(per="3", team="NYR", scorer="P. Dorofeyev",  a1=None,        a2=None, typ="SHG", score="2-3"),
+        dict(per="3", team="NYR", scorer="A. Lafreniere", a1=None,        a2=None, typ="EV",  score="2-4"),
     ],
     recap=[
-        ("1", "Horvat breaks in on the left post and goes cross slot to Palmieri (1), who one-times it from "
-              "inside the hash in the left circle (1-0). Duclair (1) skates in on a delayed penalty and dekes "
-              "to a backhand at the right post (2-0). Gritsyuk slashing. Noesen slashing, 5-on-3. Schenn hooking. "
-              "Palmieri tripping, 5-on-3 the other way. Pageau hooking, 5-on-3 for 6 seconds. Schaefer (1) goes "
-              "down broadway on the break and has hands on Rittich shorthanded (3-0)."),
-        ("2", "Bratt rebounds himself at the right post after a flurry of shots to start the period (3-1)."),
-        ("3", "Mantha slashing. Bjugstad holding, 5-on-3. Coronato feeds Schenn (1), who finishes from above "
-              "the hash in the right circle on the power play (4-1). Hischier interference. Cizikas (1) is "
-              "credited after losing the puck at the side of the net and watching Bratt knock it into his own "
-              "net (5-1). Maccelli (1) breaks away with two defensemen in tow and has hands down the slot on "
-              "Rittich (6-1)."),
+        ("1", "Bjorkstrand charging. Rempe strips Barzal along the wall and beats Sorokin blocker side "
+              "shorthanded (1-0). Veleno takes it off the boards after the Isles lose the puck in their own "
+              "end and makes it two shorthanded goals in the period (2-0). Romanov (1) one-times Maccelli's "
+              "pass from above the left dot out of the high slot (2-1). Dorofeyev elbowing. Sorokin leaves "
+              "the ice behind his own net and takes a delay of game, 4-on-4. Cuylle slashing. Cizikas "
+              "boarding, 4-on-4 again. Dorofeyev interference with 30 seconds left."),
+        ("2", "Heineman slashing, more 4-on-4 to start the period. Palmieri hooking. Neither side scored."),
+        ("3", "Rempe charging at 12:06. Miller charging behind him, 5-on-3 for a minute, and Schneider "
+              "penalized on top of it. Barzal finds Heineman (1) at the left post on the power play (2-2). "
+              "Dorofeyev answers in alone on Sorokin with New York still a man down (3-2). Seven and a half "
+              "minutes left. Lafreniere breaks in alone and has hands in close (4-2)."),
     ],
     inside=[
         # the story lead already prints the record, so a bullet restating it is dead copy
-        "<b>Six</b> different Islanders scored in G2 vs. NJD; the team had one goal in G1 at TOR.",
-        "NYI took the 1st and the 3rd <b>3-0</b> in G2 vs. NJD and lost the 2nd <b>1-0</b>.",
-        "Three NYI minors in the 1st of G2 vs. NJD handed New Jersey two 5-on-3 power plays, the second of them "
-        "6 seconds long, and the only goal scored during either went the other way.",
-        "NYI won G2 vs. NJD by five while being outshot <b>42-35</b> and winning <b>14 of 46 faceoffs (30%)</b>.",
-        "The Isles have killed all <b>6</b> power plays they have faced this season and are <b>1 for 7</b> on their "
-        "own, the goal coming in the 3rd of G2 vs. NJD.",
-        # topup passes ignore the editorial lists; these two were appended to the Inside sheet
-        # directly when the screens arrived.
+        "The Isles have killed all <b>10</b> power plays they have faced this season, but New York scored "
+        "<b>three</b> shorthanded goals in G3 at NYR.",
+        "NYI has out-shot its opponent once in three games, <b>47-31</b> in G3 at NYR, and lost by two.",
+        "Eight power plays and <b>8:09</b> with the extra man in G3 at NYR produced one goal. NYI is "
+        "<b>2 for 15</b> on the season, both goals in the 3rd period.",
+        "NYI has won <b>48 of 123 faceoffs (39%)</b> this season and <b>13 of 40</b> in G3 at NYR.",
+        "<b>Five</b> of the nine goals NYI has scored this season have come in the 1st period.",
     ],
     headlines=[
-        (41, "Saves", "The only puck past <b>Sorokin</b> in G2 vs. NJD was Bratt's own rebound in the 2nd; he is "
-                      "at three goals allowed through two starts.", "active"),
-        (3, "Points", "<b>Schaefer</b> set up the opening goal, fed Schenn on the power play and scored "
-                      "shorthanded himself in G2 vs. NJD, a three-point night from a 19-year-old defenseman.", "active"),
-        (2, "Points", "<b>Schenn</b> found Duclair at the right post in the 1st and finished Coronato's pass "
-                      "from above the right circle in the 3rd of G2 vs. NJD.", "active"),
-        (1, "Goals", "<b>Palmieri</b> one-timed Horvat's cross-slot feed from the left circle to open the "
-                     "scoring in G2 vs. NJD, the first of six Islanders goals.", "active"),
-        (2, "Games", "<b>Horvat</b> has a point in each of the first two games: the goal in G1 at TOR and the "
-                     "primary assist on Palmieri's opener in G2 vs. NJD.", "active"),
-        (1, "Goals", "<b>Maccelli</b> outran two defensemen down the slot and beat Rittich for the last of the "
-                     "six in G2 vs. NJD.", "active"),
+        (27, "Saves", "<b>Sorokin</b> stopped 27 of 31 in G3 at NYR and gave up four goals in a night after "
+                      "allowing three across his first two starts combined.", "active"),
+        (1, "Goals", "<b>Romanov</b> one-timed Maccelli's feed out of the high slot in the 1st of G3 at NYR, "
+                     "the defenseman's first of the season and the only Islanders goal until the 3rd.", "active"),
+        (1, "Goals", "<b>Heineman</b> finished Barzal's pass at the left post to pull G3 at NYR level at 2-2, "
+                     "the only goal NYI got out of eight power plays.", "active"),
+        (1, "Assists", "<b>Barzal</b> picked up his first point of the season on the tying goal in the 3rd of "
+                       "G3 at NYR.", "active"),
+        (2, "Games", "<b>Maccelli</b> has a point in each of the last two: the sixth goal in G2 vs. NJD and the "
+                     "feed to Romanov in G3 at NYR.", "active"),
+        (2, "Games", "<b>Horvat</b>'s point streak ended at two in G3 at NYR.", "past"),
     ],
-    summary="Six goals from six different scorers in the home opener, three of them in the first period. "
-            "New Jersey's only reply came off its own rebound.",
-    notes="Team stats and both box scores held for the screens; the play-by-play carries the scoring, the "
-          "penalties and nothing else.",
+    summary="Out-shot New York 47-31 and drew eight power plays, but gave up three shorthanded goals and "
+            "lost a game they had pulled level at 2-2 in the 3rd.",
+    notes="Team stats from the 1st and 2nd intermission screens and the final; per-period shots and hits "
+          "differenced from the cumulative ones. Both box scores held for the screens. The Rangers goalie is "
+          "not named anywhere, so Opp Goaltending has no row. New York's third shorthanded goal is assigned to "
+          "Dorofeyev: the screens put SHG A at 2 after the 2nd and 3 at the final, NYR scored twice in the 3rd "
+          "and took no power play in it, and Dorofeyev's came straight off the Heineman power-play goal with "
+          "penalties still being served. Lafreniere's is logged even strength.",
 )
 # ===========================================================================
 
