@@ -240,13 +240,22 @@ Carried over from the baseball project because they're habits, not sport rules:
 - **Only prose gets `table-layout: fixed`.** A table of names, positions and money (Extension
   Eligible) sizes to its content with `white-space: nowrap`; fixed widths dumped the slack into
   the Player column and broke `LD/RD` and the `M` of `$0.975M` onto second lines. Owner Goals
-  and Transactions keep fixed layout because they carry sentences.
+  keeps fixed layout because it carries sentences; Transactions keeps it on desktop only, and
+  goes to `auto` on a phone (see the scrolling rule below).
 - **A table must fit its column; horizontal scrolling is a defect.** The chrome's default
   `tbody td { white-space: nowrap }` is what pushes the last column off-screen, so any table
   carrying prose or long strings needs `table-layout: fixed`, per-column widths, and
   `white-space: normal; overflow-wrap: anywhere`. Verify at 390px as well as desktop, and
-  remember a `nowrap` chip inside a cell sets the floor for that column. Drop the least
-  important columns on a phone rather than letting the table scroll.
+  remember a `nowrap` chip inside a cell sets the floor for that column.
+- **A table of short atomic values scrolls on a phone; only a prose table gets squeezed.**
+  The user's ruling, and it overrides the older "drop columns rather than scroll" line for
+  this shape of table. Cramming Transactions' six columns into 390px broke every asset into
+  slivers - `NYI 2027 / R3 / I. George / (D, / $0.915M)` - so under 560px it goes
+  `table-layout: auto` with `white-space: nowrap` and scrolls sideways inside `.tbl-scroll`.
+  `pieces()` already puts each asset on its own line, so nowrap keeps each one whole. **The
+  page itself must still never scroll** - only the table does; check
+  `document.documentElement.scrollWidth` on every tab after the change. A table carrying
+  actual sentences (Owner Goals) still wraps and fits.
 - **The same floor rule applies to a grid, and `1fr` does not cap a track.** `1fr` means
   `minmax(auto, 1fr)`, so a track grows past its share when its content's min-content width
   is wider, and one wide tile pushes the whole page sideways. Strips use
@@ -315,6 +324,9 @@ Carried over from the baseball project because they're habits, not sport rules:
   table - columns, not prose - so the two can never drift; if the duplication grates, the
   ledger is the one to drop, not the wire. The tab sits after Front Office: transactions are
   front-office business, and Overview / Roster / Lines stay the daily-read tabs.
+- **Transactions read newest first**, in the ledger and the wire alike: days descending,
+  and within a day the sheet's own order, so a waiver claim still sits above the assignment
+  it caused. `txn_order()` is shared by both so the two can never drift.
 - **A wire sentence carries the outcome; the chip carries the category.** `Waivers` +
   `Accepted` reads "Claimed ... off waivers", not a "Waivers" chip beside an "Accepted" chip
   that says nothing about what was accepted. Player names in the wire are clickable like

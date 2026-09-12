@@ -98,6 +98,10 @@ the one sheet, so nothing can drift.
   set the tile's floor). The strip is three across under 560px. Check
   `document.documentElement.scrollWidth` against the viewport on **every tab** at 360 and
   390px after any layout change; a single wide value on one tab is enough to break it.
+- **The Transactions ledger scrolls on a phone** (`table-layout: auto` + `nowrap` under
+  560px) instead of cramming its six columns; the page around it still must not scroll.
+  Both the ledger and the wire order rows through `txn_order()` - newest day first, sheet
+  order within a day.
 - **A table must fit its column.** The chrome's default is `tbody td { white-space: nowrap }`,
   which pushes the last column off-screen. A table carrying prose needs `table-layout: fixed`,
   per-column widths and `white-space: normal; overflow-wrap: anywhere`. Verify at 390px.

@@ -656,6 +656,19 @@ def affil_tile(name):
     ini = "".join(w[0] for w in re.split(r"[^A-Za-z]+", str(name)) if w)[:3].upper()
     return '<span class="tabbr sm" title="%s">%s</span>' % (esc(name), esc(ini or "-"))
 
+def txn_order(rows):
+    """Newest day first, and within a day the sheet's own order, which is chronological -
+    a claim stays above the assignment it caused. The ledger and the wire share this so the
+    two can never read differently."""
+    keyed = []
+    for i, t in enumerate(rows):
+        try:
+            k = dt.datetime.strptime(str(t["Date"]), "%m/%d/%Y").date().toordinal()
+        except ValueError:
+            k = 0
+        keyed.append((-k, i, t))
+    return [t for _, _, t in sorted(keyed, key=lambda x: (x[0], x[1]))]
+
 def txn_row(t):
     res = str(t["Result"])
     partner = str(t["Partner"] or "-")
@@ -667,7 +680,7 @@ def txn_row(t):
 
 declined = sum(1 for t in trades if str(t["Result"]) == "Declined")
 gm = sec("Transactions", table(["Date", "Type", "Team", "NYI sends", "NYI gets", "Result"],
-    [txn_row(t) for t in trades], cls="txn"),
+    [txn_row(t) for t in txn_order(trades)], cls="txn"),
     meta="%d logged &middot; %d declined" % (len(trades), declined))
 
 # players whose deal runs out after this season - the ones an extension can be offered to
@@ -790,8 +803,8 @@ def news_card(t):
 def news_panel():
     if not trades:
         return sec("Transactions", empty("No transactions logged"))
-    days = []           # the sheet is chronological, so a date change starts a new day
-    for t in trades:
+    days = []           # already newest-day-first, so a date change starts a new day
+    for t in txn_order(trades):
         raw = str(t["Date"])
         try:
             d = dt.datetime.strptime(raw, "%m/%d/%Y").date()
@@ -803,7 +816,7 @@ def news_panel():
         days[-1][2].append(t)
     feed = "".join('<div class="news-day">%s</div><div class="news">%s</div>'
                    % (esc(label), "".join(news_card(t) for t in ts))
-                   for _, label, ts in sorted(days, key=lambda x: -x[0]))
+                   for _, label, ts in days)
     return sec("Transactions", '<div class="newswire">%s</div>' % feed,
                meta="%d logged &middot; %d declined" % (len(trades), declined))
 
