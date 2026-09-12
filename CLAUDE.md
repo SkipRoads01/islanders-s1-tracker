@@ -150,7 +150,7 @@ goals/shots/hits come from the four cumulative screens differenced into per-peri
 `Transactions` covers everything the front office is offered or does, not just trades: `Type`
 is `Trade offer`, `Signing`, `Waivers`, `Assignment` or the like. **`Result` is written in the
 vocabulary of the `Type`**, not one accept/decline word for everything: a `Trade offer` is
-`Accepted` / `Declined`, a `Waivers` row is `Claimed` / `Passed`, and an `Assignment` is `-`,
+`Accepted` / `Declined`, a `Waivers` row is `Claimed` / `Declined`, and an `Assignment` is `-`,
 because sending a player to the affiliate is a roster move with no accept-or-decline outcome
 to report - the same reason a waiver claim's `Partner` is `-`. On a `Waivers` row `Direction`
 is `Claim` and `Partner` is `-`, because a waiver claim has no counterparty. On an `Assignment` row `Direction` is `To AHL` / `To NHL`, `Partner`
@@ -337,6 +337,10 @@ Carried over from the baseball project because they're habits, not sport rules:
 - **A partner with no crest shows its initials in the ledger and its full name in the wire.**
   The ledger's Team column is 42px - wide enough for a crest, not for "Hamilton Hammers",
   which would break mid-word - so `affil_tile()` renders `HH` with the name on `title`.
+- **Vocabulary comes from the game and the sport, never from what reads better.** A waiver
+  a club does not claim is `Declined`, not `Passed` - `Passed` was freelanced and had to be
+  reverted. The same applies to every label the site prints: if the screen or the sport has a
+  word for it, that is the word, and if neither does, ask rather than coin one.
 - **A figure derived by arithmetic from two screens is data; a figure that is merely likely
   is not.** Sorokin's 28-29 and 29-30 cap hits were never photographed, but the In the System
   screen's 29-30 footer reads $54.050M against $45.800M of skater salary - a difference of

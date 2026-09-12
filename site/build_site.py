@@ -674,7 +674,7 @@ def txn_row(t):
     partner = str(t["Partner"] or "-")
     tm = tlogo(partner, "xs") if partner in team_name else (
         affil_tile(partner) if partner != "-" else '<span class="dash">-</span>')
-    cls = {"Accepted": "ok", "Claimed": "ok", "Declined": "no", "Passed": "no"}.get(res, "unk")
+    cls = {"Accepted": "ok", "Claimed": "ok", "Declined": "no"}.get(res, "unk")
     chip = ('<span class="dash">-</span>' if res in ("-", "", "None")
             else '<span class="txres %s">%s</span>' % (cls, esc(res)))
     return ("", [td(esc(txn_date(t["Date"]))), td(esc(t.get("Type") or "-")), td(tm),
@@ -684,7 +684,7 @@ def res_count(*names):
     return sum(1 for t in trades if str(t["Result"]) in names)
 
 txn_meta = "%d logged &middot; %d declined &middot; %d claimed" % (
-    len(trades), res_count("Declined"), res_count("Claimed"))
+    len(trades), res_count("Declined"), res_count("Claimed"))   # each word is a Result value
 gm = sec("Transactions", table(["Date", "Type", "Team", "NYI sends", "NYI gets", "Result"],
     [txn_row(t) for t in txn_order(trades)], cls="txn"),
     meta=txn_meta)

@@ -73,7 +73,7 @@ News sheet and no prose column. One card per row, grouped by date, newest day fi
 | `Signing` | `Signed <who>.` |
 
 `Result` is written in the vocabulary of the `Type` - `Accepted`/`Declined` for a trade,
-`Claimed`/`Passed` on waivers, `-` for an assignment - so `news_line()` and the ledger's chip
+`Claimed`/`Declined` on waivers, `-` for an assignment - so `news_line()` and the ledger's chip
 both key off those words, not off a single "Accepted". A `-` renders as a muted dash, never a
 green chip.
 
