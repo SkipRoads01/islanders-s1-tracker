@@ -586,7 +586,7 @@ scratched = [p for p in main_sk if p.get("Status") == "Scratched"]
 roster_html = sec("Main Roster", roster_table(main_sk),
                   meta="%d skaters &middot; %d dressed &middot; %d scratched" % (len(main_sk), len(dressed), len(scratched)))
 roster_html += sec("Goalies", roster_table(main_g, goalie=True), meta="contracts pending")
-roster_html += sec("In the System", roster_table(system), meta="%d skaters" % len(system))
+roster_html += sec("In the System", roster_table(system), meta="%d players" % len(system))
 
 # ---- lines
 by_unit = defaultdict(list)
@@ -644,10 +644,17 @@ def txn_date(v):
     except ValueError:
         return str(v)
 
+def affil_tile(name):
+    """A partner with no crest - the AHL affiliate on an assignment. The Team column is
+    42px wide, so the ledger takes its initials and the News wire spells it out."""
+    ini = "".join(w[0] for w in re.split(r"[^A-Za-z]+", str(name)) if w)[:3].upper()
+    return '<span class="tabbr sm" title="%s">%s</span>' % (esc(name), esc(ini or "-"))
+
 def txn_row(t):
     res = str(t["Result"])
     partner = str(t["Partner"] or "-")
-    tm = tlogo(partner, "xs") if partner in team_name else '<span class="dash">-</span>'
+    tm = tlogo(partner, "xs") if partner in team_name else (
+        affil_tile(partner) if partner != "-" else '<span class="dash">-</span>')
     return ("", [td(esc(txn_date(t["Date"]))), td(esc(t.get("Type") or "-")), td(tm),
                  td(pieces(t["Out"])), td(pieces(t["In"])),
                  td('<span class="txres %s">%s</span>' % ("ok" if res == "Accepted" else "no", esc(res)))])
@@ -720,6 +727,81 @@ fo += sec("League Cap Rules", table(["Rule", "Value"],
     [("", [td(esc(k.replace(" ($M)", ""))), td("$%sM" % mnum(front[k]))])
      for k in ("Salary Cap ($M)", "Salary Cap Floor ($M)", "Max Player Salary ($M)",
                "Min Player Salary ($M)", "Max Rookie Salary ($M)")], cls=""))
+
+# ---- news: the transaction wire
+# Generated from the Transactions sheet so there is one source of truth. Front Office
+# keeps the ledger table (who/what/result in columns); this is the reader's feed, one
+# plain sentence per move, newest day first.
+NEWS_LABEL = {"Trade offer": "Trade"}
+PIECE_NAME = re.compile(r"^([A-Z]\.\s*[A-Za-z\'\-]+)")
+
+def bits_of(v):
+    """'A; B' -> ['A', 'B']. A '-' is an empty field, not a piece."""
+    return [x.strip() for x in str(v or "").split(";") if x.strip() and x.strip() != "-"]
+
+def and_join(xs):
+    if not xs:
+        return ""
+    return xs[0] if len(xs) == 1 else ", ".join(xs[:-1]) + " and " + xs[-1]
+
+def piece(s):
+    """'I. George (D, $0.915M)' -> clickable name plus the rest. A draft pick passes through."""
+    m = PIECE_NAME.match(s)
+    if m and pkey(m.group(1)) in PLAYERS:
+        return pname(m.group(1), "pname strong") + esc(s[m.end():])
+    return esc(s)
+
+def news_line(t):
+    """One wire sentence. The chip names the category; the sentence carries the move."""
+    typ = str(t.get("Type") or "").strip()
+    res = str(t.get("Result") or "").strip()
+    partner = str(t.get("Partner") or "-").strip()
+    club = esc("" if partner == "-" else team_name.get(partner, partner))
+    out = and_join([piece(x) for x in bits_of(t["Out"])])
+    inn = and_join([piece(x) for x in bits_of(t["In"])])
+    if typ == "Trade offer":
+        if res == "Accepted":
+            return "Acquired %s from the %s for %s." % (inn, club, out)
+        return "Declined a %s offer of %s for %s." % (club, inn, out)
+    if typ == "Waivers":
+        who = inn or out
+        return ("Claimed %s off waivers." if res == "Accepted" else "Did not claim %s off waivers.") % who
+    if typ == "Assignment":
+        return "Assigned %s to the %s." % (out or inn, club or "minors")
+    if typ == "Signing":
+        return ("Signed %s." if res != "Declined" else "Did not sign %s.") % (inn or out)
+    parts = [x for x in ("in " + inn if inn else "", "out " + out if out else "") if x]
+    return "%s: %s." % (esc(typ or "Move"), "; ".join(parts) or esc(res))
+
+def news_card(t):
+    partner = str(t.get("Partner") or "-").strip()
+    typ = str(t.get("Type") or "").strip()
+    logo = tlogo(partner, "xs") if partner in team_name else ""
+    return ('<article class="nws"><div class="nws-k"><span class="ntype">%s</span>%s</div>'
+            '<p class="nws-t">%s</p></article>') % (
+        esc(NEWS_LABEL.get(typ, typ or "Move")), logo, news_line(t))
+
+def news_panel():
+    if not trades:
+        return sec("Transactions", empty("No transactions logged"))
+    days = []           # the sheet is chronological, so a date change starts a new day
+    for t in trades:
+        raw = str(t["Date"])
+        try:
+            d = dt.datetime.strptime(raw, "%m/%d/%Y").date()
+            key, label = d.toordinal(), d.strftime("%B %-d, %Y")
+        except ValueError:
+            key, label = 0, raw
+        if not days or days[-1][0] != key:
+            days.append((key, label, []))
+        days[-1][2].append(t)
+    feed = "".join('<div class="news-day">%s</div><div class="news">%s</div>'
+                   % (esc(label), "".join(news_card(t) for t in ts))
+                   for _, label, ts in sorted(days, key=lambda x: -x[0]))
+    return sec("Transactions", '<div class="newswire">%s</div>' % feed,
+               meta="%d logged &middot; %d declined" % (len(trades), declined))
+
+news_html = news_panel()
 
 # ---- schedule / goalies / divisions
 def schedule_panel():
@@ -836,8 +918,8 @@ teams_html += sec("vs. Divisions", div_html, meta="record vs each club")
 
 # ------------------------------------------------------------------ page
 TABS = [("p-overview", "Overview", overview), ("p-roster", "Roster", roster_html), ("p-lines", "Lines", lines_html),
-        ("p-front", "Front Office", fo), ("p-schedule", "Schedule", schedule_html), ("p-goalies", "Goalies", goalies_html),
-        ("p-teams", "Teams", teams_html)]
+        ("p-front", "Front Office", fo), ("p-news", "News", news_html), ("p-schedule", "Schedule", schedule_html),
+        ("p-goalies", "Goalies", goalies_html), ("p-teams", "Teams", teams_html)]
 tabs = "".join('<button class="tab%s" role="tab" aria-selected="%s" data-panel="%s">%s</button>' % (
     " is-active" if i == 0 else "", "true" if i == 0 else "false", pid, esc(label)) for i, (pid, label, _) in enumerate(TABS))
 panels = "".join('<div class="panel%s" id="%s" role="tabpanel">%s</div>' % (" is-active" if i == 0 else "", pid, body)

@@ -179,7 +179,9 @@
   @media (max-width: 560px) {
     table.txn, table.ext { font-size: 11.5px; }
     table.txn tbody td, table.ext tbody td, table.txn thead th, table.ext thead th { padding: 7px 5px; }
-    table.txn tbody td:nth-child(1), table.txn thead th:nth-child(1) { width: 64px; }
+    /* 60px: 'Deslauriers' needed one more pixel than the prose columns had, and
+       the date is the column with slack ('10/03/26' measures 48px). */
+    table.txn tbody td:nth-child(1), table.txn thead th:nth-child(1) { width: 60px; }
     table.txn tbody td:nth-child(2), table.txn thead th:nth-child(2) { width: 58px; }
     table.txn tbody td:nth-child(3), table.txn thead th:nth-child(3) { width: 34px; }
     table.txn tbody td:nth-child(6), table.txn thead th:nth-child(6) { width: 62px; }
@@ -192,7 +194,14 @@
     table.goals tbody td:nth-child(3), table.goals thead th:nth-child(3) { width: 56px; }
     table.goals tbody td:nth-child(4), table.goals thead th:nth-child(4) { width: 68px; }
     table.goals tbody td:nth-child(5), table.goals thead th:nth-child(5) { width: 52px; }
-    table.txn tbody td:nth-child(2), table.txn thead th:nth-child(2) { width: 50px; }
+    /* Type holds single words - Waivers, Assignment - and `overflow-wrap: anywhere`
+       was breaking them mid-word ("Waiver / s"). Wrap at spaces only, and give the
+       column enough room for the longest of them at this size. */
+    table.txn tbody td:nth-child(2), table.txn thead th:nth-child(2) {
+      width: 66px; font-size: 10.5px; overflow-wrap: normal;
+    }
+    /* "TEAM" is one word in a 34px column, so the header overflowed its own cell */
+    table.txn thead th:nth-child(3) { font-size: 8.5px; letter-spacing: 0; }
     table.txn tbody td:nth-child(6), table.txn thead th:nth-child(6) { width: 58px; }
     /* Cap Outlook is five columns wide; at 70px each it ran off the screen. The money
        strings lost their trailing zeros, so 60px holds $104M and $88.75M alike. */
@@ -246,4 +255,28 @@
     table.ratings thead th:nth-child(n+4) { font-size: 9px; letter-spacing: 0; padding: 7px 3px; }
     table.ratings .rv { font-size: 15px; }
     table.ratings tbody td { padding: 5px 4px; }
+  }
+  /* ---- News: the transaction wire. One card per move, newest day first. ---- */
+  .news-day {
+    font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--ink-mute); margin: 20px 0 8px 2px;
+  }
+  .newswire > .news-day:first-child { margin-top: 4px; }
+  .news { display: flex; flex-direction: column; gap: 8px; }
+  .nws {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+    box-shadow: var(--shadow); padding: 11px 13px 12px;
+  }
+  .nws-k { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
+  .ntype {
+    font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--isles-bright); background: color-mix(in srgb, var(--isles) 12%, var(--surface-2));
+    border: 1px solid color-mix(in srgb, var(--isles) 30%, transparent);
+    padding: 3px 7px; border-radius: 6px; white-space: nowrap;
+  }
+  /* the sentence is prose: it wraps, and a long asset string never widens the card */
+  .nws-t { margin: 0; font-size: 13.5px; line-height: 1.5; color: var(--ink-soft); overflow-wrap: anywhere; }
+  @media (max-width: 560px) {
+    .nws { padding: 10px 11px 11px; }
+    .nws-t { font-size: 12.5px; }
   }

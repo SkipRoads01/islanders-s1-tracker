@@ -36,6 +36,8 @@ islanders-s1-tracker/          # data repo AND the GitHub Pages repo (one repo, 
 ├── add_game.py                # injection engine — edit the GAME block, run it (not yet ported)
 ├── scripts/seed_workbook.py   # one-time seed from the 09/29/2026 franchise screens; record only
 └── site/
+    ├── CLAUDE.md              # the build spec - generator layout, invariants; read before
+    │                          # touching build_site.py / the CSS / site.js
     ├── build_site.py          # workbook -> index.html + version.txt
     ├── deploy.sh              # build, ASCII + build-id checks, commit, push
     ├── chrome.css             # the Royals CSS ported to Islanders tokens (--isles, --orange)
@@ -146,9 +148,13 @@ goals/shots/hits come from the four cumulative screens differenced into per-peri
 | `Notes` | `Date` `Note` |
 
 `Transactions` covers everything the front office is offered or does, not just trades: `Type`
-is `Trade offer`, `Signing`, `Waivers` or the like, and `Result` is `Accepted` or `Declined`.
-On a `Waivers` row `Direction` is `Claim` and `Partner` is `-`, because a waiver claim has no
-counterparty. A field the screen did not capture is a `-`, never a guess.
+is `Trade offer`, `Signing`, `Waivers`, `Assignment` or the like, and `Result` is `Accepted` or
+`Declined`. On a `Waivers` row `Direction` is `Claim` and `Partner` is `-`, because a waiver
+claim has no counterparty. On an `Assignment` row `Direction` is `To AHL` / `To NHL`, `Partner`
+is the affiliate by name (`Hamilton Hammers`) and the player rides in `Out` when he leaves the
+main roster, `In` when he joins it. A field the screen did not capture is a `-`, never a guess.
+**This sheet is the only source for the News tab** (S7), so every move gets a row, including
+the ones that never touch the NHL roster.
 
 `Roster Ref` conventions, taken from the game's List All Contracts screen: `Group` is
 `Main Roster` or `In the System`; `Status` is `Dressed` / `Scratched` for the main roster;
@@ -290,6 +296,20 @@ Carried over from the baseball project because they're habits, not sport rules:
 - **The `Team Goaltending` totals row counts only the games the goalie log covers**, not every
   game played, and the section says so (`1 of 2 games logged`). Season-to-date totals must
   never imply coverage they do not have.
+- **The `News` tab is the transaction wire, generated from `Transactions`.** No News sheet
+  and no prose column: `news_line()` turns the row's own columns into one plain sentence per
+  `Type`, cards group by date, newest day first. A new `Type` must get its own branch rather
+  than falling through to the generic line. The Front Office ledger keeps the same rows as a
+  table - columns, not prose - so the two can never drift; if the duplication grates, the
+  ledger is the one to drop, not the wire. The tab sits after Front Office: transactions are
+  front-office business, and Overview / Roster / Lines stay the daily-read tabs.
+- **A wire sentence carries the outcome; the chip carries the category.** `Waivers` +
+  `Accepted` reads "Claimed ... off waivers", not a "Waivers" chip beside an "Accepted" chip
+  that says nothing about what was accepted. Player names in the wire are clickable like
+  everywhere else.
+- **A partner with no crest shows its initials in the ledger and its full name in the wire.**
+  The ledger's Team column is 42px - wide enough for a crest, not for "Hamilton Hammers",
+  which would break mid-word - so `affil_tile()` renders `HH` with the name on `title`.
 - **Unknowns sort to the bottom of every table**, in both directions - a club with no rating,
   a contract with no clause. `site.js` treats an empty cell and a `-` cell as unknown.
 - Still open, ask when they first arise: shootout goals in the skater log, empty-net goals
@@ -365,8 +385,11 @@ deploy after every game**, not just the workbook.
   `·`/`–`. Entity-escape emitted HTML; use `\25B2`-style escapes in CSS and `\u2013`
   in JS; assert the chrome files are ASCII at build time.
 - Empty sections render an `.empty` placeholder so a 0-0-0 page looks deliberate.
-- The Pages repo keeps its **own CLAUDE.md build spec** listing customizations that must
-  survive every regeneration. Read it before changing the generator.
+- The build spec lives at **`site/CLAUDE.md`**: the generator's section order, how to add a
+  tab, how the news wire is generated, and the invariants that must survive every
+  regeneration. Read it before changing `build_site.py`, the CSS or `site.js` - it exists so
+  a new session does not have to re-derive 900 lines, so **keep it current** when the
+  generator changes.
 
 ---
 
@@ -381,10 +404,15 @@ deploy after every game**, not just the workbook.
   confirmed Cizikas' goal was even strength.
 - **Team Ratings** table on the Teams tab: every club, 72px crest, offense / defense /
   goaltending, sortable, unknowns at the bottom. **All 32 clubs are rated.** NYI reads
-  87/89/93; the league's best goaltending is NYI's 93, then WPG 92 and TBL 90.
-- Site built from this repo: tabs Overview, Roster, Lines, Front Office, Schedule, Goalies,
-  Teams (Team Ratings + vs. Divisions; the tab was `vs. Divisions` before the ratings table
-  joined it). Game-driven sections render `.empty` placeholders. Works offline once loaded
+  **88/89/93** (offense rose from 87 on 10/03/2026); the league's best goaltending is NYI's
+  93, then WPG 92 and TBL 90.
+- **Waiver claim 10/03/2026**: G **K. Mandolese** claimed and assigned to the Hamilton
+  Hammers. One year left at $0.85M; `In the System`, so the main roster and the Goalies tab
+  are unchanged. OVR, age and handedness are blank - the user reported the move, not the
+  player screen. The date is the franchise's current date (G2) because he did not give one.
+- Site built from this repo: tabs Overview, Roster, Lines, Front Office, News, Schedule,
+  Goalies, Teams (Team Ratings + vs. Divisions; the tab was `vs. Divisions` before the
+  ratings table joined it). Game-driven sections render `.empty` placeholders. Works offline once loaded
   (service worker, verified with the network cut). GitHub Pages serves `main` at the repo
   root: https://skiproads01.github.io/islanders-s1-tracker/ once the branch is merged and
   Pages is switched on.
