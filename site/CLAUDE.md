@@ -72,6 +72,11 @@ News sheet and no prose column. One card per row, grouped by date, newest day fi
 | `Assignment` | `Assigned <who> to the <Partner>.` |
 | `Signing` | `Signed <who>.` |
 
+`Result` is written in the vocabulary of the `Type` - `Accepted`/`Declined` for a trade,
+`Claimed`/`Passed` on waivers, `-` for an assignment - so `news_line()` and the ledger's chip
+both key off those words, not off a single "Accepted". A `-` renders as a muted dash, never a
+green chip.
+
 `Out` is what NYI sends, `In` is what NYI gets - an offer of `In` for `Out`. Semicolons
 split a cell into pieces (`bits_of`), and a leading `X. Surname` that matches the roster
 becomes a clickable name (`piece`). A new `Type` falls through to a generic line: add a

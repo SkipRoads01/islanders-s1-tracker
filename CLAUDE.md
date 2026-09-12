@@ -148,9 +148,12 @@ goals/shots/hits come from the four cumulative screens differenced into per-peri
 | `Notes` | `Date` `Note` |
 
 `Transactions` covers everything the front office is offered or does, not just trades: `Type`
-is `Trade offer`, `Signing`, `Waivers`, `Assignment` or the like, and `Result` is `Accepted` or
-`Declined`. On a `Waivers` row `Direction` is `Claim` and `Partner` is `-`, because a waiver
-claim has no counterparty. On an `Assignment` row `Direction` is `To AHL` / `To NHL`, `Partner`
+is `Trade offer`, `Signing`, `Waivers`, `Assignment` or the like. **`Result` is written in the
+vocabulary of the `Type`**, not one accept/decline word for everything: a `Trade offer` is
+`Accepted` / `Declined`, a `Waivers` row is `Claimed` / `Passed`, and an `Assignment` is `-`,
+because sending a player to the affiliate is a roster move with no accept-or-decline outcome
+to report - the same reason a waiver claim's `Partner` is `-`. On a `Waivers` row `Direction`
+is `Claim` and `Partner` is `-`, because a waiver claim has no counterparty. On an `Assignment` row `Direction` is `To AHL` / `To NHL`, `Partner`
 is the affiliate by name (`Hamilton Hammers`) and the player rides in `Out` when he leaves the
 main roster, `In` when he joins it. A field the screen did not capture is a `-`, never a guess.
 **This sheet is the only source for the News tab** (S7), so every move gets a row, including

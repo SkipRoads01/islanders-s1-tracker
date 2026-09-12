@@ -674,14 +674,20 @@ def txn_row(t):
     partner = str(t["Partner"] or "-")
     tm = tlogo(partner, "xs") if partner in team_name else (
         affil_tile(partner) if partner != "-" else '<span class="dash">-</span>')
+    cls = {"Accepted": "ok", "Claimed": "ok", "Declined": "no", "Passed": "no"}.get(res, "unk")
+    chip = ('<span class="dash">-</span>' if res in ("-", "", "None")
+            else '<span class="txres %s">%s</span>' % (cls, esc(res)))
     return ("", [td(esc(txn_date(t["Date"]))), td(esc(t.get("Type") or "-")), td(tm),
-                 td(pieces(t["Out"])), td(pieces(t["In"])),
-                 td('<span class="txres %s">%s</span>' % ("ok" if res == "Accepted" else "no", esc(res)))])
+                 td(pieces(t["Out"])), td(pieces(t["In"])), td(chip)])
 
-declined = sum(1 for t in trades if str(t["Result"]) == "Declined")
+def res_count(*names):
+    return sum(1 for t in trades if str(t["Result"]) in names)
+
+txn_meta = "%d logged &middot; %d declined &middot; %d claimed" % (
+    len(trades), res_count("Declined"), res_count("Claimed"))
 gm = sec("Transactions", table(["Date", "Type", "Team", "NYI sends", "NYI gets", "Result"],
     [txn_row(t) for t in txn_order(trades)], cls="txn"),
-    meta="%d logged &middot; %d declined" % (len(trades), declined))
+    meta=txn_meta)
 
 # players whose deal runs out after this season - the ones an extension can be offered to
 CURRENT_SEASON = "26-27"
@@ -784,7 +790,7 @@ def news_line(t):
         return "Declined a %s offer of %s for %s." % (club, inn, out)
     if typ == "Waivers":
         who = inn or out
-        return ("Claimed %s off waivers." if res == "Accepted" else "Did not claim %s off waivers.") % who
+        return ("Claimed %s off waivers." if res == "Claimed" else "Did not claim %s off waivers.") % who
     if typ == "Assignment":
         return "Assigned %s to the %s." % (out or inn, club or "minors")
     if typ == "Signing":
@@ -818,7 +824,7 @@ def news_panel():
                    % (esc(label), "".join(news_card(t) for t in ts))
                    for _, label, ts in days)
     return sec("Transactions", '<div class="newswire">%s</div>' % feed,
-               meta="%d logged &middot; %d declined" % (len(trades), declined))
+               meta=txn_meta)
 
 news_html = news_panel()
 
