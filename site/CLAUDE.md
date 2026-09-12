@@ -90,6 +90,12 @@ the one sheet, so nothing can drift.
 - **Every table is sortable and totals rows are locked.** Pass a totals row as `table(...,
   tfoot=[...])`; `site.js` refuses to sort `tfoot` and any `tr.tot` it finds in a `tbody`.
 - **Unknowns sort to the bottom** in both directions - `site.js` treats `""` and `-` as unknown.
+- **Nothing scrolls sideways - tables or grids.** A grid track written `1fr` is
+  `minmax(auto, 1fr)` and grows past its share, so strips use `repeat(n, minmax(0, 1fr))`
+  and `.stat .v` carries `flex-wrap: wrap` (its `<small>` is `nowrap` and would otherwise
+  set the tile's floor). The strip is three across under 560px. Check
+  `document.documentElement.scrollWidth` against the viewport on **every tab** at 360 and
+  390px after any layout change; a single wide value on one tab is enough to break it.
 - **A table must fit its column.** The chrome's default is `tbody td { white-space: nowrap }`,
   which pushes the last column off-screen. A table carrying prose needs `table-layout: fixed`,
   per-column widths and `white-space: normal; overflow-wrap: anywhere`. Verify at 390px.

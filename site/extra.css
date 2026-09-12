@@ -280,3 +280,23 @@
     .nws { padding: 10px 11px 11px; }
     .nws-t { font-size: 12.5px; }
   }
+  /* ---- Overview / Front Office strip: must fit the screen, now and in March ----
+     Two things pushed the page sideways on a phone. `repeat(4, 1fr)` is
+     `minmax(auto, 1fr)`, so a track grows past its share when its content's
+     min-content width is wider - one tile inflated the whole grid and the page
+     scrolled. And `.stat .v` is a flex row whose <small> is nowrap, so
+     "10/10" + "100.0%" set that floor, the same way a nowrap chip sets a table
+     column's. Cap the track and let the value row break instead. */
+  .strip { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .stat { min-width: 0; }
+  .stat .v { flex-wrap: wrap; }
+  .stat .k, .stat .v { overflow-wrap: anywhere; }
+  @media (max-width: 560px) {
+    /* three across: 94px of content per tile, enough for a W-L-OTL pace figure
+       (45-25-14) once the Pace tile joins at game 10 */
+    .strip { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
+    .stat { padding: 10px 9px; }
+    .stat .k { font-size: 9.5px; letter-spacing: .06em; }
+    .stat .v { font-size: 19px; }
+    .stat .v small { font-size: 11px; }
+  }

@@ -247,6 +247,14 @@ Carried over from the baseball project because they're habits, not sport rules:
   `white-space: normal; overflow-wrap: anywhere`. Verify at 390px as well as desktop, and
   remember a `nowrap` chip inside a cell sets the floor for that column. Drop the least
   important columns on a phone rather than letting the table scroll.
+- **The same floor rule applies to a grid, and `1fr` does not cap a track.** `1fr` means
+  `minmax(auto, 1fr)`, so a track grows past its share when its content's min-content width
+  is wider, and one wide tile pushes the whole page sideways. Strips use
+  `repeat(n, minmax(0, 1fr))`. The floor inside a stat tile is its value row: `.stat .v` is a
+  flex row whose `<small>` is `nowrap`, so `10/10` + `100.0%` set the width the way a nowrap
+  chip sets a table column's - it carries `flex-wrap: wrap` so the secondary figure breaks to
+  its own line instead. **The strip goes three across on a phone**, which leaves 94px of
+  content per tile: enough for a `W-L-OTL` pace figure once the `Pace` tile joins at game 10.
 - **Every table is sortable; totals rows are locked.** A totals row goes in `<tfoot>` with
   class `tot` and never takes part in a sort. `build_site.py`'s `table()` does this via its
   `tfoot=` argument; never emit a totals row into `<tbody>`.
