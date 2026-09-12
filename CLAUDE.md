@@ -381,6 +381,11 @@ deploy after every game**, not just the workbook.
 - **Name the game and the opponent in every editorial line**: `in G1 at TOR`. The preposition
   carries the venue - `at` for a road game, `vs.` for a home one. A bare "to open the scoring"
   tells the reader neither when nor against whom.
+- **An opponent goal's assists read `n/a`, not `unassisted`.** The user tracks NYI assists,
+  so a blank `A1`/`A2` on an NYI row really does mean the goal was unassisted. He does not
+  track the opponent's, so a blank there says nothing about the goal and claiming `unassisted`
+  invents a fact. `n/a` is muted and `site.js` counts it as unknown, so those rows sort to the
+  bottom of the Assists column with the other unknowns.
 - **A goal always carries the scorer's season total in parentheses**, hockey box-score style:
   `Horvat (1)`. It is the running count through that game, not the season-to-date figure, so
   G1's goal reads `(1)` forever. Applied in the `Scoring` table and in recap prose. Opponent

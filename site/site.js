@@ -15,7 +15,7 @@
   // in both directions rather than jumbling with real values.
   function isBlank(td) {
     var t = (td.textContent || "").trim();
-    return t === "" || t === "-" || t === "\u2013";
+    return t === "" || t === "-" || t === "\u2013" || t === "n/a";
   }
 
   function makeSortable(table) {

@@ -89,7 +89,9 @@ the one sheet, so nothing can drift.
 - **Empty sections render `empty()`**, so a 0-0-0 page looks deliberate rather than broken.
 - **Every table is sortable and totals rows are locked.** Pass a totals row as `table(...,
   tfoot=[...])`; `site.js` refuses to sort `tfoot` and any `tr.tot` it finds in a `tbody`.
-- **Unknowns sort to the bottom** in both directions - `site.js` treats `""` and `-` as unknown.
+- **Unknowns sort to the bottom** in both directions - `site.js` treats `""`, `-` and `n/a`
+  as unknown. Opponent assists render `n/a` because they are not tracked; only an NYI goal
+  with no assists prints `unassisted`.
 - **Nothing scrolls sideways - tables or grids.** A grid track written `1fr` is
   `minmax(auto, 1fr)` and grows past its share, so strips use `repeat(n, minmax(0, 1fr))`
   and `.stat .v` carries `flex-wrap: wrap` (its `<small>` is `nowrap` and would otherwise

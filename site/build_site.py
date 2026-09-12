@@ -492,8 +492,12 @@ def scoring_table(g):
             who += ' <span class="gtot">(%d)</span>' % num
         if x["Type"] and x["Type"] != "EV":
             who += ' <span class="pos">%s</span>' % esc(x["Type"])
+        # NYI assists are tracked, so a blank there really means unassisted. Opponent
+        # assists are not tracked at all, so a blank says nothing about the goal.
         helpers = ", ".join((pname(v) if x["Team"] == TAG else esc(v))
-                            for v in (x["A1"], x["A2"]) if v) or "unassisted"
+                            for v in (x["A1"], x["A2"]) if v)
+        if not helpers:
+            helpers = "unassisted" if x["Team"] == TAG else '<span class="dash">n/a</span>'
         body.append(("", [td(esc(x["Period"])), td('<span class="tabbr sm">%s</span>' % esc(x["Team"])),
                           td(who), td(helpers), td(esc(x["Score"]), "num")]))
     return sec("Scoring", table(["Per", "", "Goal", "Assists", "Score"], body, cls=""))
