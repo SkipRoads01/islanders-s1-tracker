@@ -156,6 +156,10 @@ main roster, `In` when he joins it. A field the screen did not capture is a `-`,
 **This sheet is the only source for the News tab** (S7), so every move gets a row, including
 the ones that never touch the NHL roster.
 
+The List All Contracts screen colours an `RFA` chip blue for **tendered** and orange for
+**non-tendered**; `Roster Ref`'s year columns hold the tag only, so that distinction has no
+home. Logged as plain `RFA` until the user says whether he wants a column for it.
+
 `Roster Ref` conventions, taken from the game's List All Contracts screen: `Group` is
 `Main Roster` or `In the System`; `Status` is `Dressed` / `Scratched` for the main roster;
 year columns hold the salary in $M as a number, or the tag the game shows in that year
@@ -310,6 +314,14 @@ Carried over from the baseball project because they're habits, not sport rules:
 - **A partner with no crest shows its initials in the ledger and its full name in the wire.**
   The ledger's Team column is 42px - wide enough for a crest, not for "Hamilton Hammers",
   which would break mid-word - so `affil_tile()` renders `HH` with the name on `title`.
+- **A figure derived by arithmetic from two screens is data; a figure that is merely likely
+  is not.** Sorokin's 28-29 and 29-30 cap hits were never photographed, but the In the System
+  screen's 29-30 footer reads $54.050M against $45.800M of skater salary - a difference of
+  exactly $8.25M - and a contract cannot skip a year, so both are recorded with the derivation
+  written into `Notes`. His 30-31 figure is left blank even though the same screen's contract
+  count (6 against 5 skaters) proves he is signed that season: knowing a deal exists is not
+  knowing its number. Never let a derivation go unwritten, and never promote a pattern
+  ("his hit has been flat so far") into a cell.
 - **Unknowns sort to the bottom of every table**, in both directions - a club with no rating,
   a contract with no clause. `site.js` treats an empty cell and a `-` cell as unknown.
 - Still open, ask when they first arise: shootout goals in the skater log, empty-net goals
@@ -406,10 +418,17 @@ deploy after every game**, not just the workbook.
   goaltending, sortable, unknowns at the bottom. **All 32 clubs are rated.** NYI reads
   **88/89/93** (offense rose from 87 on 10/03/2026); the league's best goaltending is NYI's
   93, then WPG 92 and TBL 90.
-- **Waiver claim 10/03/2026**: G **K. Mandolese** claimed and assigned to the Hamilton
-  Hammers. One year left at $0.85M; `In the System`, so the main roster and the Goalies tab
-  are unchanged. OVR, age and handedness are blank - the user reported the move, not the
-  player screen. The date is the franchise's current date (G2) because he did not give one.
+- **Waiver claim 10/06/2026**: G **K. Mandolese** (74 OVR, Backup/Med, 26) claimed and
+  assigned to the Hamilton Hammers. One year left at $0.85M; `In the System`, so the main
+  roster and the Goalies tab are unchanged. Dated by the franchise's own clock - the contract
+  screens read 10/06/2026.
+- **Goalie contracts are in**, off the two List All Contracts screens dated 10/06/2026:
+  **Sorokin** $8.25M, NMC, FSC Yes, 31; **Varlamov** $2.75M, M-NTC, 38, UFA after 26-27.
+  In the system: **Vanecek** 77 ($1M, UFA after), **Mandolese** 74, **Tikkanen** 68,
+  **Hood** 67 (unsigned, 19), **Lennox** 65 - four of them the 09/29 seed never had.
+  `Cap Outlook`'s Main Roster and System columns were skater-only and now carry the goalie
+  deals through 29-30; 30-31 and 31-32 still exclude Sorokin. Front Office reads 44/50
+  contracts as of 10/06/2026.
 - Site built from this repo: tabs Overview, Roster, Lines, Front Office, News, Schedule,
   Goalies, Teams (Team Ratings + vs. Divisions; the tab was `vs. Divisions` before the
   ratings table joined it). Game-driven sections render `.empty` placeholders. Works offline once loaded
@@ -424,7 +443,12 @@ deploy after every game**, not just the workbook.
   signing, not extending. It replaced the old Wants Extension table on the Roster tab.
 - A played schedule row now carries its result (`OTL 1-2`, `W 6-1`) where an upcoming row
   carries the puck drop; only unplayed rows keep the `upcoming` styling.
-- Pending from the user: goalie contracts (Sorokin, Varlamov); the wordmark image file
+- Pending from the user: **the main roster goalie screen scrolled right** - Sorokin is signed
+  at least through 30-31 (see S7) and the workbook stops at 29-30, so every "Through" figure
+  for him understates; whether `RFA` **tendered vs non-tendered** deserves a column (S4);
+  **why the game counts 44 contracts when the workbook's rows come to 45** (39 skaters and 6
+  signed goalies - one contract is not counting against the 50 and the screens do not say
+  which); the wordmark image file
   (`site/logos/wordmark.png`; the crest stands in until then); player photos
   (`site/logos/players/`); **the skater box score for G1** - the play-by-play supports
   only Horvat's goal and the three NYI minors, so `Skater Game Log` is deliberately empty and

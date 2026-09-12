@@ -585,7 +585,9 @@ dressed = [p for p in main_sk if p.get("Status") == "Dressed"]
 scratched = [p for p in main_sk if p.get("Status") == "Scratched"]
 roster_html = sec("Main Roster", roster_table(main_sk),
                   meta="%d skaters &middot; %d dressed &middot; %d scratched" % (len(main_sk), len(dressed), len(scratched)))
-roster_html += sec("Goalies", roster_table(main_g, goalie=True), meta="contracts pending")
+g_now = sum(p["26-27"] for p in main_g if isinstance(p.get("26-27"), (int, float)))
+roster_html += sec("Goalies", roster_table(main_g, goalie=True),
+                   meta="%d on the main roster &middot; $%sM in 26-27" % (len(main_g), mnum(g_now)))
 roster_html += sec("In the System", roster_table(system), meta="%d players" % len(system))
 
 # ---- lines
@@ -722,7 +724,7 @@ fo += sec("Cap Outlook", table(["Season", "Salary Cap", "Main Roster", "System",
     [("", [td(esc(c["Season"])), td(("$%sM" % mnum(c["Salary Cap"])) if c["Salary Cap"] else "-"),
            td("$%sM" % mnum(c["Main Roster"])), td("$%sM" % mnum(c["System"])),
            td(esc(c["Contracts"]) if c["Contracts"] is not None else "-")]) for c in cap], cls="fin"),
-    meta="skater salaries &middot; goalie deals pending")
+    meta="goalie deals through 29-30 &middot; 30-31 on is skaters only")
 fo += sec("League Cap Rules", table(["Rule", "Value"],
     [("", [td(esc(k.replace(" ($M)", ""))), td("$%sM" % mnum(front[k]))])
      for k in ("Salary Cap ($M)", "Salary Cap Floor ($M)", "Max Player Salary ($M)",
