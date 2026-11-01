@@ -29,75 +29,27 @@ WB = ROOT / "S1 NY Islanders.xlsx"
 # arrive, fill the same block in, set topup=True, and run again: the Games row is
 # topped up in place and the goalie / skater rows are appended.
 GAME = dict(
-    g=3, date="10/06/2026", opp="NYR", ha="A",
-    result="L",                        # W / L / OTL / SOL
+    g=1, date="09/30/2026", opp="TOR", ha="A",
+    result=None,                       # W / L / OTL / SOL
     topup=False,
     # period lines: (NYI, OPP) goals and shots and hits, in order 1,2,3,OT,SO
-    # 1st and 2nd intermission screens plus the final, differenced into per-period lines
-    goals=[(1, 2), (0, 0), (1, 2)],
-    shots=[(12, 8), (10, 12), (25, 11)],
-    hits=[(14, 10), (18, 14), (12, 13)],
+    goals=[],
+    shots=None,
+    hits=None,
     # final team stats, exactly as the game's screen shows them
-    toa=("11:53", "03:12"), passing=(78.9, 91.7), fow=(13, 27),
-    pim=("08:00", "16:00"), pp=("1/8", "0/4"), ppm=("08:09", "03:07"), shg=(0, 3),
-    goalies=[dict(goalie="I. Sorokin", dec="L", sa=31, sv=27, ga=4, toi="60:00", start="Start")],
-    # the Rangers goalie is not named in the notes and there is no box score screen
+    toa=None, passing=None, fow=None,
+    pim=None, pp=None, ppm=None, shg=None,
+    goalies=[],
     opp_goalies=[],
     skaters=[],
     # scoring: the site adds the scorer's running season total in parens, so do not type it here.
     # Score is NYI-first here; recap prose is leader-first, per the user's own shorthand.
-    scoring=[
-        dict(per="1", team="NYR", scorer="M. Rempe",      a1=None,        a2=None, typ="SHG", score="0-1"),
-        dict(per="1", team="NYR", scorer="J. Veleno",     a1=None,        a2=None, typ="SHG", score="0-2"),
-        dict(per="1", team="NYI", scorer="A. Romanov",    a1="M. Maccelli", a2=None, typ="EV",  score="1-2"),
-        dict(per="3", team="NYI", scorer="E. Heineman",   a1="M. Barzal", a2=None, typ="PPG", score="2-2"),
-        dict(per="3", team="NYR", scorer="P. Dorofeyev",  a1=None,        a2=None, typ="SHG", score="2-3"),
-        dict(per="3", team="NYR", scorer="A. Lafreniere", a1=None,        a2=None, typ="EV",  score="2-4"),
-    ],
-    recap=[
-        ("1", "Bjorkstrand charging. Rempe strips Barzal along the wall and beats Sorokin blocker side "
-              "shorthanded (1-0). Veleno takes it off the boards after the Isles lose the puck in their own "
-              "end and makes it two shorthanded goals in the period (2-0). Romanov (1) one-times Maccelli's "
-              "pass from above the left dot out of the high slot (2-1). Dorofeyev elbowing. Sorokin leaves "
-              "the ice behind his own net and takes a delay of game, 4-on-4. Cuylle slashing. Cizikas "
-              "boarding, 4-on-4 again. Dorofeyev interference with 30 seconds left."),
-        ("2", "Heineman slashing, more 4-on-4 to start the period. Palmieri hooking. Neither side scored."),
-        ("3", "Rempe charging at 12:06. Miller charging behind him, 5-on-3 for a minute, and Schneider "
-              "penalized on top of it. Barzal finds Heineman (1) at the left post on the power play (2-2). "
-              "Dorofeyev answers in alone on Sorokin with New York still a man down (3-2). Seven and a half "
-              "minutes left. Lafreniere breaks in alone and has hands in close (4-2)."),
-    ],
-    inside=[
-        # the story lead already prints the record, so a bullet restating it is dead copy
-        "The Isles have killed all <b>10</b> power plays they have faced this season, but New York scored "
-        "<b>three</b> shorthanded goals in G3 at NYR.",
-        "NYI has out-shot its opponent once in three games, <b>47-31</b> in G3 at NYR, and lost by two.",
-        "Eight power plays and <b>8:09</b> with the extra man in G3 at NYR produced one goal. NYI is "
-        "<b>2 for 15</b> on the season, both goals in the 3rd period.",
-        "NYI has won <b>48 of 123 faceoffs (39%)</b> this season and <b>13 of 40</b> in G3 at NYR.",
-        "<b>Five</b> of the nine goals NYI has scored this season have come in the 1st period.",
-    ],
-    headlines=[
-        (27, "Saves", "<b>Sorokin</b> stopped 27 of 31 in G3 at NYR and gave up four goals in a night after "
-                      "allowing three across his first two starts combined.", "active"),
-        (1, "Goals", "<b>Romanov</b> one-timed Maccelli's feed out of the high slot in the 1st of G3 at NYR, "
-                     "the defenseman's first of the season and the only Islanders goal until the 3rd.", "active"),
-        (1, "Goals", "<b>Heineman</b> finished Barzal's pass at the left post to pull G3 at NYR level at 2-2, "
-                     "the only goal NYI got out of eight power plays.", "active"),
-        (1, "Assists", "<b>Barzal</b> picked up his first point of the season on the tying goal in the 3rd of "
-                       "G3 at NYR.", "active"),
-        (2, "Games", "<b>Maccelli</b> has a point in each of the last two: the sixth goal in G2 vs. NJD and the "
-                     "feed to Romanov in G3 at NYR.", "active"),
-        (2, "Games", "<b>Horvat</b>'s point streak ended at two in G3 at NYR.", "past"),
-    ],
-    summary="Out-shot New York 47-31 and drew eight power plays, but gave up three shorthanded goals and "
-            "lost a game they had pulled level at 2-2 in the 3rd.",
-    notes="Team stats from the 1st and 2nd intermission screens and the final; per-period shots and hits "
-          "differenced from the cumulative ones. Both box scores held for the screens. The Rangers goalie is "
-          "not named anywhere, so Opp Goaltending has no row. New York's third shorthanded goal is assigned to "
-          "Dorofeyev: the screens put SHG A at 2 after the 2nd and 3 at the final, NYR scored twice in the 3rd "
-          "and took no power play in it, and Dorofeyev's came straight off the Heineman power-play goal with "
-          "penalties still being served. Lafreniere's is logged even strength.",
+    scoring=[],
+    recap=[],
+    inside=[],
+    headlines=[],
+    summary="",
+    notes="",
 )
 # ===========================================================================
 

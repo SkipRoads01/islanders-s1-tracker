@@ -342,13 +342,21 @@ Carried over from the baseball project because they're habits, not sport rules:
   reverted. The same applies to every label the site prints: if the screen or the sport has a
   word for it, that is the word, and if neither does, ask rather than coin one.
 - **A figure derived by arithmetic from two screens is data; a figure that is merely likely
-  is not.** Sorokin's 28-29 and 29-30 cap hits were never photographed, but the In the System
+  is not.** The worked example is from the season since restarted, but the rule stands.
+  Sorokin's 28-29 and 29-30 cap hits were never photographed, but the In the System
   screen's 29-30 footer reads $54.050M against $45.800M of skater salary - a difference of
   exactly $8.25M - and a contract cannot skip a year, so both are recorded with the derivation
   written into `Notes`. His 30-31 figure is left blank even though the same screen's contract
   count (6 against 5 skaters) proves he is signed that season: knowing a deal exists is not
   knowing its number. Never let a derivation go unwritten, and never promote a pattern
   ("his hit has been flat so far") into a cell.
+- **A blank workbook is a real state and must build.** A season restart leaves every sheet
+  at its headers, so nothing may assume a row exists: no `front[key]`, no `strptime` on a
+  missing date, no table emitted with an empty `tbody`. A header strip with nothing under it
+  reads as broken, so `table_or_empty()` falls back to the same `.empty` placeholder a
+  game-driven section uses, and a meta that describes absent data is dropped rather than
+  printed as `$M` or `as of Not yet loaded`. Build against the empty workbook before
+  shipping a generator change.
 - **Unknowns sort to the bottom of every table**, in both directions - a club with no rating,
   a contract with no clause. `site.js` treats an empty cell and a `-` cell as unknown.
 - Still open, ask when they first arise: shootout goals in the skater log, empty-net goals
@@ -439,62 +447,39 @@ deploy after every game**, not just the workbook.
 
 ## 10. Current state
 
-- **New York Islanders, Season 1, regular season.** Record **1-1-1** through G3.
-- **G1 logged**: 09/30/2026 at TOR, 1-2 OTL. Kessel has the assist on Horvat's goal.
-- **G2 logged**: 10/03/2026 vs NJD, 6-1 W, the home opener. Six goals, six scorers, Schaefer
-  shorthanded. Team stats came in on a second pass (`topup=True`) from the 1st, 2nd and final
-  screens; per-period shots and hits were differenced from the cumulative ones. Both box
-  scores are still **held for the screens** (§7). PP 1/5 with the only goal in the 3rd is what
-  confirmed Cizikas' goal was even strength.
-- **G3 logged**: 10/06/2026 at NYR, 2-4 L. New York scored **three shorthanded goals** while NYI
-  went 1 for 8 on the power play and out-shot them 47-31. All three team-stat screens (1st, 2nd,
-  final) were photographed; per-period shots and hits were differenced from the cumulative ones.
-  The **third shorthanded goal is assigned to Dorofeyev** rather than Lafreniere: `SHG A` reads 2
-  after the 2nd and 3 at the final, NYR scored twice in the 3rd and took no power play in it, and
-  Dorofeyev's came straight off Heineman's power-play goal with penalties still being served.
-  **No `Opp Goaltending` row** - the Rangers goalie is not named in the notes and there is no box
-  score screen. Sorokin is logged 31 SA / 27 SV / 4 GA, L.
-- **Team Ratings** table on the Teams tab: every club, 72px crest, offense / defense /
-  goaltending, sortable, unknowns at the bottom. **All 32 clubs are rated.** NYI reads
-  **88/89/93** (offense rose from 87 on 10/03/2026); the league's best goaltending is NYI's
-  93, then WPG 92 and TBL 90.
-- **Waiver claim 10/06/2026**: G **K. Mandolese** (74 OVR, Backup/Med, 26) claimed and
-  assigned to the Hamilton Hammers. One year left at $0.85M; `In the System`, so the main
-  roster and the Goalies tab are unchanged. Dated by the franchise's own clock - the contract
-  screens read 10/06/2026.
-- **Goalie contracts are in**, off the two List All Contracts screens dated 10/06/2026:
-  **Sorokin** $8.25M, NMC, FSC Yes, 31; **Varlamov** $2.75M, M-NTC, 38, UFA after 26-27.
-  In the system: **Vanecek** 77 ($1M, UFA after), **Mandolese** 74, **Tikkanen** 68,
-  **Hood** 67 (unsigned, 19), **Lennox** 65 - four of them the 09/29 seed never had.
-  `Cap Outlook`'s Main Roster and System columns were skater-only and now carry the goalie
-  deals through 29-30; 30-31 and 31-32 still exclude Sorokin. Front Office reads 44/50
-  contracts as of 10/06/2026.
-- Site built from this repo: tabs Overview, Roster, Lines, Front Office, News, Schedule,
-  Goalies, Teams (Team Ratings + vs. Divisions; the tab was `vs. Divisions` before the
-  ratings table joined it). Game-driven sections render `.empty` placeholders. Works offline once loaded
-  (service worker, verified with the network cut). GitHub Pages serves `main` at the repo
-  root: https://skiproads01.github.io/islanders-s1-tracker/ once the branch is merged and
-  Pages is switched on.
-- Schedule loaded (84 games, see §7). Hero shows the next game, the NHL shield
-  and the Eastern Conference mark.
+- **New York Islanders, Season 1, regular season. Restarted 11/01/2026 after a game
+  update.** Record **0-0-0**, no games played. The previous run (G1 at TOR, G2 vs NJD,
+  G3 at NYR) is gone from the workbook and lives only in git history.
+- **The workbook is at its headers.** Every game log (`Games`, `Scoring`, `Goalie Game Log`,
+  `Opp Goaltending`, `Skater Game Log`, `Recaps`, `Inside`, `Headlines`) and every franchise
+  sheet (`Roster Ref`, `Lines`, `Owner Goals`, `Budget`, `Cap`, `Front Office`,
+  `Transactions`, `Notes`) was cleared with `delete_rows` from row 3; row 1 headers and the
+  row 2 styled template are intact.
+- **Kept deliberately**: `Schedule` (84 games, the NHL 2026-27 release, opening 09/30/2026
+  at TOR - a game update does not move the league's own schedule) and `Teams` (all 32 clubs
+  with name, abbr, conference and division).
+- **The `Teams` ratings columns were NOT cleared and are from before the update.** Treat
+  every club's `Off` / `Def` / `Goalie` as unverified until the user reports it again; the
+  per-club workflow in S4 overwrites them one at a time as he does. Say the word and they
+  get blanked instead.
+- **The site builds clean from the empty workbook** - 0-0-0 hero, next game G1 at TOR in
+  the hero and the schedule, and 22 `.empty` placeholders. Verified at 360, 390 and 900px:
+  no horizontal scroll on any tab, no JS errors, and no section renders a heading with
+  nothing under it.
+- `add_game.py`'s `GAME` block is reset to a blank G1 template.
+- Site tabs: Overview, Roster, Lines, Front Office, News, Schedule, Goalies, Teams
+  (Team Ratings + vs. Divisions). Works offline once loaded (service worker). GitHub Pages
+  serves `main` at the repo root:
+  https://skiproads01.github.io/islanders-s1-tracker/
 - **Extension Eligible** lists every player whose deal ends after the current season, sorted
   interested-first then by OVR, with `Roster Ref`'s `Ext` column as the `Interest` value
-  (`Yes` / `No` / `-` when the screen did not say). Unsigned prospects are excluded: they need
-  signing, not extending. It replaced the old Wants Extension table on the Roster tab.
-- A played schedule row now carries its result (`OTL 1-2`, `W 6-1`) where an upcoming row
-  carries the puck drop; only unplayed rows keep the `upcoming` styling.
-- Pending from the user: **the main roster goalie screen scrolled right** - Sorokin is signed
-  at least through 30-31 (see S7) and the workbook stops at 29-30, so every "Through" figure
-  for him understates; whether `RFA` **tendered vs non-tendered** deserves a column (S4);
-  **why the game counts 44 contracts when the workbook's rows come to 45** (39 skaters and 6
-  signed goalies - one contract is not counting against the 50 and the screens do not say
-  which); the wordmark image file
+  (`Yes` / `No` / `-` when the screen did not say). Unsigned prospects are excluded: they
+  need signing, not extending.
+- A played schedule row carries its result (`OTL 1-2`, `W 6-1`) where an upcoming row carries
+  the puck drop; only unplayed rows keep the `upcoming` styling.
+- **Waiting on the user**: the updated roster (`Roster Ref`), and with it `Lines`,
+  `Owner Goals`, `Budget`, `Cap` and `Front Office`; **which postgame screens NHL 26 actually
+  shows**, which decides the logging workflow in S5; the wordmark image file
   (`site/logos/wordmark.png`; the crest stands in until then); player photos
-  (`site/logos/players/`); **the skater box score for G1** - the play-by-play supports
-  only Horvat's goal and the three NYI minors, so `Skater Game Log` is deliberately empty and
-  Skating Leaders / Team Skating render placeholders rather than partial totals; **G2's skater box
-  score** (Sorokin's 42 SA / 41 SV / 1 GA win and Rittich's 35 SA / 29 SV are both logged;
-  Rittich carries no first initial, which the screen would supply); **G3's skater box score and
-  the name of the Rangers goalie**; and the franchise screen for the `Win the regular season home opener` owner goal,
-  which evaluated 10/03/2026 and stays `Open` until the game says otherwise.
+  (`site/logos/players/`).
 - `add_game.py` is the injection engine: edit its `GAME` block, run it, then `site/deploy.sh`.

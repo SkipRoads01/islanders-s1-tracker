@@ -113,6 +113,11 @@ the one sheet, so nothing can drift.
   A `nowrap` chip inside a cell sets that column's floor - the 42px Team column in the
   ledger is why a non-NHL partner renders as an initials tile (`affil_tile`) and not its name.
   Only prose gets `table-layout: fixed`; a table of names and money sizes to its content.
+- **A blank workbook must build.** A season restart leaves every sheet at its headers.
+  Never index `front[key]`, never `strptime` a possibly-missing date, and never emit a table
+  with an empty `tbody` - `table_or_empty()` falls back to `empty()`. Drop a meta that
+  describes absent data instead of printing `$M`. Run the build against the empty workbook
+  as part of any generator change; `sections with no body` must come back empty.
 - **Money never carries trailing zeros.** `mnum()` formats every figure; `$104M`, `$0.975M`.
 - **Player names are clickable wherever they appear**, editorial copy included. Photos at
   `site/logos/players/<pkey>.png`; the crest stands in until one exists.

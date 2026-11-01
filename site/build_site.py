@@ -168,9 +168,14 @@ BLL = sum(1 for g in games if g["Result"] != "W" and led_at_any_point(g))
 MOST_GF = max([n(g["GF"]) for g in games], default=0)
 MOST_GA = max([n(g["GA"]) for g in games], default=0)
 
-as_of = str(front.get("As Of", ""))
-as_of_dt = dt.datetime.strptime(as_of, "%m/%d/%Y")
-as_of_txt = as_of_dt.strftime("%b %-d, %Y")
+def parse_date(v):
+    try:
+        return dt.datetime.strptime(str(v), "%m/%d/%Y")
+    except (ValueError, TypeError):
+        return None
+
+as_of_dt = parse_date(front.get("As Of"))
+as_of_txt = as_of_dt.strftime("%b %-d, %Y") if as_of_dt else ""
 if games:
     as_of_txt = dt.datetime.strptime(str(games[-1]["Date"]), "%m/%d/%Y").strftime("%b %-d, %Y")
     through_txt = "Through G%d" % int(games[-1]["G"])
@@ -207,6 +212,10 @@ def table(headers, body_rows, cls="num", tfoot=None):
     tf = ('<tfoot><tr class="tot">%s</tr></tfoot>' % "".join(tfoot)) if tfoot else ""
     return ('<div class="tbl-wrap"><div class="tbl-scroll"><table class="%s"><thead><tr>%s</tr></thead>'
             '<tbody>%s</tbody>%s</table></div></div>') % (cls, th, tb, tf)
+
+def table_or_empty(headers, body_rows, note, **kw):
+    """A header strip with nothing under it is not an empty state - it reads as broken."""
+    return table(headers, body_rows, **kw) if body_rows else empty(note)
 
 def td(v, cls=None):
     return "<td%s>%s</td>" % (' class="%s"' % cls if cls else "", v if v is not None else "")
@@ -587,12 +596,15 @@ main_g = [p for p in roster if p["Group"] == "Main Roster" and p["Pos"] == "G"]
 system = [p for p in roster if p["Group"] == "In the System"]
 dressed = [p for p in main_sk if p.get("Status") == "Dressed"]
 scratched = [p for p in main_sk if p.get("Status") == "Scratched"]
-roster_html = sec("Main Roster", roster_table(main_sk),
-                  meta="%d skaters &middot; %d dressed &middot; %d scratched" % (len(main_sk), len(dressed), len(scratched)))
+roster_html = sec("Main Roster", roster_table(main_sk) if main_sk else empty("Roster not loaded yet"),
+                  meta=("%d skaters &middot; %d dressed &middot; %d scratched"
+                        % (len(main_sk), len(dressed), len(scratched))) if main_sk else None)
 g_now = sum(p["26-27"] for p in main_g if isinstance(p.get("26-27"), (int, float)))
-roster_html += sec("Goalies", roster_table(main_g, goalie=True),
-                   meta="%d on the main roster &middot; $%sM in 26-27" % (len(main_g), mnum(g_now)))
-roster_html += sec("In the System", roster_table(system), meta="%d players" % len(system))
+roster_html += sec("Goalies", roster_table(main_g, goalie=True) if main_g else empty("Roster not loaded yet"),
+                   meta=("%d on the main roster &middot; $%sM in 26-27"
+                         % (len(main_g), mnum(g_now))) if main_g else None)
+roster_html += sec("In the System", roster_table(system) if system else empty("Roster not loaded yet"),
+                   meta=("%d players" % len(system)) if system else None)
 
 # ---- lines
 by_unit = defaultdict(list)
@@ -621,15 +633,19 @@ def unit_card(label, unit, order=None):
     return '<div class="line-card"><div class="line-head"><span class="line-k">%s</span>%s</div><div class="lps n%d">%s</div></div>' % (
         esc(label), chem_html(chem), len(ps), cells)
 
+NO_LINES = "Lineup not loaded yet"
 lines_html = sec("Even Strength", "".join([
     unit_card("Line 1", "F1", ["LW", "C", "RW"]), unit_card("Line 2", "F2", ["LW", "C", "RW"]),
     unit_card("Line 3", "F3", ["LW", "C", "RW"]), unit_card("Line 4", "F4", ["LW", "C", "RW"]),
     unit_card("Pair 1", "D1", ["LD", "RD"]), unit_card("Pair 2", "D2", ["LD", "RD"]), unit_card("Pair 3", "D3", ["LD", "RD"]),
-]), meta="as of %s" % esc(as_of_txt))
-lines_html += sec("Power Play", unit_card("PP1", "PP1", ["LW", "C", "RW", "LD", "RD"]) + unit_card("PP2", "PP2", ["LW", "C", "RW", "LD", "RD"]))
-lines_html += sec("Penalty Kill", unit_card("PK1", "PK1", ["LW", "C", "LD", "RD"]) + unit_card("PK2", "PK2", ["LW", "C", "LD", "RD"]) + unit_card("PK3", "PK3", ["LW", "C", "LD", "RD"]))
-lines_html += sec("Goalies", unit_card("Goalies", "G", ["1", "2"]))
-lines_html += sec("Scratched", unit_card("Scratched", "SCR"))
+]) or empty(NO_LINES), meta=("as of %s" % esc(as_of_txt)) if as_of_dt or games else None)
+lines_html += sec("Power Play", (unit_card("PP1", "PP1", ["LW", "C", "RW", "LD", "RD"])
+                                 + unit_card("PP2", "PP2", ["LW", "C", "RW", "LD", "RD"])) or empty(NO_LINES))
+lines_html += sec("Penalty Kill", (unit_card("PK1", "PK1", ["LW", "C", "LD", "RD"])
+                                   + unit_card("PK2", "PK2", ["LW", "C", "LD", "RD"])
+                                   + unit_card("PK3", "PK3", ["LW", "C", "LD", "RD"])) or empty(NO_LINES))
+lines_html += sec("Goalies", unit_card("Goalies", "G", ["1", "2"]) or empty(NO_LINES))
+lines_html += sec("Scratched", unit_card("Scratched", "SCR") or empty(NO_LINES))
 
 # ---- front office
 def num(v, fmt=None):
@@ -685,9 +701,9 @@ def res_count(*names):
 
 txn_meta = "%d logged &middot; %d declined &middot; %d claimed" % (
     len(trades), res_count("Declined"), res_count("Claimed"))   # each word is a Result value
-gm = sec("Transactions", table(["Date", "Type", "Team", "NYI sends", "NYI gets", "Result"],
-    [txn_row(t) for t in txn_order(trades)], cls="txn"),
-    meta=txn_meta)
+gm = sec("Transactions", table_or_empty(["Date", "Type", "Team", "NYI sends", "NYI gets", "Result"],
+    [txn_row(t) for t in txn_order(trades)], "No transactions logged", cls="txn"),
+    meta=txn_meta if trades else None)
 
 # players whose deal runs out after this season - the ones an extension can be offered to
 CURRENT_SEASON = "26-27"
@@ -716,42 +732,62 @@ if erows:
               table(["Player", "Pos", "OVR", "Age", "Salary", "Then", "Interest", "Roster"], body, cls="ext"),
               meta="%d expiring &middot; %d interested" % (len(erows), yes))
 
+def mtile(label, key):
+    """A franchise figure the screens have not supplied yet is a dash, never '$M'."""
+    v = front.get(key)
+    return tile(label, ("$%sM" % num(v)) if v not in (None, "") else "-")
+
 fo_strip = "".join([
-    tile("Cap Space", "$%sM" % num(front.get("Cap Space ($M)"))),
-    tile("Cap Hit", "$%sM" % num(front.get("Team Cap Hit ($M)"))),
-    tile("Salary Cap", "$%sM" % num(front.get("Salary Cap ($M)"))),
-    tile("Playoff Cap", "$%sM" % num(front.get("Playoff Cap ($M)"))),
-    tile("Contracts", front.get("Contracts")),
-    tile("Funds", "$%sM" % num(front.get("Funds Remaining ($M)"))),
-    tile("Salary Target", "$%sM" % num(front.get("Salary Target ($M)"))),
-    tile("Retained", "$%sM" % num(front.get("Retained Salary ($M)"))),
+    mtile("Cap Space", "Cap Space ($M)"),
+    mtile("Cap Hit", "Team Cap Hit ($M)"),
+    mtile("Salary Cap", "Salary Cap ($M)"),
+    mtile("Playoff Cap", "Playoff Cap ($M)"),
+    tile("Contracts", front.get("Contracts") or "-"),
+    mtile("Funds", "Funds Remaining ($M)"),
+    mtile("Salary Target", "Salary Target ($M)"),
+    mtile("Retained", "Retained Salary ($M)"),
 ])
 goal_rows = []
 for g in goals:
     goal_rows.append(("", [td('<span class="pos" style="margin-left:0">%s</span>' % esc(g["Tier"])), td(esc(g["Goal"])),
                            td("$%s" % format(int(g["Reward"]), ","), "num"), td(esc(g["Eval Date"]), "num"), td(esc(g["Status"]))]))
-owner = ('<div class="story-card"><div class="story-lead"><div class="story-big">%s</div><div class="story-lead-txt">%s</div></div>'
-         '<ul class="story-list"><li>Owner happiness: <b>%s</b></li><li>State of the team: <b>%s</b></li></ul></div>') % (
-    esc(front.get("State of the Team")), esc(front.get("Owner Message")), esc(front.get("Owner Happiness")), esc(front.get("State of the Team")))
+if front.get("Owner Message"):
+    owner = ('<div class="story-card"><div class="story-lead"><div class="story-big">%s</div><div class="story-lead-txt">%s</div></div>'
+             '<ul class="story-list"><li>Owner happiness: <b>%s</b></li><li>State of the team: <b>%s</b></li></ul></div>') % (
+        esc(front.get("State of the Team")), esc(front.get("Owner Message")),
+        esc(front.get("Owner Happiness")), esc(front.get("State of the Team")))
+else:
+    owner = empty("Franchise screens not loaded yet")
 fo = '<div class="strip">%s</div>' % fo_strip
 fo += sec("General Manager", gm, cls="gmsec")
-fo += sec("Owner", owner, meta="as of %s" % esc(as_of_txt))
-fo += sec("Owner Goals", table(["Tier", "Goal", "Reward", "Evaluated", "Status"], goal_rows, cls="goals"))
-fo += sec("Operations Budget", table(["Line", "Allocated", "Spent", "Remaining"],
-    [("", [td(esc(b["Line"])), td("$%sM" % mnum(b["Allocated"])), td("$%sM" % mnum(b["Spent"])), td("$%sM" % mnum(b["Remaining"]))]) for b in budget],
-    tfoot=[td("Total"), td("$%sM" % mnum(sum(b["Allocated"] for b in budget))),
-           td("$%sM" % mnum(sum(b["Spent"] for b in budget))),
-           td("$%sM" % mnum(sum(b["Remaining"] for b in budget)))], cls="fin"),
-    meta="salary target $%sM" % num(front.get("Salary Target ($M)")))
-fo += sec("Cap Outlook", table(["Season", "Salary Cap", "Main Roster", "System", "Contracts"],
+fo += sec("Owner", owner, meta=("as of %s" % esc(as_of_txt)) if as_of_dt or games else None)
+fo += sec("Owner Goals", table_or_empty(["Tier", "Goal", "Reward", "Evaluated", "Status"],
+                                        goal_rows, "Franchise screens not loaded yet", cls="goals"))
+if budget:
+    fo += sec("Operations Budget", table(["Line", "Allocated", "Spent", "Remaining"],
+        [("", [td(esc(b["Line"])), td("$%sM" % mnum(b["Allocated"])), td("$%sM" % mnum(b["Spent"])), td("$%sM" % mnum(b["Remaining"]))]) for b in budget],
+        tfoot=[td("Total"), td("$%sM" % mnum(sum(b["Allocated"] for b in budget))),
+               td("$%sM" % mnum(sum(b["Spent"] for b in budget))),
+               td("$%sM" % mnum(sum(b["Remaining"] for b in budget)))], cls="fin"),
+        meta=("salary target $%sM" % num(front["Salary Target ($M)"]))
+             if front.get("Salary Target ($M)") not in (None, "") else None)
+else:
+    fo += sec("Operations Budget", empty("Franchise screens not loaded yet"))
+fo += sec("Cap Outlook", table_or_empty(["Season", "Salary Cap", "Main Roster", "System", "Contracts"],
     [("", [td(esc(c["Season"])), td(("$%sM" % mnum(c["Salary Cap"])) if c["Salary Cap"] else "-"),
            td("$%sM" % mnum(c["Main Roster"])), td("$%sM" % mnum(c["System"])),
-           td(esc(c["Contracts"]) if c["Contracts"] is not None else "-")]) for c in cap], cls="fin"),
-    meta="goalie deals through 29-30 &middot; 30-31 on is skaters only")
-fo += sec("League Cap Rules", table(["Rule", "Value"],
-    [("", [td(esc(k.replace(" ($M)", ""))), td("$%sM" % mnum(front[k]))])
-     for k in ("Salary Cap ($M)", "Salary Cap Floor ($M)", "Max Player Salary ($M)",
-               "Min Player Salary ($M)", "Max Rookie Salary ($M)")], cls=""))
+           td(esc(c["Contracts"]) if c["Contracts"] is not None else "-")]) for c in cap],
+    "Franchise screens not loaded yet", cls="fin"),
+    meta=("%s through %s" % (cap[0]["Season"], cap[-1]["Season"])) if cap else None)
+CAP_RULES = ("Salary Cap ($M)", "Salary Cap Floor ($M)", "Max Player Salary ($M)",
+             "Min Player Salary ($M)", "Max Rookie Salary ($M)")
+if any(front.get(k) not in (None, "") for k in CAP_RULES):
+    fo += sec("League Cap Rules", table(["Rule", "Value"],
+        [("", [td(esc(k.replace(" ($M)", ""))),
+               td(("$%sM" % mnum(front[k])) if front.get(k) not in (None, "") else "-")])
+         for k in CAP_RULES], cls=""))
+else:
+    fo += sec("League Cap Rules", empty("Franchise screens not loaded yet"))
 
 # ---- news: the transaction wire
 # Generated from the Transactions sheet so there is one source of truth. Front Office
@@ -889,8 +925,10 @@ def goalie_card(p):
                                      esc(r["SV"]), esc(r["SA"]), esc(r["GA"]), esc(r["TOI"]))
     return '<div class="starter">%s<div class="starts">%s</div></div>' % (head, rows_)
 
-goalies_html = sec("Goalies", "".join(goalie_card(p) for p in sorted(main_g, key=lambda g: -int(g["OVR"]))),
-                   meta="%d on the roster" % len(main_g))
+goalies_html = sec("Goalies",
+                   "".join(goalie_card(p) for p in sorted(main_g, key=lambda g: -int(g["OVR"] or 0)))
+                   or empty("Roster not loaded yet"),
+                   meta=("%d on the roster" % len(main_g)) if main_g else None)
 if opp_goalies:
     body = [("", [td(esc(r["Goalie"]) + ((' <span class="pos">(L)</span>') if r["Catches"] == "L" else "")),
                   td('<span class="tabbr sm">%s</span>' % esc(r["Opp"])), td("G%d" % int(r["G"])), td(esc(r["Dec"])),
@@ -987,7 +1025,7 @@ page = """<!doctype html>
     </div>
     </button>
     <div class="mast-right">
-      <div class="updated">%(through)s<br>%(as_of)s</div>
+      <div class="updated">%(through)s%(as_of)s</div>
     </div>
   </div>
 </header>
@@ -1008,7 +1046,7 @@ page = """<!doctype html>
 </body>
 </html>
 """ % dict(build=build, season=SEASON, chrome=chrome_css, extra=extra_css, ghost=ghost_uri, ghost_kind=ghost_kind,
-           crest=crest_uri, as_of=esc(as_of_txt), through=esc(through_txt), hero=hero, logos=logo_css(), pmodal=player_modal(), tabs=tabs, panels=panels, team=TEAM, record=record_txt, js=js)
+           crest=crest_uri, as_of=("<br>" + esc(as_of_txt)) if as_of_txt else "", through=esc(through_txt), hero=hero, logos=logo_css(), pmodal=player_modal(), tabs=tabs, panels=panels, team=TEAM, record=record_txt, js=js)
 
 assert_ascii("index.html", page)
 OUT.write_text(page)
