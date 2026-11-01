@@ -437,6 +437,13 @@ workbook, `site/deploy.sh` wraps it and pushes to a GitHub Pages repo. **Rebuild
 deploy after every game**, not just the workbook.
 
 ### Editorial voice — same rules as baseball, hockey subjects
+**Real NHL baselines for comparison** (Hockey-Reference, 2025-26, per team per game):
+**3.08 goals**, **27.6 shots**, **21.1%** power play, **.896** save percentage; shooting
+percentage therefore **11.2%**. Use these when a comparison is earned, and re-verify rather
+than recalling them. **They are only meaningful if period length is near regulation** - at
+short periods every counting stat is off by construction, and a pace-against-the-NHL line
+becomes noise. Confirm the setting before writing one.
+
 - **`Inside the Numbers` is team-level season context** — records, paces, rate stats.
   **Take the data seriously.** Keep real-world comparisons where they're earned (a pace
   against an NHL record, a save percentage against the league's best). **Never write the
