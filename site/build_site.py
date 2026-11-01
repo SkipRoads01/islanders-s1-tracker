@@ -764,11 +764,19 @@ fo += sec("Owner", owner, meta=("as of %s" % esc(as_of_txt)) if as_of_dt or game
 fo += sec("Owner Goals", table_or_empty(["Tier", "Goal", "Reward", "Evaluated", "Status"],
                                         goal_rows, "Franchise screens not loaded yet", cls="goals"))
 if budget:
+    def mcell(v):
+        """The setup screen carries an allocation and nothing else, so Spent and Remaining
+        are genuinely empty until an in-season budget screen arrives."""
+        return td(("$%sM" % mnum(v)) if isinstance(v, (int, float)) else '<span class="dash">-</span>')
+
+    def mtotal(key):
+        vals = [b[key] for b in budget if isinstance(b[key], (int, float))]
+        return mcell(round(sum(vals), 3)) if vals else mcell(None)
+
     fo += sec("Operations Budget", table(["Line", "Allocated", "Spent", "Remaining"],
-        [("", [td(esc(b["Line"])), td("$%sM" % mnum(b["Allocated"])), td("$%sM" % mnum(b["Spent"])), td("$%sM" % mnum(b["Remaining"]))]) for b in budget],
-        tfoot=[td("Total"), td("$%sM" % mnum(sum(b["Allocated"] for b in budget))),
-               td("$%sM" % mnum(sum(b["Spent"] for b in budget))),
-               td("$%sM" % mnum(sum(b["Remaining"] for b in budget)))], cls="fin"),
+        [("", [td(esc(b["Line"])), mcell(b["Allocated"]), mcell(b["Spent"]), mcell(b["Remaining"])])
+         for b in budget],
+        tfoot=[td("Total"), mtotal("Allocated"), mtotal("Spent"), mtotal("Remaining")], cls="fin"),
         meta=("salary target $%sM" % num(front["Salary Target ($M)"]))
              if front.get("Salary Target ($M)") not in (None, "") else None)
 else:

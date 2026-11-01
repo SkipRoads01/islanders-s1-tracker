@@ -186,6 +186,20 @@ year columns hold the salary in $M as a number, or the tag the game shows in tha
 screen orders them), `SCR`. `Chem` is the unit's line-chemistry OVR impact, repeated on
 each row of the unit.
 
+`Budget` `Line` labels come off the setup screen with the word `Budget` dropped, because
+every row in that column is one: `Player Salary`, `Arena Operations`, `Promotions`,
+`Marketing`, `Scout Salary`, `Scout Travel`, `Coach`. NHL 27 says **Marketing** where the
+first run's sheet said `Advertising`; the game's wording wins. The setup screen carries the
+**allocation only**, so `Spent` and `Remaining` stay empty until an in-season budget screen
+arrives, and the site prints a dash for each rather than `$M`.
+
+`Front Office` is `Key`/`Value`, so a new key is data and not a schema change. Beyond the cap
+figures it now carries the setup screen: `Total Team Budget ($M)`, `AHL Affiliate`, `Arena`,
+`Seating Capacity`, `Arena Age (years)`, `Owner Spending` / `Owner Importance of Success` /
+`Owner Patience` as `n/5`, the four `Facility ...` ratings as `n/5`, and `Top Players`.
+**None of those render on the site yet** - the Front Office tab reads only the cap keys - so
+they are stored, not shown, until the user says he wants an Arena / Owner section.
+
 `Teams`' `Off` / `Def` / `Goalie` are the club's **team ratings off the matchup screen** -
 offense, defense, goaltending - entered club by club as the user reports them and blank until
 then. His shorthand for them is the parenthesised triple after the opponent in the game notes:
