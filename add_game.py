@@ -32,11 +32,12 @@ GAME = dict(
     g=1, date="09/30/2026", opp="TOR", ha="A",
     result=None,                       # W / L / OTL / SOL
     topup=False,
-    # period lines: (NYI, OPP) goals and shots and hits, in order 1,2,3,OT,SO
+    # goals by period: (NYI, OPP) in order 1,2,3,OT,SO. These are the only per-period
+    # columns the Games sheet has, and the scoring summary already carries each goal's
+    # period, so they cost nothing extra.
     goals=[],
-    shots=None,
-    hits=None,
-    # final team stats, exactly as the game's screen shows them
+    # final team stats, exactly as the game's screen shows them - one (NYI, OPP) pair each
+    shots=None, hits=None,
     toa=None, passing=None, fow=None,
     pim=None, pp=None, ppm=None, shg=None,
     goalies=[],
@@ -115,17 +116,13 @@ def pair(v):
     """A team-stat pair the screens have not supplied yet stays empty."""
     return (None, None) if v is None else v
 
-def totals(periods):
-    """Per-period (NYI, OPP) lines summed; None when the screens are pending."""
-    if periods is None:
-        return (None, None)
-    return (sum(a for a, b in periods), sum(b for a, b in periods))
-
 def team_stat_cells(g):
-    """Columns R..AI of the Games row, in sheet order."""
-    sf, sa = totals(g["shots"]); hf, ha = totals(g["hits"])
-    out = [sf, sa, hf, ha]
-    for key in ("toa", "passing", "fow", "pim", "pp", "ppm", "shg"):
+    """Columns R..AI of the Games row, in sheet order. Every one of these is a single
+    (NYI, OPP) pair off the final team-stats screen: the Games sheet stores shots and hits
+    as game totals, so per-period shot and hit lines were only ever summed and thrown
+    away - which is why the intermission screens are not worth taking."""
+    out = []
+    for key in ("shots", "hits", "toa", "passing", "fow", "pim", "pp", "ppm", "shg"):
         out += list(pair(g[key]))
     return out
 

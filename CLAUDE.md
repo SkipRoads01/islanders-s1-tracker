@@ -182,19 +182,36 @@ then. His shorthand for them is the parenthesised triple after the opponent in t
 
 ### How a game gets logged (the cheap path)
 
-G1 proved the split: **the screens carry the numbers, the notes carry the story.** Every
-figure in the `Games` row came from photographs, not from anything the user had to write.
+**The screens carry the numbers, the notes carry the story.** The PS5 has every figure;
+the only cost is the Share button, so the workflow is built to minimise *photos per game*,
+not to maximise data per photo.
 
-| Tier | What | Fills |
-|---|---|---|
-| 1 | The team-stats screen at each intermission **and** at the final - 4 photos | every `Games` team column. Per-period lines come from differencing the cumulative screens, so no per-period screen is needed |
-| 2 | The postgame player-stats screen - 1 photo | `Skater Game Log`, and every skater's season card |
-| 3 | Whatever the user feels like writing | `Scoring`, `Recaps`, `Headlines`, the game summary |
+**All of it is postgame. Never pause at an intermission.** The three intermission
+screenshots the first run used were waste: the `Games` sheet's only per-period columns are
+**goals** (`P1 F/A` ... `SO F/A`), and shots and hits are stored as game totals, so the
+per-period shot and hit lines were summed and thrown away. The final screen gives those
+totals directly, and the scoring summary already carries each goal's period.
 
-Tier 3 can be as thin as the scoring line and still produce a full page, because tiers 1 and
-2 are already complete. **A missing tier 3 never blocks a publish.** What must never happen is
-inventing tier 2 out of tier 3 - if the box score is not photographed, the skater log stays
-empty and the site says so.
+| Tier | Photo | Fills | Cost |
+|---|---|---|---|
+| **1** | **Final team stats** | the whole `Games` row bar the period line - score, shots, hits, TOA, passing, faceoffs, PIM, power plays, PP minutes, SHG | 1 press |
+| **2** | **Scoring summary** | `Scoring` entirely - scorer, assists, strength, period - and with it the per-period goals, the recaps and the editorial | 1 press |
+| 3 | Skater box score | `Skater Game Log`, Skating Leaders, every player card | 1 press |
+| 4 | Goalie box score, both sides | `Goalie Game Log` and `Opp Goaltending`, with the opposing goalie's real name | 1 press |
+| 5 | Whatever he feels like writing | colour the screens cannot carry - what a goal looked like | optional |
+
+**Tiers 1 and 2 are the whole job: two photos, both after the final horn.** That is strictly
+more data than the old five-photo workflow produced, and nothing interrupts the game.
+
+**One photo still publishes a game.** Tier 1 alone fills a complete `Games` row and a complete
+game card; `Scoring`, the box scores and the editorial render their `.empty` placeholders and
+the site says so. Tiers 3 and 4 are depth he chooses game by game, and `topup=True` adds them
+later without disturbing anything already logged (S7).
+
+**Never invent a tier from a lower one.** If the skater box score is not photographed, the
+skater log stays empty - it is never reconstructed from the scoring summary. The first run's
+one real error came from exactly this: with no scoring summary, which of two Rangers goals was
+shorthanded had to be inferred from a difference between two screens.
 
 **The user will identify new shorthand as it happens** - when he does, add it here immediately
 so it becomes permanent.
