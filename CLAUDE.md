@@ -17,9 +17,24 @@ every game, no sims. The user pastes handwritten play-by-play notes; you parse t
 inject the results into a multi-sheet Excel workbook that serves as the permanent data
 source, then regenerate and publish the site.
 
+- The game is **EA Sports NHL 27 on PS5**, offline **Franchise Mode**. Record the title,
+  because screen layouts and features move year to year.
 - This is a **video-game franchise, not the real NHL.** Never conflate the two. Engine
   artifacts are not anomalies to "correct."
 - Preseason and Regular Season are **separate files** and must never be merged.
+
+### There is no data feed. Do not go looking again.
+Checked 11/01/2026 against EA's own pages and launch coverage:
+- NHL 27 adds **Connected Franchise**, an online league of **up to 32 human-controlled
+  teams** - and EA's trailer states that *"teams without a human user cannot be controlled,
+  traded with, or played against."* There are no CPU teams, so **it cannot be run solo** and
+  is no use to this project.
+- EA's NHL 27 FAQ describes every stat surface as in-game ("comprehensive data screens",
+  announcements to "every GM's in-game inbox"). **No companion app, no website, no export.**
+  Madden's companion app has an export-to-fan-site button; NHL has never had the equivalent.
+
+So the **Share button is the only way data leaves the console**, and the workflow in S5 is
+built around minimising photos rather than around a feed that does not exist.
 
 ---
 
