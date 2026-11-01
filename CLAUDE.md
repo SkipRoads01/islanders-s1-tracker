@@ -282,6 +282,8 @@ Carried over from the baseball project because they're habits, not sport rules:
   games are intra-division, so every Metropolitan rival is played 4 times and the preseason
   is capped at 4 games. Used for pace math and the schedule count.
 - **Own division first** in `vs. Divisions`: Metropolitan, Atlantic, Central, Pacific.
+- **Division Realignment is not used.** It is a setup option the user ignores, so the
+  `Teams` sheet's real alignment holds. Settled - do not raise it again.
 - **Schedule** is the NHL.com official 2026-27 release: **84 games, 42 home, 42 away**,
   opening **09/30/2026 at TOR**. An earlier load from a third-party calendar PDF was short
   one game (it omitted the September opener) and was replaced. Preseason is not played.
