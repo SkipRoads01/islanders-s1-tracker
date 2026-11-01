@@ -440,9 +440,10 @@ deploy after every game**, not just the workbook.
 **Real NHL baselines for comparison** (Hockey-Reference, 2025-26, per team per game):
 **3.08 goals**, **27.6 shots**, **21.1%** power play, **.896** save percentage; shooting
 percentage therefore **11.2%**. Use these when a comparison is earned, and re-verify rather
-than recalling them. **They are only meaningful if period length is near regulation** - at
-short periods every counting stat is off by construction, and a pace-against-the-NHL line
-becomes noise. Confirm the setting before writing one.
+than recalling them. **The comparison is always legitimate**: NHL 27 periods are always
+20 minutes of game clock - the user sets the *timing rate*, which changes how fast that clock
+drains in real time, not how much hockey a period contains. So every box score is already on
+a true 60-minute basis and needs no scaling before it is set against the league.
 
 - **`Inside the Numbers` is team-level season context** — records, paces, rate stats.
   **Take the data seriously.** Keep real-world comparisons where they're earned (a pace
