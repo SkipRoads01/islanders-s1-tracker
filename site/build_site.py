@@ -787,8 +787,10 @@ fo += sec("Cap Outlook", table_or_empty(["Season", "Salary Cap", "Main Roster", 
            td(esc(c["Contracts"]) if c["Contracts"] is not None else "-")]) for c in cap],
     "Franchise screens not loaded yet", cls="fin"),
     meta=("%s through %s" % (cap[0]["Season"], cap[-1]["Season"])) if cap else None)
-CAP_RULES = ("Salary Cap ($M)", "Salary Cap Floor ($M)", "Max Player Salary ($M)",
-             "Min Player Salary ($M)", "Max Rookie Salary ($M)")
+# the New Salary Cap dialog's own wording; the first run used "Salary Cap Floor"
+CAP_RULES = ("Maximum Salary Cap ($M)", "Minimum Salary Cap ($M)",
+             "Maximum Player Salary Cap ($M)", "Minimum Player Salary Cap ($M)",
+             "Maximum Rookie Salary Cap ($M)")
 if any(front.get(k) not in (None, "") for k in CAP_RULES):
     fo += sec("League Cap Rules", table(["Rule", "Value"],
         [("", [td(esc(k.replace(" ($M)", ""))),

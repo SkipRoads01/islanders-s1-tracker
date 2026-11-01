@@ -193,8 +193,13 @@ first run's sheet said `Advertising`; the game's wording wins. The setup screen 
 **allocation only**, so `Spent` and `Remaining` stay empty until an in-season budget screen
 arrives, and the site prints a dash for each rather than `$M`.
 
-`Front Office` is `Key`/`Value`, so a new key is data and not a schema change. Beyond the cap
-figures it now carries the setup screen: `Total Team Budget ($M)`, `AHL Affiliate`, `Arena`,
+`Front Office` is `Key`/`Value`, so a new key is data and not a schema change. The league cap
+keys take the New Salary Cap dialog's own wording - `Maximum Salary Cap ($M)`,
+`Minimum Salary Cap ($M)`, `Maximum Player Salary Cap ($M)`, `Minimum Player Salary Cap ($M)`,
+`Maximum Rookie Salary Cap ($M)` - where the first run said `Salary Cap Floor`;
+`build_site.py`'s `CAP_RULES` tuple must match them exactly or the table renders empty.
+`As Of` is the **franchise's** clock, not the real-world date. Beyond the cap figures it also
+carries the setup screen: `Total Team Budget ($M)`, `AHL Affiliate`, `Arena`,
 `Seating Capacity`, `Arena Age (years)`, `Owner Spending` / `Owner Importance of Success` /
 `Owner Patience` as `n/5`, the four `Facility ...` ratings as `n/5`, and `Top Players`.
 **None of those render on the site yet** - the Front Office tab reads only the cap keys - so
