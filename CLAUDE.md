@@ -323,9 +323,18 @@ Carried over from the baseball project because they're habits, not sport rules:
 - **Every table is sortable; totals rows are locked.** A totals row goes in `<tfoot>` with
   class `tot` and never takes part in a sort. `build_site.py`'s `table()` does this via its
   `tfoot=` argument; never emit a totals row into `<tbody>`.
-- **Overview strip tiles** (proposed, veto any): Goals For, Goals Ag., Goal Diff, 1-Goal,
-  OT/SO, Shutouts, Comebacks (+share of wins), PP, PK, Most Goals, Most Goals Allowed, BLL.
-  `Pace` joins from game 10, per the Royals spec.
+- **Overview strip tiles are the user's list, in his order and his labels** (given
+  11/02/2026): `L10` `H` `A` `GF` `GA` `GD` `CFBW` `SO` `SOA` `1-GG` `PPG` `SHG`
+  `Most Scored` `Most Allowed` `LWS` `LLS`, then the three the site already carried -
+  `OT/SO` `PP%` `PK%` - and `BLL`. `Pace` joins from game 10. The record and streak stay in
+  the hero rather than taking a tile. **Every one of them is derived from `Games`**; none
+  needs an input column, so this list costs him no extra photographing.
+  - `CFBW` is come-from-behind wins (the old `Comebacks`), `SOA` is shutouts against,
+    `1-GG` is the record in one-goal games, `LWS`/`LLS` are the longest win and loss runs.
+  - `LLS` counts only `L` results: an OTL is not a loss (see the OTL ruling), so it breaks
+    a win run and never extends a loss run.
+  - `PPG` is the numerator of `PP%`, so the two overlap deliberately - he asked for the
+    count and the rate is already there.
 - **An OTL is not a loss.** The user's own wording. It never starts or extends a loss streak;
   it gets its own streak token, `OT1`, `OT2`. A shootout loss takes `SO1`. The standings award
   a point, so the record stays `W-L-OTL`.
@@ -410,6 +419,10 @@ Carried over from the baseball project because they're habits, not sport rules:
   game-driven section uses, and a meta that describes absent data is dropped rather than
   printed as `$M` or `as of Not yet loaded`. Build against the empty workbook before
   shipping a generator change.
+- **A typed cell that goes missing is derived, not printed raw.** The hero's streak pill
+  read `None` on a `Games` row whose `Streak` cell was empty, because it stringified the
+  cell. `current_streak()` falls back to counting the trailing run of identical results.
+  Same family as the blank-workbook rule: never render a cell's absence as its value.
 - **Unknowns sort to the bottom of every table**, in both directions - a club with no rating,
   a contract with no clause. `site.js` treats an empty cell and a `-` cell as unknown.
 - Still open, ask when they first arise: shootout goals in the skater log, empty-net goals

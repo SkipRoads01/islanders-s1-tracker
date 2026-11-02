@@ -162,7 +162,18 @@ def led_at_any_point(g):
             return True
     return False
 
+def longest_run(result):
+    """Longest run of consecutive `result` games. An OTL is not a loss, so it breaks a
+    W run and never extends an L run - it simply is not that result."""
+    best = run = 0
+    for g in games:
+        run = run + 1 if g["Result"] == result else 0
+        best = max(best, run)
+    return best
+
 SHUTOUTS = sum(1 for g in games if n(g["GA"]) == 0)
+SHUTOUTS_AGAINST = sum(1 for g in games if n(g["GF"]) == 0)
+SHG_F = sum(n(g["SHG F"]) for g in games)
 COMEBACKS = sum(1 for g in games if g["Result"] == "W" and not led_at_any_point(g) and n(g["GA"]) > 0)
 BLL = sum(1 for g in games if g["Result"] != "W" and led_at_any_point(g))
 MOST_GF = max([n(g["GF"]) for g in games], default=0)
@@ -372,8 +383,22 @@ ghost_uri, ghost_kind = ghost_image()
 record_txt = "%d-%d-%d" % (W, L, OTL)
 record_html = ('<div class="record num"><b>%d</b><span class="dash">&ndash;</span><b>%d</b>'
                '<span class="dash">&ndash;</span><b>%d</b></div>') % (W, L, OTL)
+def current_streak():
+    """The Streak cell is typed by add_game.py; derive it when the cell is empty so the
+    pill never prints 'None'. An OTL/SOL is its own token, never a loss streak (S7)."""
+    last = games[-1]["Streak"]
+    if last not in (None, ""):
+        return str(last)
+    res = games[-1]["Result"]
+    run = 0
+    for g in reversed(games):
+        if g["Result"] != res:
+            break
+        run += 1
+    return {"W": "W", "L": "L", "OTL": "OT", "SOL": "SO"}.get(res, "") + str(run)
+
 if games:
-    st = str(games[-1]["Streak"])
+    st = current_streak()
     tone = {"W": ("var(--win-bg)", "var(--win)"), "L": ("var(--loss-bg)", "var(--loss)")}.get(
         st[0] if st[:2] != "OT" and st[:2] != "SO" else "X",
         ("var(--surface-2)", "var(--ink-soft)"))
@@ -417,15 +442,20 @@ def trunc_pct(a, b):
 
 diff = GF - GA
 strip_tiles = [
-    tile("Goals For", GF), tile("Goals Ag.", GA),
-    tile("Goal Diff", ("+%d" % diff) if diff > 0 else str(diff), good=diff > 0),
-    tile("1-Goal", rec_of([g for g in games if one_goal(g)])),
+    tile("L10", rec_of(games[-10:])),
+    tile("H", rec_of([g for g in games if g["H/A"] == "H"])),
+    tile("A", rec_of([g for g in games if g["H/A"] == "A"])),
+    tile("GF", GF), tile("GA", GA),
+    tile("GD", ("+%d" % diff) if diff > 0 else str(diff), good=diff > 0),
+    tile("CFBW", COMEBACKS, small=trunc_pct(COMEBACKS, W)),
+    tile("SO", SHUTOUTS), tile("SOA", SHUTOUTS_AGAINST),
+    tile("1-GG", rec_of([g for g in games if one_goal(g)])),
+    tile("PPG", PP_G), tile("SHG", SHG_F),
+    tile("Most Scored", MOST_GF), tile("Most Allowed", MOST_GA),
+    tile("LWS", longest_run("W")), tile("LLS", longest_run("L")),
     tile("OT/SO", rec_of([g for g in games if went_to_extra(g)])),
-    tile("Shutouts", SHUTOUTS),
-    tile("Comebacks", COMEBACKS, small=trunc_pct(COMEBACKS, W)),
-    tile("PP", "%d/%d" % (PP_G, PP_OPP), small=pct(PP_G, PP_OPP)),
-    tile("PK", "%d/%d" % (PK_OPP - PK_GA, PK_OPP), small=pct(PK_OPP - PK_GA, PK_OPP)),
-    tile("Most Goals", MOST_GF), tile("Most Goals Allowed", MOST_GA),
+    tile("PP%", "%d/%d" % (PP_G, PP_OPP), small=pct(PP_G, PP_OPP)),
+    tile("PK%", "%d/%d" % (PK_OPP - PK_GA, PK_OPP), small=pct(PK_OPP - PK_GA, PK_OPP)),
 ]
 if GP >= 10:   # a projection off a handful of games is noise, not a record
     w84 = int(round(84.0 * (2 * W + OTL) / (2.0 * GP) * 1))
